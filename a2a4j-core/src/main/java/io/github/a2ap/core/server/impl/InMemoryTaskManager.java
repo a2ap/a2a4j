@@ -9,12 +9,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * In-memory implementation of the TaskManager interface.
  * This implementation stores all tasks in memory and is suitable for testing
  * and demonstration purposes.
  */
+@Slf4j
 public class InMemoryTaskManager implements TaskManager {
 
     private final Map<String, Task> tasks = new ConcurrentHashMap<>();
@@ -48,11 +50,11 @@ public class InMemoryTaskManager implements TaskManager {
         return tasks.values().stream()
                 .filter(task -> {
                     if (role == null) {
-                        return task.getSender().equals(agentId) || task.getReceiver().equals(agentId);
+                        return task.getSender().getId().equals(agentId) || task.getReceiver().getId().equals(agentId);
                     } else if (role.equalsIgnoreCase("sender")) {
-                        return task.getSender().equals(agentId);
+                        return task.getSender().getId().equals(agentId);
                     } else if (role.equalsIgnoreCase("receiver")) {
-                        return task.getReceiver().equals(agentId);
+                        return task.getReceiver().getId().equals(agentId);
                     }
                     return false;
                 })
@@ -65,7 +67,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             return false;
         }
-
+        
         task.setStatus(status);
         tasks.put(taskId, task);
 
@@ -74,36 +76,36 @@ public class InMemoryTaskManager implements TaskManager {
         if (callbackUrl != null) {
             // In a real implementation, this would make an HTTP call to the callback URL
             // For simplicity, we're just logging it here
-            System.out.println("Notifying callback URL: " + callbackUrl + " for task: " + taskId);
+            log.info("Notifying callback for task {} with url {}", taskId, callbackUrl);
         }
 
         return true;
     }
 
     @Override
-    public boolean cancelTask(String taskId) {
+    public Task cancelTask(String taskId) {
         Task task = tasks.get(taskId);
         if (task == null) {
-            return false;
+            throw new IllegalArgumentException("Cancel Task with ID " + taskId + " not found.");
         }
 
         TaskStatus cancelledStatus = new TaskStatus();
         cancelledStatus.setState(TaskState.CANCELED);
         task.setStatus(cancelledStatus);
         tasks.put(taskId, task);
-
-        return true;
+        return task;
     }
 
     @Override
-    public boolean deleteTask(String taskId) {
-        if (!tasks.containsKey(taskId)) {
-            return false;
+    public Task deleteTask(String taskId) {
+        Task task = tasks.get(taskId);
+        if (task == null) {
+            throw new IllegalArgumentException("Delete Task with ID " + taskId + " not found.");
         }
 
         tasks.remove(taskId);
         taskCallbacks.remove(taskId);
-        return true;
+        return task;
     }
 
     @Override

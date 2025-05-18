@@ -1,13 +1,14 @@
 package io.github.a2ap.core.server.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.server.A2AServer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Flux;
 /**
  * Spring Boot Controller to handle A2A protocol JSON-RPC requests.
  */
+@Slf4j
 @RestController
 public class A2AController {
 
@@ -37,11 +39,11 @@ public class A2AController {
     @PostMapping("/a2a") // Define the endpoint path
     public ResponseEntity<JSONRPCResponse> handleA2ARequest(@RequestBody JSONRPCRequest request) {
         JSONRPCResponse response = new JSONRPCResponse();
-        response.setJsonrpc("2.0");
-        response.setId(request.getId()); // Echo the request ID
-
+        // Echo the request ID
+        response.setId(request.getId());
+        // params is typically a JSON object or array
         String method = request.getMethod();
-        Object params = request.getParams(); // params is typically a JSON object or array
+        Object params = request.getParams(); 
 
         try {
             switch (method) {
@@ -86,23 +88,19 @@ public class A2AController {
                 // tasks/resubscribe)
                 default:
                     // Method not found error
-                    response.setError(new JSONRPCResponse.Error(-32601, "Method not found",
+                    log.warn("Unsupported method: {}", method);
+                    response.setError(new JSONRPCError(-32601, "Method not found",
                             "Method '" + method + "' not supported"));
                     break;
             }
         } catch (IllegalArgumentException e) {
             // Handle validation errors from A2AServerImpl
-            response.setError(new JSONRPCResponse.Error(-32602, "Invalid params", e.getMessage()));
-        } catch (JsonProcessingException e) {
-            // Handle JSON parsing errors
-            response.setError(
-                    new JSONRPCResponse.Error(-32700, "Parse error", "Invalid JSON-RPC parameters: " + e.getMessage()));
+            response.setError(new JSONRPCError(-32602, "Invalid params", e.getMessage()));
         } catch (Exception e) {
             // Handle other internal errors
-            response.setError(new JSONRPCResponse.Error(-32603, "Internal error", e.getMessage()));
+            response.setError(new JSONRPCError(-32603, "Internal error", e.getMessage()));
             // Log the error with more context
-            System.err.println("Internal error processing method '" + method + "': " + e.getMessage());
-            e.printStackTrace();
+            log.error("Internal error processing method {}.", method, e);
         }
 
         return ResponseEntity.ok(response);

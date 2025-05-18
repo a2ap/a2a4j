@@ -51,7 +51,7 @@ public interface TaskManager {
      * @param taskId The ID of the task to cancel
      * @return true if the task was successfully cancelled, false otherwise
      */
-    boolean cancelTask(String taskId);
+    Task cancelTask(String taskId);
 
     /**
      * Deletes a task.
@@ -59,7 +59,7 @@ public interface TaskManager {
      * @param taskId The ID of the task to delete
      * @return true if the task was successfully deleted, false otherwise
      */
-    boolean deleteTask(String taskId);
+    Task deleteTask(String taskId);
 
     /**
      * Registers a callback for task status updates.

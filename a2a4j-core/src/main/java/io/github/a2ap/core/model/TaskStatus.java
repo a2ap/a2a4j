@@ -17,6 +17,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskStatus {
+    
+    /**
+     * Completed task status constant.
+     */
+    public static final TaskStatus COMPLETED = TaskStatus.builder().state(TaskState.COMPLETED).build();
+    
+    /**
+     * Cancelled task status constant.
+     */
+    public static final TaskStatus CANCELLED = TaskStatus.builder().state(TaskState.CANCELED).build();
 
     /**
      * The state of the task.

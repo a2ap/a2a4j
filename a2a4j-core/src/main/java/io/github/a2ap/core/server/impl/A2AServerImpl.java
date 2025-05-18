@@ -10,8 +10,7 @@ import io.github.a2ap.core.server.TaskManager;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
@@ -19,9 +18,8 @@ import reactor.core.publisher.Sinks;
  * Implementation of the A2AServer interface.
  * This class provides the core functionality for an A2A server.
  */
+@Slf4j
 public class A2AServerImpl implements A2AServer {
-
-    private static final Logger log = LoggerFactory.getLogger(A2AServerImpl.class);
 
     private final TaskManager taskManager;
     private final Map<String, AgentCard> agents = new ConcurrentHashMap<>();
@@ -75,12 +73,12 @@ public class A2AServerImpl implements A2AServer {
         }
 
         // Check if sender and receiver are registered
-        if (!agents.containsKey(task.getSender())) {
+        if (!agents.containsKey(task.getSender().getId())) {
             log.error("Task creation failed: Sender agent '{}' is not registered.", task.getSender());
             throw new IllegalArgumentException("Sender agent is not registered");
         }
 
-        if (!agents.containsKey(task.getReceiver())) {
+        if (!agents.containsKey(task.getReceiver().getId())) {
             log.error("Task creation failed: Receiver agent '{}' is not registered.", task.getReceiver());
             throw new IllegalArgumentException("Receiver agent is not registered");
         }

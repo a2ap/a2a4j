@@ -7,7 +7,7 @@ import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskQueryParams;
 import io.github.a2ap.core.model.TaskSendParams;
-import java.util.concurrent.CompletableFuture;
+import io.github.a2ap.core.model.TaskStatus;
 import java.util.concurrent.Flow;
 
 /**
@@ -21,14 +21,14 @@ public interface A2AClient {
      * This is typically fetched from a well-known endpoint.
      * @return A CompletableFuture resolving to the AgentCard.
      */
-    CompletableFuture<AgentCard> agentCard();
+    AgentCard agentCard();
 
     /**
      * Sends a task request to the server (non-streaming).
      * @param params The parameters for the tasks/send method.
      * @return A CompletableFuture resolving to the created Task object or null.
      */
-    CompletableFuture<Task> sendTask(TaskSendParams params);
+    Task sendTask(TaskSendParams params);
 
     /**
      * Sends a task request and subscribes to streaming updates.
@@ -41,30 +41,37 @@ public interface A2AClient {
     /**
      * Retrieves the current state of a task.
      * @param params The parameters for the tasks/get method.
-     * @return A CompletableFuture resolving to the Task object or null.
+     * @return Task object or null.
      */
-    CompletableFuture<Task> getTask(TaskQueryParams params);
+    Task getTask(TaskQueryParams params);
 
+    /**
+     * Retrieves the current state status of a task.
+     * @param params The parameters for the task query
+     * @return task status or null.
+     */
+    TaskStatus getTaskStatus(TaskQueryParams params);
+    
     /**
      * Cancels a currently running task.
      * @param params The parameters for the tasks/cancel method.
      * @return A CompletableFuture resolving to the updated Task object (usually canceled state) or null.
      */
-    CompletableFuture<Task> cancelTask(TaskIdParams params);
+    Task cancelTask(TaskIdParams params);
 
     /**
      * Sets or updates the push notification config for a task.
      * @param params The parameters for the tasks/pushNotification/set method.
      * @return A CompletableFuture resolving to the confirmed TaskPushNotificationConfig or null.
      */
-    CompletableFuture<TaskPushNotificationConfig> setTaskPushNotification(TaskPushNotificationConfig params);
+    TaskPushNotificationConfig setTaskPushNotification(TaskPushNotificationConfig params);
 
     /**
      * Retrieves the currently configured push notification config for a task.
      * @param params The parameters for the tasks/pushNotification/get method.
      * @return A CompletableFuture resolving to the TaskPushNotificationConfig or null.
      */
-    CompletableFuture<TaskPushNotificationConfig> getTaskPushNotification(TaskIdParams params);
+    TaskPushNotificationConfig getTaskPushNotification(TaskIdParams params);
 
     /**
      * Resubscribes to updates for a task after a potential connection interruption.
@@ -80,5 +87,5 @@ public interface A2AClient {
      * @param capability The capability to check (e.g., 'streaming', 'pushNotifications').
      * @return A CompletableFuture resolving to true if the capability is likely supported.
      */
-    CompletableFuture<Boolean> supports(String capability);
+    Boolean supports(String capability);
 }

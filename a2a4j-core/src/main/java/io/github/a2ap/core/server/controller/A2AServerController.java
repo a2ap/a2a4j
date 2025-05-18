@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/") // Base path for A2A endpoints
+@RequestMapping("/") 
 public class A2AServerController {
 
     private final A2AServer a2aServer;
@@ -34,8 +34,7 @@ public class A2AServerController {
         // For simplicity, let's assume the server instance itself can provide it.
         // This part needs clarification on how the server's own card is managed.
         // Placeholder: Returning null for now, needs proper implementation.
-        return CompletableFuture.completedFuture(ResponseEntity.ok(null)); // TODO: Implement fetching server's own
-                                                                           // AgentCard
+        return CompletableFuture.completedFuture(ResponseEntity.ok(null)); 
     }
 
     @PostMapping("tasks/create")
@@ -44,14 +43,11 @@ public class A2AServerController {
             Task createdTask = a2aServer.createTask(task);
             return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.CREATED).body(createdTask));
         } catch (IllegalArgumentException e) {
-            return CompletableFuture.completedFuture(ResponseEntity.badRequest().body(null)); // Handle validation
-                                                                                              // errors
+            return CompletableFuture.completedFuture(ResponseEntity.badRequest().body(null)); 
         } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture
-                    .completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)); // Handle
-                                                                                                          // other
-                                                                                                          // errors
+                    .completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)); 
         }
     }
 
@@ -74,24 +70,11 @@ public class A2AServerController {
 
     @PostMapping("tasks/cancel")
     public CompletableFuture<ResponseEntity<Task>> cancelTask(@RequestBody TaskIdParams params) {
-        // Assuming TaskIdParams is simple and contains taskId
-        // A2AServerImpl's cancelTask returns boolean, client expects Task.
-        // Mismatch here as well. Server should ideally return the updated Task.
-        // TODO: Adjust A2AServer interface/impl to return Task for cancelTask
-        boolean success = a2aServer.cancelTask(params.getTaskId());
-        if (success) {
-            // Need to fetch the updated task to return to client
-            // This requires a getTask method on A2AServer that returns Task
-            // For now, returning a placeholder.
-            return CompletableFuture.completedFuture(ResponseEntity.ok(null)); // Placeholder
+        Task cancelTask = a2aServer.cancelTask(params.getTaskId());
+        if (cancelTask != null) {
+            return CompletableFuture.completedFuture(ResponseEntity.ok(cancelTask));
         } else {
-            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)); // Task
-                                                                                                              // not
-                                                                                                              // found
-                                                                                                              // or
-                                                                                                              // couldn't
-                                                                                                              // be
-                                                                                                              // cancelled
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)); 
         }
     }
 

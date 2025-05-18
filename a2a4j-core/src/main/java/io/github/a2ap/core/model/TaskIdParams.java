@@ -5,10 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Parameters for task ID related operations.
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskIdParams {
-    private String id;
+    /**
+     * The ID of the task.
+     */
+    private String taskId;
 }
