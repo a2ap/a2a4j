@@ -1,0 +1,45 @@
+package io.github.a2ap.core.model;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * Represents the status of a task.
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class TaskStatus {
+
+    /**
+     * The state of the task.
+     * Required field.
+     */
+    @JsonProperty("state")
+    private TaskState state;
+
+    /**
+     * The messages exchanged during the task.
+     */
+    @JsonProperty("messages")
+    private List<Message> messages;
+
+    /**
+     * The artifacts produced by the task.
+     */
+    @JsonProperty("artifacts")
+    private List<Artifact> artifacts;
+
+    /**
+     * The error message if the task failed.
+     */
+    @JsonProperty("error")
+    private String error;
+}
