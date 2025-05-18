@@ -14,7 +14,7 @@ public interface CardResolver {
      * The identifier could be a URL, a DID, or other forms.
      * 
      * @param agentIdentifier The identifier of the agent.
-     * @return A CompletableFuture resolving to the AgentCard.
+     * @return AgentCard info.
      */
-    CompletableFuture<AgentCard> resolveCard(String agentIdentifier);
+    AgentCard resolveCard(String agentIdentifier);
 }

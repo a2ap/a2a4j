@@ -1,26 +1,41 @@
 package io.github.a2ap.core.server.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.a2ap.core.jsonrpc.JSONRPCError;
+import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
+import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
-import io.github.a2ap.core.model.TaskQueryParams;
 import io.github.a2ap.core.server.A2AServer;
 import java.util.concurrent.CompletableFuture;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
+/**
+ * Spring Boot Controller to handle A2A protocol JSON-RPC requests.
+ */
+@Slf4j
 @RestController
-@RequestMapping("/") 
 public class A2AServerController {
 
     private final A2AServer a2aServer;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public A2AServerController(A2AServer a2aServer) {
+    public A2AServerController(A2AServer a2aServer, ObjectMapper objectMapper) {
         this.a2aServer = a2aServer;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping(".well-known/a2a-agent-card")
@@ -34,78 +49,105 @@ public class A2AServerController {
         // For simplicity, let's assume the server instance itself can provide it.
         // This part needs clarification on how the server's own card is managed.
         // Placeholder: Returning null for now, needs proper implementation.
-        return CompletableFuture.completedFuture(ResponseEntity.ok(null)); 
+        return CompletableFuture.completedFuture(ResponseEntity.ok(null));
     }
 
-    @PostMapping("tasks/create")
-    public CompletableFuture<ResponseEntity<Task>> createTask(@RequestBody Task task) {
+    @PostMapping("/a2a") // Define the endpoint path
+    public ResponseEntity<JSONRPCResponse> handleA2ARequest(@RequestBody JSONRPCRequest request) {
+        JSONRPCResponse response = new JSONRPCResponse();
+        // Echo the request ID
+        response.setId(request.getId());
+        // params is typically a JSON object or array
+        String method = request.getMethod();
+        Object params = request.getParams(); 
+
         try {
-            Task createdTask = a2aServer.createTask(task);
-            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.CREATED).body(createdTask));
+            switch (method) {
+                case "agentCard":
+                    // No params expected for agentCard
+                    Object agentCardResult = a2aServer.getSelfAgentCard();
+                    response.setResult(agentCardResult);
+                    break;
+                case "tasks/send":
+                    // Params expected: Task object
+                    Task taskToSend = objectMapper.convertValue(params, Task.class);
+                    Task createdTask = a2aServer.createTask(taskToSend);
+                    response.setResult(createdTask);
+                    break;
+                case "tasks/get":
+                    // Params expected: TaskIdParams { taskId: string }
+                    TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
+                    Task task = a2aServer.getTask(taskIdParamsGet.getTaskId());
+                    response.setResult(task);
+                    break;
+                case "tasks/cancel":
+                    // Params expected: TaskIdParams { taskId: string }
+                    TaskIdParams taskIdParamsCancel = objectMapper.convertValue(params, TaskIdParams.class);
+                    Task cancelledTask = a2aServer.cancelTask(taskIdParamsCancel.getTaskId());
+                    response.setResult(cancelledTask);
+                    break;
+                case "tasks/pushNotification/set":
+                    // Params expected: TaskPushNotificationConfig object
+                    TaskPushNotificationConfig configToSet = objectMapper.convertValue(params,
+                            TaskPushNotificationConfig.class);
+                    TaskPushNotificationConfig setResult = a2aServer.setTaskPushNotification(configToSet);
+                    response.setResult(setResult);
+                    break;
+                case "tasks/pushNotification/get":
+                    // Params expected: TaskIdParams { taskId: string }
+                    TaskIdParams taskIdParamsGetConfig = objectMapper.convertValue(params, TaskIdParams.class);
+                    TaskPushNotificationConfig getConfigResult = a2aServer
+                            .getTaskPushNotification(taskIdParamsGetConfig.getTaskId());
+                    response.setResult(getConfigResult);
+                    break;
+                // TODO: Add cases for streaming methods (tasks/sendSubscribe,
+                // tasks/resubscribe)
+                default:
+                    // Method not found error
+                    log.warn("Unsupported method: {}", method);
+                    response.setError(new JSONRPCError(-32601, "Method not found",
+                            "Method '" + method + "' not supported"));
+                    break;
+            }
         } catch (IllegalArgumentException e) {
-            return CompletableFuture.completedFuture(ResponseEntity.badRequest().body(null)); 
+            // Handle validation errors from A2AServerImpl
+            response.setError(new JSONRPCError(-32602, "Invalid params", e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
-            return CompletableFuture
-                    .completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)); 
+            // Handle other internal errors
+            response.setError(new JSONRPCError(-32603, "Internal error", e.getMessage()));
+            // Log the error with more context
+            log.error("Internal error processing method {}.", method, e);
         }
+
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("tasks/get")
-    public CompletableFuture<ResponseEntity<Task>> getTask(@RequestParam String taskId) {
-        // Assuming TaskQueryParams is simple and only contains taskId
-        // If TaskQueryParams is more complex, might need @RequestBody POST
-        TaskQueryParams params = new TaskQueryParams();
-        params.setTaskId(taskId);
+    // TODO: Add endpoint for streaming methods (e.g., tasks/sendSubscribe,
+    // tasks/resubscribe)
+    // This will likely require Server-Sent Events (SSE) or WebSockets.
+    // Spring WebFlux might be needed for reactive streaming.
 
-        // A2AServerImpl currently returns TaskStatus, not Task object for getTaskStatus
-        // The client expects a Task object for getTask.
-        // This indicates a mismatch between client and server interfaces.
-        // The server should ideally return the full Task object.
-        // Let's adjust the server interface or implementation to return Task.
-        // For now, returning null as a placeholder.
-        // TODO: Adjust A2AServer interface/impl to return Task for getTask
-        return CompletableFuture.completedFuture(ResponseEntity.ok(null)); // Placeholder
+    @PostMapping(value = "/a2a/tasks/sendSubscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<Task>> sendTaskAndSubscribe(@RequestBody Task task) {
+        // First, create the task
+        Task createdTask = a2aServer.createTask(task);
+        // Then, subscribe to updates for the created task
+        return a2aServer.subscribeToTaskUpdates(createdTask.getId())
+                .map(taskUpdate -> ServerSentEvent.<Task>builder()
+                        .data(taskUpdate)
+                        .id(taskUpdate.getId())
+                        .event("task-update")
+                        .build());
     }
 
-    @PostMapping("tasks/cancel")
-    public CompletableFuture<ResponseEntity<Task>> cancelTask(@RequestBody TaskIdParams params) {
-        Task cancelTask = a2aServer.cancelTask(params.getTaskId());
-        if (cancelTask != null) {
-            return CompletableFuture.completedFuture(ResponseEntity.ok(cancelTask));
-        } else {
-            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)); 
-        }
+    @GetMapping(value = "/a2a/tasks/resubscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<Task>> resubscribeToTask(@RequestParam String taskId) {
+        // Subscribe to updates for the existing task ID
+        return a2aServer.subscribeToTaskUpdates(taskId)
+                .map(taskUpdate -> ServerSentEvent.<Task>builder()
+                        .data(taskUpdate)
+                        .id(taskUpdate.getId())
+                        .event("task-update")
+                        .build());
     }
-
-    @PostMapping("tasks/pushNotification/set")
-    public CompletableFuture<ResponseEntity<TaskPushNotificationConfig>> setTaskPushNotification(
-            @RequestBody TaskPushNotificationConfig params) {
-        // A2AServerImpl's subscribeToTaskUpdates takes taskId and callbackUrl, not
-        // TaskPushNotificationConfig object.
-        // Mismatch here. The server interface needs to be updated to match the client's
-        // model.
-        // TODO: Adjust A2AServer interface/impl to handle TaskPushNotificationConfig
-        // For now, returning a placeholder.
-        return CompletableFuture.completedFuture(ResponseEntity.ok(null)); // Placeholder
-    }
-
-    @GetMapping("tasks/pushNotification/get")
-    public CompletableFuture<ResponseEntity<TaskPushNotificationConfig>> getTaskPushNotification(
-            @RequestParam String taskId) {
-        // Assuming TaskIdParams is simple and contains taskId
-        // A2AServerImpl does not have a method to get push notification config.
-        // Mismatch here. Server needs a method to retrieve this config.
-        // TODO: Add getTaskPushNotification method to A2AServer interface/impl
-        // For now, returning a placeholder.
-        return CompletableFuture.completedFuture(ResponseEntity.ok(null)); // Placeholder
-    }
-
-    // TODO: Implement /tasks/sendSubscribe and /tasks/resubscribe using SSE
-    // This will require using Spring WebFlux's Server-Sent Events capabilities.
-    // This is more complex and will be addressed in a future step.
-
-    // Helper method to handle potential mismatches or additional logic
-    // private Task convertTaskStatusToTask(String taskId, TaskStatus status) { ...
-    // }
 }
