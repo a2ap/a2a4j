@@ -1,9 +1,11 @@
 package io.github.a2ap.core.server.impl;
 
+import io.github.a2ap.core.event.TaskUpdateEvent;
 import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
+import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.TaskManager;
@@ -56,16 +58,15 @@ public class A2AServerImpl implements A2AServer {
     }
 
     /**
-     * Creates a new task on the server.
+     * Handle the task on the server.
      *
-     * @param task The Task object to create.
-     * @return The created Task object with updated status and ID.
-     * @throws IllegalArgumentException if the task is invalid or sender/receiver
-     *                                  agents are not registered.
+     * @param params The Task params object to handle.
+     * @return The Task object with updated status and ID.
+     * @throws IllegalArgumentException if the task is invalid 
      */
     @Override
-    public Task createTask(Task task) {
-        log.info("Attempting to create task: {}", task);
+    public Task handleTask(TaskSendParams params) {
+        log.info("Attempting to handle the task: {}", params);
         // Validate task
         if (task == null || task.getSender() == null || task.getReceiver() == null) {
             log.error("Task creation failed: Task must have a sender and receiver.");
@@ -93,6 +94,13 @@ public class A2AServerImpl implements A2AServer {
         log.debug("Created sink for task {} and emitted initial state.", createdTask.getId());
 
         return createdTask;
+    }
+
+    @Override
+    public Flux<TaskUpdateEvent> handleSubscribeTask(TaskSendParams params) {
+        
+        
+        return null;
     }
 
     /**

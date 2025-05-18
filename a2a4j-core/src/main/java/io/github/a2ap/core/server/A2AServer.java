@@ -1,8 +1,10 @@
 package io.github.a2ap.core.server;
 
+import io.github.a2ap.core.event.TaskUpdateEvent;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
+import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.model.TaskStatus;
 import reactor.core.publisher.Flux;
 
@@ -21,12 +23,19 @@ public interface A2AServer {
     boolean registerAgent(AgentCard agentCard);
 
     /**
-     * Creates a new task.
+     * Handle send task.
      * 
-     * @param task The task to create
-     * @return The created task with a generated ID
+     * @param params The task params to send
+     * @return The task with a generated ID
      */
-    Task createTask(Task task);
+    Task handleTask(TaskSendParams params);
+
+    /**
+     * Handle send task streaming.
+     * @param params The task params to send
+     * @return Streaming events
+     */
+    Flux<TaskUpdateEvent> handleSubscribeTask(TaskSendParams params);
 
     /**
      * Gets a task by its ID.
@@ -53,14 +62,6 @@ public interface A2AServer {
      *         found or cancellation failed
      */
     Task cancelTask(String taskId);
-
-    /**
-     * Gets information about an agent.
-     * 
-     * @param agentId The ID of the agent
-     * @return The agent card for the specified agent
-     */
-    AgentCard getAgentInfo(String agentId);
 
     /**
      * Sets or updates the push notification configuration for a task.

@@ -8,8 +8,8 @@ import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
+import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.server.A2AServer;
-import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,7 +18,6 @@ import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
@@ -39,39 +38,25 @@ public class A2AServerController {
     }
 
     @GetMapping(".well-known/a2a-agent-card")
-    public CompletableFuture<ResponseEntity<AgentCard>> getAgentCard() {
-        // Assuming A2AServer has a method to get its own AgentCard
-        // This might need to be implemented or retrieved from configuration
-        // For now, returning a placeholder or fetching from a known source
-        // A more complete implementation would involve the server knowing its own card.
-        // Let's assume A2AServerImpl has a method like getSelfAgentCard()
-        // Or we might need to register the server's own card somewhere.
-        // For simplicity, let's assume the server instance itself can provide it.
-        // This part needs clarification on how the server's own card is managed.
-        // Placeholder: Returning null for now, needs proper implementation.
-        return CompletableFuture.completedFuture(ResponseEntity.ok(null));
+    public ResponseEntity<AgentCard> getAgentCard() {
+        AgentCard card = a2aServer.getSelfAgentCard();
+        return ResponseEntity.ok(card);
     }
 
-    @PostMapping("/a2a") // Define the endpoint path
-    public ResponseEntity<JSONRPCResponse> handleA2ARequest(@RequestBody JSONRPCRequest request) {
+    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
         JSONRPCResponse response = new JSONRPCResponse();
         // Echo the request ID
         response.setId(request.getId());
         // params is typically a JSON object or array
         String method = request.getMethod();
-        Object params = request.getParams(); 
-
+        Object params = request.getParams();
         try {
             switch (method) {
-                case "agentCard":
-                    // No params expected for agentCard
-                    Object agentCardResult = a2aServer.getSelfAgentCard();
-                    response.setResult(agentCardResult);
-                    break;
                 case "tasks/send":
                     // Params expected: Task object
-                    Task taskToSend = objectMapper.convertValue(params, Task.class);
-                    Task createdTask = a2aServer.createTask(taskToSend);
+                    TaskSendParams taskSendParams = objectMapper.convertValue(params, TaskSendParams.class);
+                    Task createdTask = a2aServer.handleTask(taskSendParams);
                     response.setResult(createdTask);
                     break;
                 case "tasks/get":
@@ -100,8 +85,6 @@ public class A2AServerController {
                             .getTaskPushNotification(taskIdParamsGetConfig.getTaskId());
                     response.setResult(getConfigResult);
                     break;
-                // TODO: Add cases for streaming methods (tasks/sendSubscribe,
-                // tasks/resubscribe)
                 default:
                     // Method not found error
                     log.warn("Unsupported method: {}", method);
@@ -118,36 +101,56 @@ public class A2AServerController {
             // Log the error with more context
             log.error("Internal error processing method {}.", method, e);
         }
-
         return ResponseEntity.ok(response);
     }
 
-    // TODO: Add endpoint for streaming methods (e.g., tasks/sendSubscribe,
-    // tasks/resubscribe)
-    // This will likely require Server-Sent Events (SSE) or WebSockets.
-    // Spring WebFlux might be needed for reactive streaming.
-
-    @PostMapping(value = "/a2a/tasks/sendSubscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<Task>> sendTaskAndSubscribe(@RequestBody Task task) {
-        // First, create the task
-        Task createdTask = a2aServer.createTask(task);
-        // Then, subscribe to updates for the created task
-        return a2aServer.subscribeToTaskUpdates(createdTask.getId())
-                .map(taskUpdate -> ServerSentEvent.<Task>builder()
-                        .data(taskUpdate)
-                        .id(taskUpdate.getId())
-                        .event("task-update")
-                        .build());
-    }
-
-    @GetMapping(value = "/a2a/tasks/resubscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<Task>> resubscribeToTask(@RequestParam String taskId) {
-        // Subscribe to updates for the existing task ID
-        return a2aServer.subscribeToTaskUpdates(taskId)
-                .map(taskUpdate -> ServerSentEvent.<Task>builder()
-                        .data(taskUpdate)
-                        .id(taskUpdate.getId())
-                        .event("task-update")
-                        .build());
+    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
+        JSONRPCResponse response = new JSONRPCResponse();
+        // Echo the request ID
+        response.setId(request.getId());
+        // params is typically a JSON object or array
+        String method = request.getMethod();
+        Object params = request.getParams();
+        try {
+            switch (method) {
+                case "tasks/sendSubscribe":
+                    // First, create the task
+                    Task taskToSend = objectMapper.convertValue(params, Task.class);
+                    Task createdTask = a2aServer.handleTask(taskToSend);
+                    // Then, subscribe to updates for the created task
+                    return a2aServer.subscribeToTaskUpdates(createdTask.getId())
+                            .map(taskUpdate -> ServerSentEvent.<Task>builder()
+                                    .data(taskUpdate)
+                                    .id(taskUpdate.getId())
+                                    .event("task-update")
+                                    .build());
+                case "tasks/resubscribe":
+                    // Params expected: TaskIdParams { taskId: string }
+                    // Subscribe to updates for the existing task ID
+                    TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
+                    return a2aServer.subscribeToTaskUpdates(taskIdParamsGet.getTaskId())
+                            .map(taskUpdate -> ServerSentEvent.<Task>builder()
+                                    .data(taskUpdate)
+                                    .id(taskUpdate.getId())
+                                    .event("task-update")
+                                    .build());
+                default:
+                    // Method not found error
+                    log.warn("Unsupported method: {}", method);
+                    response.setError(new JSONRPCError(-32601, "Method not found",
+                            "Method '" + method + "' not supported"));
+                    break;
+            }
+        } catch (IllegalArgumentException e) {
+            // Handle validation errors from A2AServerImpl
+            response.setError(new JSONRPCError(-32602, "Invalid params", e.getMessage()));
+        } catch (Exception e) {
+            // Handle other internal errors
+            response.setError(new JSONRPCError(-32603, "Internal error", e.getMessage()));
+            // Log the error with more context
+            log.error("Internal error processing method {}.", method, e);
+        }
+        return Flux.empty();
     }
 }
