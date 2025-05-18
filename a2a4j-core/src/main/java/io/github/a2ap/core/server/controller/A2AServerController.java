@@ -2,7 +2,9 @@ package io.github.a2ap.core.server.controller;
 
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
+import io.github.a2ap.core.model.TaskQueryParams;
 import io.github.a2ap.core.server.A2AServer;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;

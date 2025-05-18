@@ -1,5 +1,6 @@
 package io.github.a2ap.core.client;
 
+import io.github.a2ap.core.event.TaskUpdateEvent;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
@@ -31,11 +32,11 @@ public interface A2AClient {
 
     /**
      * Sends a task request and subscribes to streaming updates.
-     * Returns a Publisher that emits TaskStatusUpdateEvent or TaskArtifactUpdateEvent payloads.
+     * Returns a Publisher that emits TaskUpdateEvent payloads (either TaskStatusUpdateEvent or TaskArtifactUpdateEvent).
      * @param params The parameters for the tasks/sendSubscribe method.
      * @return A Flow.Publisher of task update events.
      */
-    Flow.Publisher<TaskStatusUpdateEvent, TaskArtifactUpdateEvent> sendTaskSubscribe(TaskSendParams params);
+    Flow.Publisher<TaskUpdateEvent> sendTaskSubscribe(TaskSendParams params);
 
     /**
      * Retrieves the current state of a task.
@@ -67,11 +68,11 @@ public interface A2AClient {
 
     /**
      * Resubscribes to updates for a task after a potential connection interruption.
-     * Returns a Publisher that emits TaskStatusUpdateEvent or TaskArtifactUpdateEvent payloads.
+     * Returns a Publisher that emits TaskUpdateEvent payloads (either TaskStatusUpdateEvent or TaskArtifactUpdateEvent).
      * @param params The parameters for the tasks/resubscribe method.
      * @return A Flow.Publisher of task update events.
      */
-    Flow.Publisher<TaskStatusUpdateEvent | TaskArtifactUpdateEvent> resubscribeTask(TaskQueryParams params);
+    Flow.Publisher<TaskUpdateEvent> resubscribeTask(TaskQueryParams params);
 
     /**
      * Optional: Checks if the server likely supports optional methods based on agent card.

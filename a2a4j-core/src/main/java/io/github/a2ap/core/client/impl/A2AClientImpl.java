@@ -3,6 +3,7 @@ package io.github.a2ap.core.client.impl;
 import io.github.a2ap.core.client.A2AClient;
 import io.github.a2ap.core.client.CardResolver;
 import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.model.TaskStatus;
 import java.util.Optional;
 import org.slf4j.Logger;

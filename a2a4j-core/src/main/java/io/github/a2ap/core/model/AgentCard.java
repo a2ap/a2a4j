@@ -16,7 +16,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AgentCard {
+public class AgentCard {    
+    /**
+     * The unique identifier of the agent.
+     */
+    private String id;
     /**
      * The name of the agent.
      */

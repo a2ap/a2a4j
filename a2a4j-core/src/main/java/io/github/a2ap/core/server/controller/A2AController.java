@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.server.A2AServer;
 import org.springframework.beans.factory.annotation.Autowired;

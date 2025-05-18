@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -14,27 +15,19 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FilePart {
+public class FilePart extends Part {
 
     /**
-     * The type of the part, always "file" for FilePart.
+     * The file content.
      * Required field.
      */
-    @JsonProperty("type")
-    private final String type = "file";
-
-    /**
-     * The name of the file.
-     * Required field.
-     */
-    @JsonProperty("name")
-    private String name;
-
-    /**
-     * The content of the file.
-     * Required field.
-     */
-    @JsonProperty("content")
-    private FileContent content;
+    @JsonProperty("file")
+    private FileContent file;
+    
+    public FilePart(String type, java.util.Map<String, Object> metadata, FileContent file) {
+        super(type, metadata);
+        this.file = file;
+    }
 }
