@@ -1,6 +1,7 @@
 package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class AgentProvider {
     /**
      * The name of the organization providing the agent.
      */
+    @NotNull
     private String organization;
 
     /**

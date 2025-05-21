@@ -2,6 +2,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,16 +26,15 @@ public class DataPart {
     private final String type = "data";
 
     /**
-     * The MIME type of the data.
-     * Required field.
-     */
-    @JsonProperty("mime_type")
-    private String mimeType;
-
-    /**
      * The structured data content.
      * Required field.
      */
     @JsonProperty("data")
     private Object data;
+
+    /**
+     * Optional metadata associated with the part.
+     */
+    @JsonProperty("metadata")
+    private Map<String, Object> metadata;
 }

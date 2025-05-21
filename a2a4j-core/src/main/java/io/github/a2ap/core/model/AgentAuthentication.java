@@ -18,15 +18,15 @@ import lombok.NoArgsConstructor;
 public class AgentAuthentication {
 
     /**
-     * The type of authentication required by the agent.
+     * The authentication schemes supported by the agent.
      * Required field.
      */
-    @JsonProperty("type")
-    private String type;
+    @JsonProperty("schemes")
+    private java.util.List<String> schemes;
 
     /**
-     * Optional instructions for authentication.
+     * Optional credentials for authentication.
      */
-    @JsonProperty("instructions")
-    private String instructions;
+    @JsonProperty("credentials")
+    private String credentials;
 }

@@ -20,14 +20,16 @@ import lombok.NoArgsConstructor;
 public class FilePart extends Part {
 
     /**
+     * The type of the part, always "file" for FilePart.
+     * Required field.
+     */
+    @JsonProperty("type")
+    private final String type = "file";
+
+    /**
      * The file content.
      * Required field.
      */
     @JsonProperty("file")
     private FileContent file;
-    
-    public FilePart(String type, java.util.Map<String, Object> metadata, FileContent file) {
-        super(type, metadata);
-        this.file = file;
-    }
 }

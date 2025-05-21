@@ -32,5 +32,5 @@ public class Message {
      * Required field.
      */
     @JsonProperty("parts")
-    private List<Object> parts;
+    private List<Part> parts;
 }

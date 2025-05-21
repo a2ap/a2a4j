@@ -18,16 +18,26 @@ import lombok.NoArgsConstructor;
 public class FileContent {
 
     /**
-     * The MIME type of the file.
-     * Required field.
+     * The name of the file.
      */
-    @JsonProperty("mime_type")
+    @JsonProperty("name")
+    private String name;
+
+    /**
+     * The MIME type of the file.
+     */
+    @JsonProperty("mimeType")
     private String mimeType;
 
     /**
      * The base64-encoded content of the file.
-     * Required field.
      */
-    @JsonProperty("data")
-    private String data;
+    @JsonProperty("bytes")
+    private String bytes;
+
+    /**
+     * The URI of the file.
+     */
+    @JsonProperty("uri")
+    private String uri;
 }

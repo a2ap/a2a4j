@@ -2,6 +2,8 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,30 +20,45 @@ import lombok.NoArgsConstructor;
 public class Artifact {
 
     /**
-     * The unique identifier of the artifact.
-     * Required field.
+     * The name of the artifact.
      */
-    @JsonProperty("id")
-    private String id;
+    @JsonProperty("name")
+    private String name;
 
     /**
-     * The type of the artifact.
-     * Required field.
+     * An optional description of the artifact.
      */
-    @JsonProperty("type")
-    private String type;
+    @JsonProperty("description")
+    private String description;
 
     /**
-     * The MIME type of the artifact.
+     * The parts that make up the artifact content.
      * Required field.
      */
-    @JsonProperty("mime_type")
-    private String mimeType;
+    @JsonProperty("parts")
+    private List<Part> parts;
 
     /**
-     * The data of the artifact.
-     * Required field.
+     * The index of the artifact in a sequence of artifacts.
      */
-    @JsonProperty("data")
-    private Object data;
+    @JsonProperty("index")
+    private Integer index;
+
+    /**
+     * Indicates if the artifact should be appended to previous artifacts.
+     */
+    @JsonProperty("append")
+    private Boolean append;
+
+    /**
+     * Indicates if this is the last chunk of a streamed artifact.
+     */
+    @JsonProperty("lastChunk")
+    private Boolean lastChunk;
+
+    /**
+     * Optional metadata associated with the artifact.
+     */
+    @JsonProperty("metadata")
+    private Map<String, Object> metadata;
 }

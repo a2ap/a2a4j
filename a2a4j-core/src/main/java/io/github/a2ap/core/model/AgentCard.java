@@ -1,15 +1,16 @@
 package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.List;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
- * Represents an Agent Card that describes the capabilities and metadata of an
- * agent.
+ * Represents an agent's capabilities and metadata.
  */
 @Data
 @Builder
@@ -21,9 +22,11 @@ public class AgentCard {
      * The unique identifier of the agent.
      */
     private String id;
+    
     /**
      * The name of the agent.
      */
+    @NotNull
     private String name;
 
     /**
@@ -34,6 +37,7 @@ public class AgentCard {
     /**
      * The base URL endpoint for interacting with the agent.
      */
+    @NotNull
     private String url;
 
     /**
@@ -44,6 +48,7 @@ public class AgentCard {
     /**
      * The version identifier for the agent or its API.
      */
+    @NotNull
     private String version;
 
     /**
@@ -54,6 +59,7 @@ public class AgentCard {
     /**
      * The capabilities supported by the agent.
      */
+    @NotNull
     private AgentCapabilities capabilities;
 
     /**
@@ -78,5 +84,6 @@ public class AgentCard {
     /**
      * List of specific skills offered by the agent.
      */
+    @NotNull
     private List<AgentSkill> skills;
 }
