@@ -23,7 +23,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<String, String> taskCallbacks = new ConcurrentHashMap<>();
 
     @Override
-    public Task createTask(Task task) {
+    public Task loadOrCreateTask(Task task) {
         // Generate a unique ID if not provided
         if (task.getId() == null || task.getId().isEmpty()) {
             task.setId(UUID.randomUUID().toString());

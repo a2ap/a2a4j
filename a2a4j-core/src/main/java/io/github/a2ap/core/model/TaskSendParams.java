@@ -12,6 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskSendParams {
+    
     private String id;
     private String sessionId;
     private Message message;

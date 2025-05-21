@@ -11,6 +11,7 @@ package-lock.json
 *.zip
 jdk/
 data/
+js
 
 !/e2e/**/data/
 

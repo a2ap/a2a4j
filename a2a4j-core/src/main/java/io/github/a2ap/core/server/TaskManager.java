@@ -1,6 +1,8 @@
 package io.github.a2ap.core.server;
 
 import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.model.TaskStatus;
 import java.util.List;
 
@@ -11,12 +13,12 @@ import java.util.List;
 public interface TaskManager {
 
     /**
-     * Creates a new task.
+     * Load or create a new task.
      * 
-     * @param task The task to create
+     * @param params The task param to create
      * @return The created task with a generated ID
      */
-    Task createTask(Task task);
+    TaskContext loadOrCreateTask(TaskSendParams params);
 
     /**
      * Gets a task by its ID.
