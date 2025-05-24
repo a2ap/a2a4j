@@ -19,7 +19,6 @@ import reactor.core.publisher.Flux;
 /**
  * Implementation of the A2AClient interface.
  */
-@Component
 public class A2AClientImpl implements A2AClient {
 
     private static final Logger log = LoggerFactory.getLogger(A2AClientImpl.class);

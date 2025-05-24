@@ -2,6 +2,7 @@ package io.github.a2ap.core.server.impl;
 
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.model.TaskState;
 import io.github.a2ap.core.model.TaskStatus;
@@ -15,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
@@ -24,12 +26,13 @@ import reactor.core.publisher.Sinks;
  * and demonstration purposes.
  */
 @Slf4j
+@Component
 public class InMemoryTaskManager implements TaskManager {
 
     private final Map<String, Task> tasks = new ConcurrentHashMap<>();
-    private final Map<String, String> taskCallbacks = new ConcurrentHashMap<>();
     private final Map<String, Sinks.Many<Task>> taskUpdateSinks = new ConcurrentHashMap<>();
     private final TaskStore taskStore = new InMemoryTaskStore();
+    private final Map<String, TaskPushNotificationConfig> notificationConfigMap = new ConcurrentHashMap<>();
 
     @Override
     public TaskContext loadOrCreateTask(TaskSendParams params) {
@@ -70,11 +73,10 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.put(taskId, task);
 
         // Notify callback if registered
-        String callbackUrl = taskCallbacks.get(taskId);
-        if (callbackUrl != null) {
-            // In a real implementation, this would make an HTTP call to the callback URL
-            // For simplicity, we're just logging it here
-            log.info("Notifying callback for task {} with url {}", taskId, callbackUrl);
+        TaskPushNotificationConfig config = notificationConfigMap.get(taskId);
+        if (config != null) {
+            // todo
+            log.info("Notifying callback for task {} with config {}", taskId, config);
         }
 
         return true;
@@ -111,18 +113,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         tasks.remove(taskId);
-        taskCallbacks.remove(taskId);
+        notificationConfigMap.remove(taskId);
+        // todo 
         return task;
-    }
-
-    @Override
-    public boolean registerTaskStatusCallback(String taskId, String callbackUrl) {
-        if (!tasks.containsKey(taskId)) {
-            return false;
-        }
-
-        taskCallbacks.put(taskId, callbackUrl);
-        return true;
     }
 
     @Override
@@ -133,5 +126,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Mono<Task> applyTaskUpdate(TaskUpdate update) {
         return applyTaskUpdate(Stream.of(update).collect(Collectors.toList()));
+    }
+
+    @Override
+    public void registerTaskNotification(TaskPushNotificationConfig config) {
+        notificationConfigMap.put(config.getTaskId(), config);
+    }
+
+    @Override
+    public TaskPushNotificationConfig getTaskNotification(String taskId) {
+        return notificationConfigMap.get(taskId);
     }
 }

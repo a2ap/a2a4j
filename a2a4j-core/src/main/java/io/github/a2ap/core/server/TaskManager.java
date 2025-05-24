@@ -2,6 +2,7 @@ package io.github.a2ap.core.server;
 
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskUpdate;
@@ -66,15 +67,6 @@ public interface TaskManager {
     Task deleteTask(String taskId);
 
     /**
-     * Registers a callback for task status updates.
-     * 
-     * @param taskId      The ID of the task
-     * @param callbackUrl The URL to call when the task status changes
-     * @return true if the callback was successfully registered, false otherwise
-     */
-    boolean registerTaskStatusCallback(String taskId, String callbackUrl);
-
-    /**
      * apply take update for task
      * @param taskUpdates taskUpdate TaskStatus or Artifact update
      * @return mono of task
@@ -87,4 +79,17 @@ public interface TaskManager {
      * @return mono of task
      */
     Mono<Task> applyTaskUpdate(TaskUpdate update);
+
+    /**
+     * register task notification config
+     * @param config notification config
+     */
+    void registerTaskNotification(TaskPushNotificationConfig config);
+
+    /**
+     * get task notification config
+     * @param taskId task id
+     * @return notification config 
+     */
+    TaskPushNotificationConfig getTaskNotification(String taskId);
 }

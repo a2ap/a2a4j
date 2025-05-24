@@ -1,6 +1,5 @@
 package io.github.a2ap.core.server.controller;
 
-import static org.springframework.http.codec.ServerSentEvent.builder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;

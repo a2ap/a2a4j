@@ -16,11 +16,11 @@ import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.TaskHandler;
 import io.github.a2ap.core.server.TaskManager;
-import io.github.a2ap.core.server.TaskStore;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
@@ -30,26 +30,24 @@ import reactor.core.publisher.Sinks;
  * This class provides the core functionality for an A2A server.
  */
 @Slf4j
+@Component
 public class A2AServerImpl implements A2AServer {
     
     private final TaskManager taskManager;
     private final TaskHandler taskHandler;
     private final Map<String, AgentCard> agents = new ConcurrentHashMap<>();
-    // Map to hold Sinks for each streaming task ID to push updates
-    private final Map<String, Sinks.Many<Task>> taskUpdateSinks = new ConcurrentHashMap<>();
-
+    
     /**
      * Constructs a new A2AServerImpl with the specified TaskStore and TaskHandler.
      *
      * @param taskStore The TaskStore to use for task management.
      * @param taskHandler The TaskHandler to use for task processing.
      */
-    public A2AServerImpl(TaskStore taskStore, TaskHandler taskHandler, TaskManager taskManager) {
-        this.taskStore = taskStore;
+    public A2AServerImpl(TaskHandler taskHandler, TaskManager taskManager) {
         this.taskHandler = taskHandler;
         this.taskManager = taskManager;
-        log.info("A2AServerImpl initialized with TaskStore: {} and TaskHandler: {}",
-                taskStore.getClass().getSimpleName(), taskHandler.getClass().getSimpleName());
+        log.info("A2AServerImpl initialized with TaskManager: {} and TaskHandler: {}",
+                taskManager.getClass().getSimpleName(), taskHandler.getClass().getSimpleName());
     }
 
     /**
@@ -162,10 +160,6 @@ public class A2AServerImpl implements A2AServer {
         return cancelledTask;
     }
 
-    // Need a mechanism to store and retrieve push notification configurations.
-    // A simple Map can be used for now.
-    private final Map<String, TaskPushNotificationConfig> pushNotificationConfigs = new ConcurrentHashMap<>();
-
     /**
      * Sets or updates the push notification configuration for a task.
      *
@@ -180,8 +174,7 @@ public class A2AServerImpl implements A2AServer {
             log.warn("Failed to set push notification config: Invalid config provided.");
             return null; // Invalid config
         }
-
-        pushNotificationConfigs.put(config.getTaskId(), config);
+        taskManager.registerTaskNotification(config);
         log.info("Push notification config set for task {}.", config.getTaskId());
         return config; // Return the set config
     }
@@ -195,7 +188,7 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public TaskPushNotificationConfig getTaskPushNotification(String taskId) {
         log.info("Getting push notification config for task ID: {}", taskId);
-        TaskPushNotificationConfig config = pushNotificationConfigs.get(taskId);
+        TaskPushNotificationConfig config = taskManager.getTaskNotification(taskId);
         if (config != null) {
             log.debug("Found push notification config for task {}: {}", taskId, config);
         } else {
@@ -213,16 +206,17 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public Flux<TaskUpdateEvent> subscribeToTaskUpdates(String taskId) {
         log.info("Subscribing to task updates for ID: {}", taskId);
-        Sinks.Many<Task> sink = taskUpdateSinks.computeIfAbsent(taskId,
-                id -> {
-                    log.debug("Creating new sink for task {}.", id);
-                    return Sinks.many().multicast().onBackpressureBuffer();
-                });
-        log.debug("Returning Flux for task {} updates.", taskId);
-        return sink.asFlux()
-                .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates.", taskId))
-                .doOnComplete(() -> log.debug("Task {} updates stream completed.", taskId))
-                .doOnError(e -> log.error("Error in task {} updates stream: {}", taskId, e.getMessage(), e));
+        return Flux.empty();
+//        Sinks.Many<Task> sink = taskUpdateSinks.computeIfAbsent(taskId,
+//                id -> {
+//                    log.debug("Creating new sink for task {}.", id);
+//                    return Sinks.many().multicast().onBackpressureBuffer();
+//                });
+//        log.debug("Returning Flux for task {} updates.", taskId);
+//        return sink.asFlux()
+//                .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates.", taskId))
+//                .doOnComplete(() -> log.debug("Task {} updates stream completed.", taskId))
+//                .doOnError(e -> log.error("Error in task {} updates stream: {}", taskId, e.getMessage(), e));
     }
 
     /**
