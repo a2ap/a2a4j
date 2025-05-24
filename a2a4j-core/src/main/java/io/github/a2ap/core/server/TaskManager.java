@@ -32,39 +32,12 @@ public interface TaskManager {
     Task getTask(String taskId);
 
     /**
-     * Gets all tasks for a specific agent (either as sender or receiver).
-     * 
-     * @param agentId The ID of the agent
-     * @param role    The role of the agent ("sender" or "receiver"), or null for
-     *                both
-     * @return A list of tasks for the specified agent
-     */
-    List<Task> getTasksForAgent(String agentId, String role);
-
-    /**
-     * Updates the status of a task.
-     * 
-     * @param taskId The ID of the task
-     * @param status The new status of the task
-     * @return true if the update was successful, false otherwise
-     */
-    boolean updateTaskStatus(String taskId, TaskStatus status);
-
-    /**
      * Cancels a task.
      * 
      * @param taskId The ID of the task to cancel
      * @return true if the task was successfully cancelled, false otherwise
      */
     Task cancelTask(String taskId);
-
-    /**
-     * Deletes a task.
-     * 
-     * @param taskId The ID of the task to delete
-     * @return true if the task was successfully deleted, false otherwise
-     */
-    Task deleteTask(String taskId);
 
     /**
      * apply take update for task

@@ -2,7 +2,7 @@ package io.github.a2ap.core.server;
 
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.Message;
-import io.github.a2ap.core.model.TaskAndHistory;
+import io.github.a2ap.core.model.TaskContext;
 import java.util.List;
 
 /**
@@ -24,5 +24,5 @@ public interface TaskStore {
      * @param taskId The ID of the task to load.
      * @return an object containing the Task and its history, or null if not found.
      */
-    TaskAndHistory load(String taskId);
+    TaskContext load(String taskId);
 }
