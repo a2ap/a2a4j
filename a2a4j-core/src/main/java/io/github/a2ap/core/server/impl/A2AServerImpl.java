@@ -17,13 +17,10 @@ import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.TaskHandler;
 import io.github.a2ap.core.server.TaskManager;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 
 /**
  * Implementation of the A2AServer interface.
@@ -35,7 +32,6 @@ public class A2AServerImpl implements A2AServer {
     
     private final TaskManager taskManager;
     private final TaskHandler taskHandler;
-    private final Map<String, AgentCard> agents = new ConcurrentHashMap<>();
     
     /**
      * Constructs a new A2AServerImpl with the specified TaskStore and TaskHandler.
@@ -48,24 +44,6 @@ public class A2AServerImpl implements A2AServer {
         this.taskManager = taskManager;
         log.info("A2AServerImpl initialized with TaskManager: {} and TaskHandler: {}",
                 taskManager.getClass().getSimpleName(), taskHandler.getClass().getSimpleName());
-    }
-
-    /**
-     * Registers an agent with the server.
-     *
-     * @param agentCard The AgentCard of the agent to register.
-     * @return true if registration was successful, false otherwise.
-     */
-    @Override
-    public boolean registerAgent(AgentCard agentCard) {
-        log.info("Attempting to register agent: {}", agentCard);
-        if (agentCard == null || agentCard.getId() == null || agentCard.getId().isEmpty()) {
-            log.warn("Agent registration failed: Invalid AgentCard provided.");
-            return false;
-        }
-        agents.put(agentCard.getId(), agentCard);
-        log.info("Agent registered successfully: {}", agentCard.getId());
-        return true;
     }
 
     /**

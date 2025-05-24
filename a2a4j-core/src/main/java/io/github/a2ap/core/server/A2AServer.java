@@ -14,14 +14,6 @@ import reactor.core.publisher.Flux;
 public interface A2AServer {
 
     /**
-     * Registers an agent with the server.
-     * 
-     * @param agentCard The agent card containing information about the agent
-     * @return true if registration was successful, false otherwise
-     */
-    boolean registerAgent(AgentCard agentCard);
-
-    /**
      * Handle send task.
      * 
      * @param params The task params to send
