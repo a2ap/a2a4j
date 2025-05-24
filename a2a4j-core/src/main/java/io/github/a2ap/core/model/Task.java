@@ -3,6 +3,7 @@ package io.github.a2ap.core.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,25 +25,12 @@ public class Task {
      */
     @JsonProperty("id")
     private String id;
-
+    
     /**
-     * The agent card of the task sender.
+     * Optional identifier for the session this task belongs to.
      */
-    @JsonProperty("sender")
-    private AgentCard sender;
-
-    /**
-     * The agent card of the task receiver.
-     */
-    @JsonProperty("receiver")
-    private AgentCard receiver;
-
-    /**
-     * The input messages for the task.
-     * Required field.
-     */
-    @JsonProperty("input")
-    private List<Message> input;
+    @JsonProperty("sessionId")
+    private String sessionId;
 
     /**
      * The current status of the task.
@@ -51,14 +39,14 @@ public class Task {
     private TaskStatus status;
 
     /**
-     * The authentication information for the task.
+     * The artifacts of the task.
      */
-    @JsonProperty("authentication")
-    private Object authentication;
+    @JsonProperty("artifacts")
+    private List<Artifact> artifacts;
 
     /**
      * The metadata associated with the task.
      */
     @JsonProperty("metadata")
-    private Object metadata;
+    private Map<String, Object> metadata;
 }

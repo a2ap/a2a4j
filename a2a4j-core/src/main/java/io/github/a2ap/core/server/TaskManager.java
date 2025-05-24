@@ -68,17 +68,19 @@ public interface TaskManager {
 
     /**
      * apply take update for task
+     * @param taskContext TaskContext
      * @param taskUpdates taskUpdate TaskStatus or Artifact update
      * @return mono of task
      */
-    Mono<Task> applyTaskUpdate(List<TaskUpdate> taskUpdates);
+    Mono<TaskContext> applyTaskUpdate(TaskContext taskContext, List<TaskUpdate> taskUpdates);
 
     /**
      * apply task update for task
+     * @param taskContext TaskContext
      * @param update tash update TaskStatus or Artifact update
      * @return mono of task
      */
-    Mono<Task> applyTaskUpdate(TaskUpdate update);
+    Mono<TaskContext> applyTaskUpdate(TaskContext taskContext, TaskUpdate update);
 
     /**
      * register task notification config

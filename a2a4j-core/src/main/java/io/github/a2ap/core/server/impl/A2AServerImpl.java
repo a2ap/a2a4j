@@ -56,16 +56,21 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public Task handleTask(TaskSendParams params) {
         log.info("Attempting to handle the task: {}", params);
-        if (params == null || params.getId() == null || params.getSessionId() == null) {
-            log.error("Task handle failed: Task params must have a id and session id.");
-            throw new IllegalArgumentException("Task params must have a id and session id");
+        if (params == null || params.getId() == null) {
+            log.error("Task handle failed: Task params must have a task id.");
+            throw new IllegalArgumentException("Task params must have a task id");
+        }
+        if (params.getMessage() == null || params.getMessage().getParts() == null 
+                || params.getMessage().getParts().isEmpty()) {
+            log.error("Task handle failed: Task params must have at least one message.");
+            throw new IllegalArgumentException("Task params must have at least one message");
         }
         TaskContext taskContext = taskManager.loadOrCreateTask(params);
         log.info("Task context loaded: {}", taskContext.getTask());
         Flux<TaskUpdate> taskFlux = taskHandler.handle(taskContext);
         List<TaskUpdate> taskUpdates = taskFlux.collectList().block();
-        Mono<Task> taskMono = taskManager.applyTaskUpdate(taskUpdates);
-        Task task = taskMono.block();
+        Mono<TaskContext> taskMono = taskManager.applyTaskUpdate(taskContext, taskUpdates);
+        Task task = taskMono.block().getTask();
         log.info("Task handle success: {}", task);
         return task;
     }
@@ -76,20 +81,20 @@ public class A2AServerImpl implements A2AServer {
         TaskContext taskContext = taskManager.loadOrCreateTask(params);
         log.info("Task context loaded: {}", taskContext.getTask());
         return taskHandler.handle(taskContext).map(update -> {
-             Task updateTask = taskManager.applyTaskUpdate(update).block();
+             TaskContext updateTaskContext = taskManager.applyTaskUpdate(taskContext, update).block();
              TaskUpdateEvent updateEvent = null;
              if (update instanceof TaskStatus) {
                  // todo some check status and 
                  boolean isComplete = ((TaskStatus) update).getState() == TaskState.COMPLETED;
                  updateEvent = TaskStatusUpdateEvent.builder()
-                         .id(updateTask.getId())
+                         .id(params.getId())
                          .status((TaskStatus) update)
                          .isFinal(isComplete)
                          .build();
              } else if (update instanceof Artifact) {
                  // todo some
                  updateEvent = TaskArtifactUpdateEvent.builder()
-                         .id(updateTask.getId())
+                         .id(params.getId())
                          .artifact((Artifact) update)
                          .build();
              } else {

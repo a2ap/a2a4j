@@ -1,6 +1,8 @@
 package io.github.a2ap.core.server.impl;
 
+import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskAndHistory;
 import io.github.a2ap.core.model.TaskContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskSendParams;
@@ -9,6 +11,9 @@ import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,7 +41,48 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public TaskContext loadOrCreateTask(TaskSendParams params) {
-        // Generate a unique ID if not provided
+        TaskAndHistory taskAndHistory = taskStore.load(params.getId());
+        if (taskAndHistory == null) {
+            // create the new one take
+            Task task = Task.builder()
+                    .id(params.getId())
+                    .status(TaskStatus.builder()
+                            .state(TaskState.SUBMITTED)
+                            .timestamp(String.valueOf(Instant.now().toEpochMilli()))
+                            .build())
+                    .sessionId(params.getSessionId())
+                    .metadata(params.getMetadata())
+                    .artifacts(new LinkedList<>())
+                    .build();
+            List<Message> initMessages = new LinkedList<>();
+            initMessages.add(params.getMessage());
+            taskAndHistory = TaskAndHistory.builder()
+                    .task(task).history(initMessages)
+                    .build();
+            log.info("Create new task: {}", taskAndHistory);
+        } else {
+            TaskState taskState = taskAndHistory.getTask().getStatus().getState();
+            if (taskState == TaskState.COMPLETED || taskState == TaskState.FAILED || taskState == TaskState.CANCELED) {
+                log.warn("Received message for task {} already in final state {}. Handling as new submission (keeping history)", params.getId(), taskState);
+                TaskStatus taskStatusUpdate = TaskStatus.builder()
+                        .state(TaskState.SUBMITTED)
+                        .timestamp(String.valueOf(Instant.now().toEpochMilli()))
+                        .build();
+                // todo
+                applyTaskUpdate(taskStatusUpdate);
+            } else if (taskState == TaskState.INPUT_REQUIRED) {
+                log.info("Received message while 'input-required', changing task {} state to 'working'", params.getId());
+                TaskStatus taskStatusUpdate = TaskStatus.builder()
+                        .state(TaskState.WORKING)
+                        .timestamp(String.valueOf(Instant.now().toEpochMilli()))
+                        .build();
+                applyTaskUpdate(taskStatusUpdate);
+            } else if (taskState == TaskState.WORKING) {
+                log.info("Received message while task {} already 'working'. Proceeding.", params.getId());
+            } else {
+                log.info("receiving task {} another message might be odd, but proceed.", params.getId());
+            }
+        }
         
         return null;
     }
@@ -48,18 +94,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getTasksForAgent(String agentId, String role) {
-        return tasks.values().stream()
-                .filter(task -> {
-                    if (role == null) {
-                        return task.getSender().getId().equals(agentId) || task.getReceiver().getId().equals(agentId);
-                    } else if (role.equalsIgnoreCase("sender")) {
-                        return task.getSender().getId().equals(agentId);
-                    } else if (role.equalsIgnoreCase("receiver")) {
-                        return task.getReceiver().getId().equals(agentId);
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
@@ -119,13 +154,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Mono<Task> applyTaskUpdate(List<TaskUpdate> taskUpdates) {
+    public Mono<TaskContext> applyTaskUpdate(TaskContext taskContext, List<TaskUpdate> taskUpdates) {
         return null;
     }
 
     @Override
-    public Mono<Task> applyTaskUpdate(TaskUpdate update) {
-        return applyTaskUpdate(Stream.of(update).collect(Collectors.toList()));
+    public Mono<TaskContext> applyTaskUpdate(TaskContext taskContext, TaskUpdate update) {
+        return applyTaskUpdate(taskContext, Stream.of(update).collect(Collectors.toList()));
     }
 
     @Override

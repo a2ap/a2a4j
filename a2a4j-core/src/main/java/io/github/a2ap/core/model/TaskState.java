@@ -6,11 +6,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Enumeration of possible states for a task.
  */
 public enum TaskState {
-    PENDING("pending"),
-    RUNNING("running"),
+    SUBMITTED("submitted"),
+    WORKING("working"),
+    INPUT_REQUIRED("input_required"),
     COMPLETED("completed"),
     FAILED("failed"),
-    CANCELED("canceled");
+    CANCELED("canceled"),
+    UNKNOWN("unknown");
 
     private final String value;
 
