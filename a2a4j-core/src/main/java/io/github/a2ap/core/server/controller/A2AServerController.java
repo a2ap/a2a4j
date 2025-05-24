@@ -1,5 +1,6 @@
 package io.github.a2ap.core.server.controller;
 
+import static org.springframework.http.codec.ServerSentEvent.builder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
@@ -116,25 +117,25 @@ public class A2AServerController {
             switch (method) {
                 case "tasks/sendSubscribe":
                     // First, create the task
-                    Task taskToSend = objectMapper.convertValue(params, Task.class);
-                    Task createdTask = a2aServer.handleTask(taskToSend);
-                    // Then, subscribe to updates for the created task
-                    return a2aServer.subscribeToTaskUpdates(createdTask.getId())
-                            .map(taskUpdate -> ServerSentEvent.<Task>builder()
-                                    .data(taskUpdate)
-                                    .id(taskUpdate.getId())
-                                    .event("task-update")
-                                    .build());
+                    TaskSendParams taskSendParams = objectMapper.convertValue(params, TaskSendParams.class);
+                    return a2aServer.handleSubscribeTask(taskSendParams).map(event -> {
+                        response.setResult(event);
+                        return ServerSentEvent.<JSONRPCResponse>builder()
+                                .data(response).id(event.getTaskId()).event("task-update").build();
+                    });
                 case "tasks/resubscribe":
                     // Params expected: TaskIdParams { taskId: string }
                     // Subscribe to updates for the existing task ID
                     TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
                     return a2aServer.subscribeToTaskUpdates(taskIdParamsGet.getTaskId())
-                            .map(taskUpdate -> ServerSentEvent.<Task>builder()
-                                    .data(taskUpdate)
-                                    .id(taskUpdate.getId())
-                                    .event("task-update")
-                                    .build());
+                            .map(event -> {
+                                response.setResult(event);
+                                return ServerSentEvent.<JSONRPCResponse>builder()
+                                        .data(response)
+                                        .id(event.getTaskId())
+                                        .event("task-update")
+                                        .build();
+                            });
                 default:
                     // Method not found error
                     log.warn("Unsupported method: {}", method);

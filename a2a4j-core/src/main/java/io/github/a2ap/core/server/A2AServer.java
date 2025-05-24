@@ -5,7 +5,6 @@ import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskSendParams;
-import io.github.a2ap.core.model.TaskStatus;
 import reactor.core.publisher.Flux;
 
 /**
@@ -46,15 +45,6 @@ public interface A2AServer {
     Task getTask(String taskId);
 
     /**
-     * Updates the status of a task.
-     * 
-     * @param taskId The ID of the task
-     * @param status The new status of the task
-     * @return true if the update was successful, false otherwise
-     */
-    boolean updateTaskStatus(String taskId, TaskStatus status);
-
-    /**
      * Cancels a task.
      *
      * @param taskId The ID of the task to cancel
@@ -92,5 +82,5 @@ public interface A2AServer {
      * @param taskId The ID of the task to subscribe to
      * @return A Flux of Task objects representing updates
      */
-    Flux<Task> subscribeToTaskUpdates(String taskId);
+    Flux<TaskUpdateEvent> subscribeToTaskUpdates(String taskId);
 }

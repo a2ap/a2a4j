@@ -1,27 +1,28 @@
 package io.github.a2ap.core.server.impl;
 
-package io.github.a2ap.core.server.impl;
-
+import io.github.a2ap.core.event.TaskArtifactUpdateEvent;
+import io.github.a2ap.core.event.TaskStatusUpdateEvent;
+import io.github.a2ap.core.event.TaskUpdateEvent;
 import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
-import io.github.a2ap.core.model.Message;
+import io.github.a2ap.core.model.Artifact;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskSendParams;
+import io.github.a2ap.core.model.TaskState;
 import io.github.a2ap.core.model.TaskStatus;
+import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.server.A2AServer;
-import io.github.a2ap.core.server.TaskContext;
 import io.github.a2ap.core.server.TaskHandler;
 import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
-import io.github.a2ap.core.server.TaskStore.TaskAndHistory;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
 /**
@@ -30,8 +31,7 @@ import reactor.core.publisher.Sinks;
  */
 @Slf4j
 public class A2AServerImpl implements A2AServer {
-
-    private final TaskStore taskStore;
+    
     private final TaskManager taskManager;
     private final TaskHandler taskHandler;
     private final Map<String, AgentCard> agents = new ConcurrentHashMap<>();
@@ -86,76 +86,43 @@ public class A2AServerImpl implements A2AServer {
         }
         TaskContext taskContext = taskManager.loadOrCreateTask(params);
         log.info("Task context loaded: {}", taskContext.getTask());
-        Flux<Task> taskFlux = taskHandler.handle(taskContext);
-        taskFlux.collectList().block();
-
-        // Asynchronously handle the task
-        CompletableFuture.runAsync(() -> {
-            try {
-                TaskContext taskContext = new TaskContext(createdTask, this, taskStore);
-                taskHandler.handleTask(taskContext);
-                // TaskHandler is expected to update task status via A2AServer methods
-            } catch (Exception e) {
-                log.error("Error handling task {}: {}", createdTask.getId(), e.getMessage(), e);
-                // Optionally update task status to failed
-                updateTaskStatus(createdTask.getId(), TaskStatus.builder().state(TaskState.FAILED).message("Error during processing: " + e.getMessage()).build());
-            }
-        });
-
-        return createdTask;
+        Flux<TaskUpdate> taskFlux = taskHandler.handle(taskContext);
+        List<TaskUpdate> taskUpdates = taskFlux.collectList().block();
+        Mono<Task> taskMono = taskManager.applyTaskUpdate(taskUpdates);
+        Task task = taskMono.block();
+        log.info("Task handle success: {}", task);
+        return task;
     }
 
     @Override
-    public Flux<Task> handleSubscribeTask(TaskSendParams params) {
+    public Flux<TaskUpdateEvent> handleSubscribeTask(TaskSendParams params) {
         log.info("Attempting to handle and subscribe to task: {}", params);
-
-        // Validate params (similar to handleTask)
-        if (params == null || params.getSender() == null || params.getReceiver() == null) {
-            log.error("Subscription failed: Task params must have a sender and receiver.");
-            throw new IllegalArgumentException("Task params must have a sender and receiver");
-        }
-
-        // Check if sender and receiver are registered
-        if (!agents.containsKey(params.getSender().getId())) {
-            log.error("Subscription failed: Sender agent '{}' is not registered.", params.getSender().getId());
-            throw new IllegalArgumentException("Sender agent is not registered");
-        }
-
-        if (!agents.containsKey(params.getReceiver().getId())) {
-            log.error("Subscription failed: Receiver agent '{}' is not registered.", params.getReceiver().getId());
-            throw new IllegalArgumentException("Receiver agent is not registered");
-        }
-
-        // Create task using TaskStore (or get existing if logic allows)
-        // For simplicity, let's assume this always creates a new task for now, similar to handleTask
-        Task createdTask = taskStore.createTask(params);
-        log.info("Task created successfully with ID: {} for subscription.", createdTask.getId());
-
-        // Get or create the sink for the task ID
-        Sinks.Many<Task> sink = taskUpdateSinks.computeIfAbsent(createdTask.getId(),
-                id -> Sinks.many().multicast().onBackpressureBuffer());
-        log.debug("Returning Flux for task {} updates for subscription.", createdTask.getId());
-
-        // Asynchronously handle the task (same logic as handleTask)
-        CompletableFuture.runAsync(() -> {
-            try {
-                TaskContext taskContext = new TaskContext(createdTask, this, taskStore);
-                taskHandler.handleTask(taskContext);
-                // TaskHandler is expected to update task status via A2AServer methods
-            } catch (Exception e) {
-                log.error("Error handling task {} for subscription: {}", createdTask.getId(), e.getMessage(), e);
-                // Optionally update task status to failed
-                updateTaskStatus(createdTask.getId(), TaskStatus.builder().state(TaskState.FAILED).message("Error during processing: " + e.getMessage()).build());
-            }
-        });
-
-        // Emit the initial task state to the sink for the new subscriber
-        sink.tryEmitNext(createdTask);
-
-        return sink.asFlux()
-                .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleSubscribeTask.", createdTask.getId()))
-                .doOnComplete(() -> log.debug("Task {} updates stream completed via handleSubscribeTask.", createdTask.getId()))
-                .doOnError(e -> log.error("Error in task {} updates stream via handleSubscribeTask: {}", createdTask.getId(), e.getMessage(), e));
+        TaskContext taskContext = taskManager.loadOrCreateTask(params);
+        log.info("Task context loaded: {}", taskContext.getTask());
+        return taskHandler.handle(taskContext).map(update -> {
+             Task updateTask = taskManager.applyTaskUpdate(update).block();
+             TaskUpdateEvent updateEvent = null;
+             if (update instanceof TaskStatus) {
+                 // todo some check status and 
+                 boolean isComplete = ((TaskStatus) update).getState() == TaskState.COMPLETED;
+                 updateEvent = TaskStatusUpdateEvent.builder()
+                         .id(updateTask.getId())
+                         .status((TaskStatus) update)
+                         .isFinal(isComplete)
+                         .build();
+             } else if (update instanceof Artifact) {
+                 // todo some
+                 updateEvent = TaskArtifactUpdateEvent.builder()
+                         .id(updateTask.getId())
+                         .artifact((Artifact) update)
+                         .build();
+             } else {
+                 // todo 
+             }
+             return updateEvent;
+        }).doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleSubscribeTask.", taskContext.getTask().getId()))
+                .doOnComplete(() -> log.debug("Task {} updates stream completed via handleSubscribeTask.", taskContext.getTask().getId()))
+                .doOnError(e -> log.error("Error in task {} updates stream via handleSubscribeTask: {}", taskContext.getTask().getId(), e.getMessage(), e));
     }
 
     /**
@@ -177,42 +144,6 @@ public class A2AServerImpl implements A2AServer {
     }
 
     /**
-     * Updates the status of a task.
-     *
-     * @param taskId The ID of the task to update.
-     * @param status The new status for the task.
-     * @return true if the status was updated successfully, false otherwise.
-     */
-    @Override
-    public boolean updateTaskStatus(String taskId, TaskStatus status) {
-        log.info("Attempting to update status for task {}: {}", taskId, status);
-        // Use taskStore to update status
-        boolean success = taskStore.updateTaskStatus(taskId, status);
-        if (success) {
-            log.info("Task {} status updated successfully to {}.", taskId, status);
-            // Get the updated task and emit it to the corresponding sink
-            Task updatedTask = taskStore.getTask(taskId);
-            Sinks.Many<Task> sink = taskUpdateSinks.get(taskId);
-            if (sink != null) {
-                sink.tryEmitNext(updatedTask);
-                log.debug("Emitted updated task {} to sink.", taskId);
-                // If the task is completed or cancelled, complete the sink
-                if (updatedTask != null && (updatedTask.getStatus().getState() == TaskState.COMPLETED
-                        || updatedTask.getStatus().getState() == TaskState.CANCELED)) {
-                    sink.tryEmitComplete();
-                    taskUpdateSinks.remove(taskId);
-                    log.debug("Completed and removed sink for task {}.", taskId);
-                }
-            } else {
-                log.warn("No active sink found for task {}. Cannot emit update.", taskId);
-            }
-        } else {
-            log.warn("Failed to update status for task {}.", taskId);
-        }
-        return success;
-    }
-
-    /**
      * Cancels a task.
      *
      * @param taskId The ID of the task to cancel.
@@ -222,41 +153,13 @@ public class A2AServerImpl implements A2AServer {
     public Task cancelTask(String taskId) {
         log.info("Attempting to cancel task with ID: {}", taskId);
         // Use taskStore to cancel task
-        Task cancelledTask = taskStore.cancelTask(taskId);
+        Task cancelledTask = taskManager.cancelTask(taskId);
         if (cancelledTask != null) {
             log.info("Task {} cancelled successfully.", taskId);
-            // Emit the cancelled task and complete the sink
-            Sinks.Many<Task> sink = taskUpdateSinks.get(taskId);
-            if (sink != null) {
-                sink.tryEmitNext(cancelledTask);
-                sink.tryEmitComplete();
-                taskUpdateSinks.remove(taskId);
-                log.debug("Emitted cancelled task {} and completed/removed sink.", taskId);
-            } else {
-                log.warn("No active sink found for task {}. Cannot emit cancellation update.", taskId);
-            }
         } else {
             log.warn("Failed to cancel task with ID {}. Task not found or already completed/failed.", taskId);
         }
         return cancelledTask;
-    }
-
-    /**
-     * Retrieves the AgentCard for a specific agent ID.
-     *
-     * @param agentId The ID of the agent.
-     * @return The AgentCard if found, otherwise null.
-     */
-    @Override
-    public AgentCard getAgentInfo(String agentId) {
-        log.info("Getting agent info for ID: {}", agentId);
-        AgentCard agentCard = agents.get(agentId);
-        if (agentCard != null) {
-            log.debug("Found agent info for {}: {}", agentId, agentCard);
-        } else {
-            log.warn("Agent with ID {} not found.", agentId);
-        }
-        return agentCard;
     }
 
     // Need a mechanism to store and retrieve push notification configurations.
@@ -308,12 +211,8 @@ public class A2AServerImpl implements A2AServer {
      * @return A Flux of Task objects representing the updates.
      */
     @Override
-    public Flux<Task> subscribeToTaskUpdates(String taskId) {
+    public Flux<TaskUpdateEvent> subscribeToTaskUpdates(String taskId) {
         log.info("Subscribing to task updates for ID: {}", taskId);
-        // Get the sink for the task ID or create a new one if it doesn't exist (for
-        // resubscribe)
-        // Note: A more robust implementation might handle resubscribe differently,
-        // e.g., replaying recent events
         Sinks.Many<Task> sink = taskUpdateSinks.computeIfAbsent(taskId,
                 id -> {
                     log.debug("Creating new sink for task {}.", id);

@@ -2,6 +2,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class AgentAuthentication {
      * Required field.
      */
     @JsonProperty("schemes")
-    private java.util.List<String> schemes;
+    private List<String> schemes;
 
     /**
      * Optional credentials for authentication.

@@ -2,6 +2,7 @@ package io.github.a2ap.core.server.impl;
 
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.Message;
+import io.github.a2ap.core.model.TaskAndHistory;
 import io.github.a2ap.core.server.TaskStore;
 import java.util.List;
 import java.util.Map;

@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TaskStatus {
+public class TaskStatus implements TaskUpdate {
     
     /**
      * Completed task status constant.

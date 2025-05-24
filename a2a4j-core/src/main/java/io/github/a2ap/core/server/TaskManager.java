@@ -4,7 +4,9 @@ import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
 import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.model.TaskStatus;
+import io.github.a2ap.core.model.TaskUpdate;
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Interface for managing tasks in the A2A system.
@@ -71,4 +73,18 @@ public interface TaskManager {
      * @return true if the callback was successfully registered, false otherwise
      */
     boolean registerTaskStatusCallback(String taskId, String callbackUrl);
+
+    /**
+     * apply take update for task
+     * @param taskUpdates taskUpdate TaskStatus or Artifact update
+     * @return mono of task
+     */
+    Mono<Task> applyTaskUpdate(List<TaskUpdate> taskUpdates);
+
+    /**
+     * apply task update for task
+     * @param update tash update TaskStatus or Artifact update
+     * @return mono of task
+     */
+    Mono<Task> applyTaskUpdate(TaskUpdate update);
 }

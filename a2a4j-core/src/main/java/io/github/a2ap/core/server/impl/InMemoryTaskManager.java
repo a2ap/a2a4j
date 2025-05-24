@@ -1,15 +1,22 @@
 package io.github.a2ap.core.server.impl;
 
 import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.TaskSendParams;
 import io.github.a2ap.core.model.TaskState;
 import io.github.a2ap.core.model.TaskStatus;
+import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.server.TaskManager;
+import io.github.a2ap.core.server.TaskStore;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 /**
  * In-memory implementation of the TaskManager interface.
@@ -21,23 +28,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     private final Map<String, Task> tasks = new ConcurrentHashMap<>();
     private final Map<String, String> taskCallbacks = new ConcurrentHashMap<>();
+    private final Map<String, Sinks.Many<Task>> taskUpdateSinks = new ConcurrentHashMap<>();
+    private final TaskStore taskStore = new InMemoryTaskStore();
 
     @Override
-    public Task loadOrCreateTask(Task task) {
+    public TaskContext loadOrCreateTask(TaskSendParams params) {
         // Generate a unique ID if not provided
-        if (task.getId() == null || task.getId().isEmpty()) {
-            task.setId(UUID.randomUUID().toString());
-        }
-
-        // Initialize task status if not provided
-        if (task.getStatus() == null) {
-            TaskStatus initialStatus = new TaskStatus();
-            initialStatus.setState(TaskState.PENDING);
-            task.setStatus(initialStatus);
-        }
-
-        tasks.put(task.getId(), task);
-        return task;
+        
+        return null;
     }
 
     @Override
@@ -88,7 +86,16 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             throw new IllegalArgumentException("Cancel Task with ID " + taskId + " not found.");
         }
-
+        // Emit the cancelled task and complete the sink
+        Sinks.Many<Task> sink = taskUpdateSinks.get(taskId);
+        if (sink != null) {
+            sink.tryEmitNext(task);
+            sink.tryEmitComplete();
+            taskUpdateSinks.remove(taskId);
+            log.debug("Emitted cancelled task {} and completed/removed sink.", taskId);
+        } else {
+            log.warn("No active sink found for task {}. Cannot emit cancellation update.", taskId);
+        }
         TaskStatus cancelledStatus = new TaskStatus();
         cancelledStatus.setState(TaskState.CANCELED);
         task.setStatus(cancelledStatus);
@@ -116,5 +123,15 @@ public class InMemoryTaskManager implements TaskManager {
 
         taskCallbacks.put(taskId, callbackUrl);
         return true;
+    }
+
+    @Override
+    public Mono<Task> applyTaskUpdate(List<TaskUpdate> taskUpdates) {
+        return null;
+    }
+
+    @Override
+    public Mono<Task> applyTaskUpdate(TaskUpdate update) {
+        return applyTaskUpdate(Stream.of(update).collect(Collectors.toList()));
     }
 }
