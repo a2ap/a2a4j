@@ -21,11 +21,11 @@ import lombok.NoArgsConstructor;
 public class DataPart extends Part {
 
     /**
-     * The type of the part, always "data" for DataPart.
+     * The kind type of the part, always "data" for DataPart.
      * Required field.
      */
-    @JsonProperty("type")
-    private final String type = "data";
+    @JsonProperty("kind")
+    private final String kind = "data";
 
     /**
      * The structured data content.

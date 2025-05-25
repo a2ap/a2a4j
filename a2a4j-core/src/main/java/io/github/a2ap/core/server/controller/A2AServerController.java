@@ -8,7 +8,7 @@ import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
-import io.github.a2ap.core.model.TaskSendParams;
+import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.server.A2AServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,36 +53,31 @@ public class A2AServerController {
         Object params = request.getParams();
         try {
             switch (method) {
-                case "tasks/send":
-                    // Params expected: Task object
-                    TaskSendParams taskSendParams = objectMapper.convertValue(params, TaskSendParams.class);
-                    Task createdTask = a2aServer.handleTask(taskSendParams);
-                    response.setResult(createdTask);
+                case "message/send":
+                    MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
+                    Task messageTask = a2aServer.handleMessage(taskSendParams);
+                    response.setResult(messageTask);
                     break;
                 case "tasks/get":
-                    // Params expected: TaskIdParams { taskId: string }
                     TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
-                    Task task = a2aServer.getTask(taskIdParamsGet.getTaskId());
+                    Task task = a2aServer.getTask(taskIdParamsGet.getId());
                     response.setResult(task);
                     break;
                 case "tasks/cancel":
-                    // Params expected: TaskIdParams { taskId: string }
                     TaskIdParams taskIdParamsCancel = objectMapper.convertValue(params, TaskIdParams.class);
-                    Task cancelledTask = a2aServer.cancelTask(taskIdParamsCancel.getTaskId());
+                    Task cancelledTask = a2aServer.cancelTask(taskIdParamsCancel.getId());
                     response.setResult(cancelledTask);
                     break;
-                case "tasks/pushNotification/set":
-                    // Params expected: TaskPushNotificationConfig object
+                case "tasks/pushNotificationConfig/set":
                     TaskPushNotificationConfig configToSet = objectMapper.convertValue(params,
                             TaskPushNotificationConfig.class);
                     TaskPushNotificationConfig setResult = a2aServer.setTaskPushNotification(configToSet);
                     response.setResult(setResult);
                     break;
-                case "tasks/pushNotification/get":
-                    // Params expected: TaskIdParams { taskId: string }
+                case "tasks/pushNotificationConfig/get":
                     TaskIdParams taskIdParamsGetConfig = objectMapper.convertValue(params, TaskIdParams.class);
                     TaskPushNotificationConfig getConfigResult = a2aServer
-                            .getTaskPushNotification(taskIdParamsGetConfig.getTaskId());
+                            .getTaskPushNotification(taskIdParamsGetConfig.getId());
                     response.setResult(getConfigResult);
                     break;
                 default:
@@ -114,10 +109,10 @@ public class A2AServerController {
         Object params = request.getParams();
         try {
             switch (method) {
-                case "tasks/sendSubscribe":
+                case "message/stream":
                     // First, create the task
-                    TaskSendParams taskSendParams = objectMapper.convertValue(params, TaskSendParams.class);
-                    return a2aServer.handleSubscribeTask(taskSendParams).map(event -> {
+                    MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
+                    return a2aServer.handleMessageStream(taskSendParams).map(event -> {
                         response.setResult(event);
                         return ServerSentEvent.<JSONRPCResponse>builder()
                                 .data(response).id(event.getTaskId()).event("task-update").build();
@@ -126,7 +121,7 @@ public class A2AServerController {
                     // Params expected: TaskIdParams { taskId: string }
                     // Subscribe to updates for the existing task ID
                     TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
-                    return a2aServer.subscribeToTaskUpdates(taskIdParamsGet.getTaskId())
+                    return a2aServer.subscribeToTaskUpdates(taskIdParamsGet.getId())
                             .map(event -> {
                                 response.setResult(event);
                                 return ServerSentEvent.<JSONRPCResponse>builder()

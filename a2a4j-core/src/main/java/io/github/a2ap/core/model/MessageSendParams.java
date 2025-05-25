@@ -1,25 +1,30 @@
 package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Parameters for task ID related operations.
- */
+import java.util.Map;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskIdParams {
+public class MessageSendParams {
+
     /**
-     * The ID of the task.
+     * message context
      */
-    @JsonProperty("id")
-    private String id;
+    @JsonProperty("message")
+    private Message message;
+
+    /**
+     * message others configuration
+     */
+    @JsonProperty("configuration")
+    private MessageSendConfiguration configuration;
 
     /**
      * message metadata

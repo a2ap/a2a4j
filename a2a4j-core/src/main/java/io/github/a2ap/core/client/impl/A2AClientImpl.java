@@ -8,11 +8,10 @@ import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskQueryParams;
-import io.github.a2ap.core.model.TaskSendParams;
+import io.github.a2ap.core.model.MessageSendParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
@@ -65,7 +64,7 @@ public class A2AClientImpl implements A2AClient {
      * @return The created Task object received from the agent.
      */
     @Override
-    public Task sendTask(TaskSendParams taskSendParams) {
+    public Task sendTask(MessageSendParams taskSendParams) {
         log.info("Sending task to {} with params: {}", this.baseUrl, taskSendParams);
         WebClient client = WebClient.create(this.baseUrl);
         try {
@@ -84,7 +83,7 @@ public class A2AClientImpl implements A2AClient {
     }
 
     @Override
-    public Flux<TaskUpdateEvent> sendTaskSubscribe(TaskSendParams params) {
+    public Flux<TaskUpdateEvent> sendTaskSubscribe(MessageSendParams params) {
         log.info("Subscribing to task updates for {} from {}", params, this.baseUrl);
         WebClient client = WebClient.create(this.baseUrl);
         return client.get()
@@ -128,7 +127,7 @@ public class A2AClientImpl implements A2AClient {
             // Assuming the cancel endpoint returns a boolean or a response indicating
             // success
             client.post()
-                    .uri("/tasks/" + params.getTaskId() + "/cancel")
+                    .uri("/tasks/" + params.getId() + "/cancel")
                     .retrieve()
                     .toBodilessEntity() // Use toBodilessEntity() if no response body is expected
                     .block(); // Using block() for simplicity

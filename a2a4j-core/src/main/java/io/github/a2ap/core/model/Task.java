@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Task {
+public class Task implements MessageOrTask {
 
     /**
      * The unique identifier of the task.
@@ -29,8 +29,8 @@ public class Task {
     /**
      * Optional identifier for the session this task belongs to.
      */
-    @JsonProperty("sessionId")
-    private String sessionId;
+    @JsonProperty("contextId")
+    private String contextId;
 
     /**
      * The current status of the task.

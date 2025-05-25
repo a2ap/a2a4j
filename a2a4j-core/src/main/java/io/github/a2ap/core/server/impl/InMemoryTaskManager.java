@@ -6,20 +6,20 @@ import io.github.a2ap.core.model.Part;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
-import io.github.a2ap.core.model.TaskSendParams;
+import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.TaskState;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,17 +43,19 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<String, TaskPushNotificationConfig> notificationConfigMap = new ConcurrentHashMap<>();
 
     @Override
-    public TaskContext loadOrCreateTask(TaskSendParams params) {
-        TaskContext taskContext = taskStore.load(params.getId());
+    public TaskContext loadOrCreateTask(MessageSendParams params) {
+        String taskId = params.getMessage().getTaskId();
+        taskId = taskId == null ? UUID.randomUUID().toString() : taskId;
+        TaskContext taskContext = taskStore.load(taskId);
         if (taskContext == null) {
             // create the new one take
             Task task = Task.builder()
-                    .id(params.getId())
+                    .id(taskId)
                     .status(TaskStatus.builder()
                             .state(TaskState.SUBMITTED)
                             .timestamp(String.valueOf(Instant.now().toEpochMilli()))
                             .build())
-                    .sessionId(params.getSessionId())
+                    .contextId(UUID.randomUUID().toString())
                     .metadata(params.getMetadata())
                     .artifacts(new LinkedList<>())
                     .build();
@@ -63,27 +65,27 @@ public class InMemoryTaskManager implements TaskManager {
                     .task(task).history(initMessages)
                     .userMessage(params.getMessage())
                     .build();
-            log.info("Create new task: {}", taskContext);
+            log.info("Create new message task: {}", taskContext);
         } else {
             TaskState taskState = taskContext.getTask().getStatus().getState();
-            if (taskState == TaskState.COMPLETED || taskState == TaskState.FAILED || taskState == TaskState.CANCELED) {
-                log.warn("Received message for task {} already in final state {}. Handling as new submission (keeping history)", params.getId(), taskState);
+            if (taskState == TaskState.COMPLETED || taskState == TaskState.FAILED || taskState == TaskState.CANCELED || taskState == TaskState.REJECTED) {
+                log.warn("Received message for task {} already in final state {}. Handling as new submission (keeping history)", taskId, taskState);
                 TaskStatus taskStatusUpdate = TaskStatus.builder()
                         .state(TaskState.SUBMITTED)
                         .timestamp(String.valueOf(Instant.now().toEpochMilli()))
                         .build();
                 applyTaskUpdate(taskContext, taskStatusUpdate).block();
-            } else if (taskState == TaskState.INPUT_REQUIRED) {
-                log.info("Received message while 'input-required', changing task {} state to 'working'", params.getId());
+            } else if (taskState == TaskState.INPUT_REQUIRED || taskState == TaskState.AUTH_REQUIRED) {
+                log.info("Received message while {}, changing task {} state to 'working'", taskState, taskId);
                 TaskStatus taskStatusUpdate = TaskStatus.builder()
                         .state(TaskState.WORKING)
                         .timestamp(String.valueOf(Instant.now().toEpochMilli()))
                         .build();
                 applyTaskUpdate(taskContext, taskStatusUpdate).block();
             } else if (taskState == TaskState.WORKING) {
-                log.info("Received message while task {} already 'working'. Proceeding.", params.getId());
+                log.info("Received message while task {} already 'working'. Proceeding.", taskId);
             } else {
-                log.info("receiving task {} another message might be odd, but proceed.", params.getId());
+                log.info("receiving task {} another message might be odd, but proceed.", taskId);
             }
         }
         return taskContext;
@@ -140,37 +142,37 @@ public class InMemoryTaskManager implements TaskManager {
             } else if (taskUpdate instanceof Artifact artifact) {
                 log.info("apply task {} updated with artifact {}", taskContext.getTask().getId(), artifact);
                 List<Artifact> artifacts = task.getArtifacts();
-                Optional<Artifact> previousArtifactOption = artifacts.stream().filter(item -> 
-                        Objects.equals(item.getIndex(), artifact.getIndex()) 
-                                || Objects.equals(item.getName(), artifact.getName())).findFirst();
-                if (previousArtifactOption.isPresent()) {
-                    Artifact previousArtifact = previousArtifactOption.get();
-                    int previousIndex = artifacts.indexOf(previousArtifact);
-                    if (artifact.getAppend() != null && artifact.getAppend()) {
-                        // combine pre and current
-                        if (StringUtils.hasText(artifact.getDescription())) {
-                            previousArtifact.setDescription(artifact.getDescription());
-                        }
-                        if (Objects.nonNull(artifact.getLastChunk())) {
-                            previousArtifact.setLastChunk(artifact.getLastChunk());
-                        }
-                        if (artifact.getMetadata() != null && !artifact.getMetadata().isEmpty()) {
-                            Map<String, Object> metadata = previousArtifact.getMetadata() == null ? new HashMap<>(8) : previousArtifact.getMetadata();
-                            metadata.putAll(artifact.getMetadata());
-                            previousArtifact.setMetadata(metadata);
-                        }
-                        if (artifact.getParts() != null && !artifact.getParts().isEmpty()) {
-                            List<Part> parts = previousArtifact.getParts() == null ? new LinkedList<>() : previousArtifact.getParts();
-                            parts.addAll(artifact.getParts());
-                            previousArtifact.setParts(parts);
-                        }
-                        artifacts.set(previousIndex, previousArtifact);
-                    } else {
-                        artifacts.set(previousIndex, artifact);
-                    }
-                } else {
-                    artifacts.add(artifact);
-                }
+//                Optional<Artifact> previousArtifactOption = artifacts.stream().filter(item -> 
+//                        Objects.equals(item.getIndex(), artifact.getIndex()) 
+//                                || Objects.equals(item.getName(), artifact.getName())).findFirst();
+//                if (previousArtifactOption.isPresent()) {
+//                    Artifact previousArtifact = previousArtifactOption.get();
+//                    int previousIndex = artifacts.indexOf(previousArtifact);
+//                    if (artifact.getAppend() != null && artifact.getAppend()) {
+//                        // combine pre and current
+//                        if (StringUtils.hasText(artifact.getDescription())) {
+//                            previousArtifact.setDescription(artifact.getDescription());
+//                        }
+//                        if (Objects.nonNull(artifact.getLastChunk())) {
+//                            previousArtifact.setLastChunk(artifact.getLastChunk());
+//                        }
+//                        if (artifact.getMetadata() != null && !artifact.getMetadata().isEmpty()) {
+//                            Map<String, Object> metadata = previousArtifact.getMetadata() == null ? new HashMap<>(8) : previousArtifact.getMetadata();
+//                            metadata.putAll(artifact.getMetadata());
+//                            previousArtifact.setMetadata(metadata);
+//                        }
+//                        if (artifact.getParts() != null && !artifact.getParts().isEmpty()) {
+//                            List<Part> parts = previousArtifact.getParts() == null ? new LinkedList<>() : previousArtifact.getParts();
+//                            parts.addAll(artifact.getParts());
+//                            previousArtifact.setParts(parts);
+//                        }
+//                        artifacts.set(previousIndex, previousArtifact);
+//                    } else {
+//                        artifacts.set(previousIndex, artifact);
+//                    }
+//                } else {
+//                    artifacts.add(artifact);
+//                }
             } else {
                 log.error("Received taskUpdate {} but not a TaskUpdate {}", taskUpdate, taskUpdate.getClass());
             }

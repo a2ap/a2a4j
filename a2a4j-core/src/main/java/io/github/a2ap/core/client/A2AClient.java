@@ -6,7 +6,7 @@ import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskQueryParams;
-import io.github.a2ap.core.model.TaskSendParams;
+import io.github.a2ap.core.model.MessageSendParams;
 import reactor.core.publisher.Flux;
 
 /**
@@ -33,7 +33,7 @@ public interface A2AClient {
      * @param params The parameters for the tasks/send method.
      * @return created Task object or null.
      */
-    Task sendTask(TaskSendParams params);
+    Task sendTask(MessageSendParams params);
 
     /**
      * Sends a task request and subscribes to streaming updates.
@@ -41,7 +41,7 @@ public interface A2AClient {
      * @param params The parameters for the tasks/sendSubscribe method.
      * @return A Flux of task update events.
      */
-    Flux<TaskUpdateEvent> sendTaskSubscribe(TaskSendParams params);
+    Flux<TaskUpdateEvent> sendTaskSubscribe(MessageSendParams params);
 
     /**
      * Retrieves the current state of a task.

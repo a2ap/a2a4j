@@ -9,7 +9,7 @@ import io.github.a2ap.core.model.Artifact;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
-import io.github.a2ap.core.model.TaskSendParams;
+import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.TaskState;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskUpdate;
@@ -54,13 +54,9 @@ public class A2AServerImpl implements A2AServer {
      * @throws IllegalArgumentException if the task is invalid 
      */
     @Override
-    public Task handleTask(TaskSendParams params) {
-        log.info("Attempting to handle the task: {}", params);
-        if (params == null || params.getId() == null) {
-            log.error("Task handle failed: Task params must have a task id.");
-            throw new IllegalArgumentException("Task params must have a task id");
-        }
-        if (params.getMessage() == null || params.getMessage().getParts() == null 
+    public Task handleMessage(MessageSendParams params) {
+        log.info("Attempting to handle the message: {}", params);
+        if (params == null || params.getMessage() == null || params.getMessage().getParts() == null 
                 || params.getMessage().getParts().isEmpty()) {
             log.error("Task handle failed: Task params must have at least one message.");
             throw new IllegalArgumentException("Task params must have at least one message");
@@ -76,7 +72,7 @@ public class A2AServerImpl implements A2AServer {
     }
 
     @Override
-    public Flux<TaskUpdateEvent> handleSubscribeTask(TaskSendParams params) {
+    public Flux<TaskUpdateEvent> handleMessageStream(MessageSendParams params) {
         log.info("Attempting to handle and subscribe to task: {}", params);
         TaskContext taskContext = taskManager.loadOrCreateTask(params);
         log.info("Task context loaded: {}", taskContext.getTask());
@@ -87,14 +83,14 @@ public class A2AServerImpl implements A2AServer {
                  // todo some check status and 
                  boolean isComplete = ((TaskStatus) update).getState() == TaskState.COMPLETED;
                  updateEvent = TaskStatusUpdateEvent.builder()
-                         .id(params.getId())
+                         .taskId(taskContext.getTask().getId())
                          .status((TaskStatus) update)
                          .isFinal(isComplete)
                          .build();
              } else if (update instanceof Artifact) {
                  // todo some
                  updateEvent = TaskArtifactUpdateEvent.builder()
-                         .id(params.getId())
+                         .taskId(taskContext.getTask().getId())
                          .artifact((Artifact) update)
                          .build();
              } else {

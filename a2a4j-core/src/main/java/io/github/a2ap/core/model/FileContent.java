@@ -11,11 +11,10 @@ import lombok.NoArgsConstructor;
  * Represents the content of a file.
  */
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FileContent {
+public abstract class FileContent {
 
     /**
      * The name of the file.
@@ -28,16 +27,4 @@ public class FileContent {
      */
     @JsonProperty("mimeType")
     private String mimeType;
-
-    /**
-     * The base64-encoded content of the file.
-     */
-    @JsonProperty("bytes")
-    private String bytes;
-
-    /**
-     * The URI of the file.
-     */
-    @JsonProperty("uri")
-    private String uri;
 }

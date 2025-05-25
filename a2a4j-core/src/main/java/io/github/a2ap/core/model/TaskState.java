@@ -8,10 +8,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum TaskState {
     SUBMITTED("submitted"),
     WORKING("working"),
-    INPUT_REQUIRED("input_required"),
+    INPUT_REQUIRED("input-required"),
     COMPLETED("completed"),
     FAILED("failed"),
     CANCELED("canceled"),
+    REJECTED("rejected"),
+    AUTH_REQUIRED("auth-required"),
     UNKNOWN("unknown");
 
     private final String value;

@@ -1,5 +1,6 @@
 package io.github.a2ap.core.model;
 
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * Represents a text part of a message.
+ * file url content
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -17,19 +18,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TextPart extends Part {
+public class FileWithUri extends FileContent {
 
     /**
-     * The kind type of the part, always "text" for TextPart.
-     * Required field.
+     * The URI of the file.
      */
-    @JsonProperty("kind")
-    private final String kind = "text";
-
-    /**
-     * The text content.
-     * Required field.
-     */
-    @JsonProperty("text")
-    private String text;
+    @JsonProperty("uri")
+    private String uri;
 }

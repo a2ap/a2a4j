@@ -17,8 +17,20 @@ public class TaskStatusUpdateEvent implements TaskUpdateEvent {
     /**
      * The ID of the task being updated.
      */
-    @JsonProperty("id")
-    private String id;
+    @JsonProperty("taskId")
+    private String taskId;
+
+    /**
+     * The context id the task is associated with
+     */
+    @JsonProperty("contextId")
+    private String contextId;
+
+    /**
+     * kind type
+     */
+    @JsonProperty("kind")
+    private String kind = "status-update";
 
     /**
      * The new status of the task.
@@ -30,7 +42,7 @@ public class TaskStatusUpdateEvent implements TaskUpdateEvent {
      * Flag indicating if this is the final update for the task.
      */
     @JsonProperty("final")
-    private boolean isFinal;
+    private Boolean isFinal;
 
     /**
      * Optional metadata associated with this update event.
@@ -40,6 +52,6 @@ public class TaskStatusUpdateEvent implements TaskUpdateEvent {
     
     @Override
     public String getTaskId() {
-        return id;
+        return taskId;
     }
 }

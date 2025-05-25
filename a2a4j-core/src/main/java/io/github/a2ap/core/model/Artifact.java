@@ -20,6 +20,12 @@ import lombok.NoArgsConstructor;
 public class Artifact implements TaskUpdate {
 
     /**
+     * artifact id
+     */
+    @JsonProperty("artifactId")
+    private String artifactId;
+    
+    /**
      * The name of the artifact.
      */
     @JsonProperty("name")
@@ -37,24 +43,6 @@ public class Artifact implements TaskUpdate {
      */
     @JsonProperty("parts")
     private List<Part> parts;
-
-    /**
-     * The index of the artifact in a sequence of artifacts.
-     */
-    @JsonProperty("index")
-    private Integer index;
-
-    /**
-     * Indicates if the artifact should be appended to previous artifacts.
-     */
-    @JsonProperty("append")
-    private Boolean append;
-
-    /**
-     * Indicates if this is the last chunk of a streamed artifact.
-     */
-    @JsonProperty("lastChunk")
-    private Boolean lastChunk;
 
     /**
      * Optional metadata associated with the artifact.

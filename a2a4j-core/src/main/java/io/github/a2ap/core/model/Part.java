@@ -24,11 +24,11 @@ import lombok.NoArgsConstructor;
 public abstract class Part {
 
     /**
-     * The type of the part.
+     * The kind type of the part.
      * Required field.
      */
-    @JsonProperty("type")
-    private String type;
+    @JsonProperty("kind")
+    private String kind;
 
     /**
      * Optional metadata associated with the part.

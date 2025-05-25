@@ -27,6 +27,7 @@ public class JSONRPCResponse {
     /**
      * The result of the method invocation.
      * This field is mutually exclusive with error.
+     * result: Message | Task | TaskStatusUpdateEvent | TaskArtifactUpdateEvent;
      */
     @JsonProperty("result")
     private Object result;

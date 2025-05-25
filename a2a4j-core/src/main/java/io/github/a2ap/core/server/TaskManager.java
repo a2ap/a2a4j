@@ -3,8 +3,7 @@ package io.github.a2ap.core.server;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
-import io.github.a2ap.core.model.TaskSendParams;
-import io.github.a2ap.core.model.TaskStatus;
+import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.TaskUpdate;
 import java.util.List;
 import reactor.core.publisher.Mono;
@@ -21,7 +20,7 @@ public interface TaskManager {
      * @param params The task param to create
      * @return The created task with a generated ID
      */
-    TaskContext loadOrCreateTask(TaskSendParams params);
+    TaskContext loadOrCreateTask(MessageSendParams params);
 
     /**
      * Gets a task by its ID.

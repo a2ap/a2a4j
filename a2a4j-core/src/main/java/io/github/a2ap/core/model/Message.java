@@ -3,6 +3,7 @@ package io.github.a2ap.core.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,8 +18,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Message {
+public class Message implements MessageOrTask {
 
+    /**
+     * message id
+     */
+    @JsonProperty("messageId")
+    private String messageId;
+
+    /**
+     * task id
+     */
+    private String taskId;
+    
+    /**
+     * context id
+     */
+    @JsonProperty("contextId")
+    private String contextId;
+    
     /**
      * The role of the message sender (e.g., "user", "assistant").
      * Required field.
@@ -33,4 +51,17 @@ public class Message {
      */
     @JsonProperty("parts")
     private List<Part> parts;
+
+    /**
+     * message metadata
+     */
+    @JsonProperty("metadata")
+    private Map<String, Object> metadata;
+
+    /**
+     * kind type
+     */
+    @JsonProperty("kind")
+    private String kind;
+
 }
