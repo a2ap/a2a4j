@@ -37,7 +37,7 @@ public class A2AServerController {
         this.objectMapper = objectMapper;
     }
 
-    @GetMapping(".well-known/a2a-agent-card")
+    @GetMapping(".well-known/agent.json")
     public ResponseEntity<AgentCard> getAgentCard() {
         AgentCard card = a2aServer.getSelfAgentCard();
         return ResponseEntity.ok(card);

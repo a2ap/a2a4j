@@ -2,6 +2,7 @@ package io.github.a2ap.core.server.impl;
 
 import io.github.a2ap.core.model.Artifact;
 import io.github.a2ap.core.model.Message;
+import io.github.a2ap.core.model.Part;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
@@ -12,14 +13,19 @@ import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
@@ -125,14 +131,51 @@ public class InMemoryTaskManager implements TaskManager {
                 log.info("apply task {} updated with status {}", taskContext.getTask().getId(), taskStatus);
                 taskStatus.setTimestamp(String.valueOf(Instant.now().toEpochMilli()));
                 task.setStatus(taskStatus);
+                // If the update includes an agent message, add it to history
+                if (taskStatus.getMessage() != null && Objects.equals(taskStatus.getMessage().getRole(), "agent")) {
+                    List<Message> history = taskContext.getHistory() == null ? new LinkedList<>() : taskContext.getHistory();
+                    history.add(taskStatus.getMessage());
+                    taskContext.setHistory(history);
+                }
             } else if (taskUpdate instanceof Artifact artifact) {
                 log.info("apply task {} updated with artifact {}", taskContext.getTask().getId(), artifact);
-                // todo
+                List<Artifact> artifacts = task.getArtifacts();
+                Optional<Artifact> previousArtifactOption = artifacts.stream().filter(item -> 
+                        Objects.equals(item.getIndex(), artifact.getIndex()) 
+                                || Objects.equals(item.getName(), artifact.getName())).findFirst();
+                if (previousArtifactOption.isPresent()) {
+                    Artifact previousArtifact = previousArtifactOption.get();
+                    int previousIndex = artifacts.indexOf(previousArtifact);
+                    if (artifact.getAppend() != null && artifact.getAppend()) {
+                        // combine pre and current
+                        if (StringUtils.hasText(artifact.getDescription())) {
+                            previousArtifact.setDescription(artifact.getDescription());
+                        }
+                        if (Objects.nonNull(artifact.getLastChunk())) {
+                            previousArtifact.setLastChunk(artifact.getLastChunk());
+                        }
+                        if (artifact.getMetadata() != null && !artifact.getMetadata().isEmpty()) {
+                            Map<String, Object> metadata = previousArtifact.getMetadata() == null ? new HashMap<>(8) : previousArtifact.getMetadata();
+                            metadata.putAll(artifact.getMetadata());
+                            previousArtifact.setMetadata(metadata);
+                        }
+                        if (artifact.getParts() != null && !artifact.getParts().isEmpty()) {
+                            List<Part> parts = previousArtifact.getParts() == null ? new LinkedList<>() : previousArtifact.getParts();
+                            parts.addAll(artifact.getParts());
+                            previousArtifact.setParts(parts);
+                        }
+                        artifacts.set(previousIndex, previousArtifact);
+                    } else {
+                        artifacts.set(previousIndex, artifact);
+                    }
+                } else {
+                    artifacts.add(artifact);
+                }
             } else {
                 log.error("Received taskUpdate {} but not a TaskUpdate {}", taskUpdate, taskUpdate.getClass());
             }
         }
-        taskStore.save(taskContext.getTask(), taskContext.getHistory());
+        taskStore.save(taskContext);
         return Mono.just(taskContext);
     }
 

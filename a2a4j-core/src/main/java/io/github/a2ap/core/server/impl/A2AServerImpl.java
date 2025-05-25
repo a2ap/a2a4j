@@ -214,11 +214,11 @@ public class A2AServerImpl implements A2AServer {
         AgentCard selfCard = AgentCard.builder()
                 .name("Example Java Agent")
                 .description("A sample A2A agent implemented in Java.")
-                .url("http://localhost:8080/a2a") // Example URL
+                .url("http://localhost:8080/a2a/server") 
                 .version("1.0.0")
                 // Placeholder capabilities - replace with actual capabilities
                 .capabilities(new AgentCapabilities())
-                .skills(List.of()) // No skills defined yet
+                .skills(List.of())
                 .build();
         log.debug("Returning self agent card: {}", selfCard);
         return selfCard;

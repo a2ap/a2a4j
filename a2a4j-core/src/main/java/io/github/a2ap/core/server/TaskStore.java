@@ -1,9 +1,6 @@
 package io.github.a2ap.core.server;
 
-import io.github.a2ap.core.model.Task;
-import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.TaskContext;
-import java.util.List;
 
 /**
  * Simplified interface for task storage providers.
@@ -14,10 +11,9 @@ public interface TaskStore {
     /**
      * Saves a task and its associated message history.
      * Overwrites existing data if the task ID exists.
-     * @param task The task object to save.
-     * @param history The list of message history associated with the task.
+     * @param taskContext The task context object to save.
      */
-    void save(Task task, List<Message> history);
+    void save(TaskContext taskContext);
 
     /**
      * Loads a task and its history by task ID.
