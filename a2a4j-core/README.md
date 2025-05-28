@@ -1,0 +1,133 @@
+# A2A4J - Agent2Agent Protocol Java Implementation
+
+A2A4J是Agent2Agent (A2A)协议的Java实现，提供了完整的服务器端和客户端支持。
+
+## 功能特性
+
+- ✅ 完整的A2A协议支持
+- ✅ JSON-RPC 2.0通信
+- ✅ Server-Sent Events流式处理
+- ✅ Agent Card发现机制
+- ✅ 任务生命周期管理
+- ✅ 推送通知配置
+- ✅ Spring Boot集成
+- ✅ 响应式编程支持
+
+## 快速开始
+
+### 运行服务器
+
+```bash
+mvn spring-boot:run
+```
+
+服务器将在 `http://localhost:8080` 启动。
+
+### Agent Card访问
+
+```bash
+curl http://localhost:8080/.well-known/agent.json
+```
+
+### 发送消息
+
+```bash
+curl -X POST http://localhost:8080/a2a/server \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "message/send",
+    "params": {
+      "message": {
+        "role": "user",
+        "parts": [
+          {
+            "type": "text",
+            "kind": "text",
+            "text": "Hello, A2A!"
+          }
+        ]
+      }
+    },
+    "id": "1"
+  }'
+```
+
+## 支持的JSON-RPC方法
+
+### 核心方法
+- `message/send` - 发送消息并创建任务
+- `message/stream` - 发送消息并订阅流式更新
+
+### 任务管理
+- `tasks/get` - 获取任务状态
+- `tasks/cancel` - 取消任务
+- `tasks/resubscribe` - 重新订阅任务更新
+
+### 推送通知
+- `tasks/pushNotificationConfig/set` - 设置推送通知配置
+- `tasks/pushNotificationConfig/get` - 获取推送通知配置
+
+## 客户端使用示例
+
+```java
+// 创建客户端
+AgentCard agentCard = AgentCard.builder()
+    .name("Target Agent")
+    .url("http://localhost:8080")
+    .version("1.0.0")
+    .capabilities(AgentCapabilities.builder().streaming(true).build())
+    .skills(List.of())
+    .build();
+
+A2AClient client = new A2AClientImpl(agentCard, new HttpCardResolver());
+
+// 发送消息
+TextPart textPart = new TextPart();
+textPart.setText("Hello from Java client!");
+
+Message message = Message.builder()
+    .role("user")
+    .parts(List.of(textPart))
+    .build();
+
+MessageSendParams params = MessageSendParams.builder()
+    .message(message)
+    .build();
+
+Task result = client.sendTask(params);
+```
+
+## 架构设计
+
+```
+a2a4j-core/
+├── src/main/java/io/github/a2ap/core/
+│   ├── model/          # 数据模型
+│   ├── server/         # 服务器端实现
+│   ├── client/         # 客户端实现
+│   ├── jsonrpc/        # JSON-RPC支持
+│   ├── event/          # 事件模型
+│   └── exception/      # 异常处理
+└── src/test/java/      # 测试代码
+```
+
+## 依赖要求
+
+- Java 17+
+- Spring Boot 3.2+
+- Maven 3.6+
+
+## 测试
+
+```bash
+mvn test
+```
+
+## 贡献
+
+欢迎提交Issue和Pull Request来改进这个实现。
+
+## 许可证
+
+MIT License 

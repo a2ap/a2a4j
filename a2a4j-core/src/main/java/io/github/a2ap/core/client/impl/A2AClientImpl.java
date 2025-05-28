@@ -14,6 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import java.util.Map;
+import java.util.UUID;
+import java.util.Objects;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of the A2AClient interface.
@@ -141,21 +145,130 @@ public class A2AClientImpl implements A2AClient {
 
     @Override
     public TaskPushNotificationConfig setTaskPushNotification(TaskPushNotificationConfig params) {
-        return null;
+        log.info("Setting push notification config for task {} on {}", params.getTaskId(), this.baseUrl);
+        WebClient client = WebClient.create(this.baseUrl);
+        try {
+            // 构建JSON-RPC请求
+            Map<String, Object> jsonRpcRequest = Map.of(
+                "jsonrpc", "2.0",
+                "method", "tasks/pushNotificationConfig/set",
+                "params", params,
+                "id", UUID.randomUUID().toString()
+            );
+            
+            Map<String, Object> response = client.post()
+                    .uri("/a2a/server")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(jsonRpcRequest)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+            
+            if (response != null && response.containsKey("result")) {
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.convertValue(response.get("result"), TaskPushNotificationConfig.class);
+            }
+            return null;
+        } catch (Exception e) {
+            log.error("Error setting push notification config for task {} on {}: {}", params.getTaskId(), this.baseUrl, e.getMessage(), e);
+            return null;
+        }
     }
 
     @Override
     public TaskPushNotificationConfig getTaskPushNotification(TaskIdParams params) {
-        return null;
+        log.info("Getting push notification config for task {} from {}", params.getId(), this.baseUrl);
+        WebClient client = WebClient.create(this.baseUrl);
+        try {
+            // 构建JSON-RPC请求
+            Map<String, Object> jsonRpcRequest = Map.of(
+                "jsonrpc", "2.0",
+                "method", "tasks/pushNotificationConfig/get",
+                "params", params,
+                "id", UUID.randomUUID().toString()
+            );
+            
+            Map<String, Object> response = client.post()
+                    .uri("/a2a/server")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(jsonRpcRequest)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+            
+            if (response != null && response.containsKey("result")) {
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.convertValue(response.get("result"), TaskPushNotificationConfig.class);
+            }
+            return null;
+        } catch (Exception e) {
+            log.error("Error getting push notification config for task {} from {}: {}", params.getId(), this.baseUrl, e.getMessage(), e);
+            return null;
+        }
     }
 
     @Override
     public Flux<TaskUpdateEvent> resubscribeTask(TaskQueryParams params) {
-        return null;
+        log.info("Resubscribing to task updates for {} from {}", params.getTaskId(), this.baseUrl);
+        WebClient client = WebClient.create(this.baseUrl);
+        
+        // 构建JSON-RPC请求
+        Map<String, Object> jsonRpcRequest = Map.of(
+            "jsonrpc", "2.0",
+            "method", "tasks/resubscribe",
+            "params", Map.of("id", params.getTaskId()),
+            "id", UUID.randomUUID().toString()
+        );
+        
+        return client.post()
+                .uri("/a2a/server")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .bodyValue(jsonRpcRequest)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .map(this::parseServerSentEvent)
+                .filter(Objects::nonNull)
+                .doOnError(e -> log.error("Error resubscribing to task updates for {}: {}", params.getTaskId(), e.getMessage(), e))
+                .doOnComplete(() -> log.info("Task resubscription stream completed for {}.", params.getTaskId()));
     }
 
     @Override
     public Boolean supports(String capability) {
-        return null;
+        if (agentCard == null) {
+            agentCard = retrieveAgentCard();
+        }
+        
+        if (agentCard == null || agentCard.getCapabilities() == null) {
+            return false;
+        }
+        
+        // 检查代理能力
+        switch (capability.toLowerCase()) {
+            case "streaming":
+                return agentCard.getCapabilities().isStreaming();
+            case "pushnotifications":
+                return agentCard.getCapabilities().isPushNotifications();
+            default:
+                return false;
+        }
+    }
+    
+    private TaskUpdateEvent parseServerSentEvent(String eventData) {
+        try {
+            // 解析SSE数据中的JSON-RPC响应
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> jsonRpcResponse = mapper.readValue(eventData, Map.class);
+            
+            if (jsonRpcResponse.containsKey("result")) {
+                Object result = jsonRpcResponse.get("result");
+                // 根据结果类型创建相应的事件
+                return mapper.convertValue(result, TaskUpdateEvent.class);
+            }
+            return null;
+        } catch (Exception e) {
+            log.error("Error parsing server-sent event: {}", e.getMessage());
+            return null;
+        }
     }
 }

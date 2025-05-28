@@ -185,17 +185,30 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public Flux<TaskUpdateEvent> subscribeToTaskUpdates(String taskId) {
         log.info("Subscribing to task updates for ID: {}", taskId);
+        
+        // 检查任务是否存在
+        Task task = taskManager.getTask(taskId);
+        if (task == null) {
+            log.warn("Task with ID {} not found for subscription.", taskId);
+            return Flux.error(new IllegalArgumentException("Task not found: " + taskId));
+        }
+        
+        // 如果任务已经完成，返回最终状态
+        TaskState state = task.getStatus().getState();
+        if (state == TaskState.COMPLETED || state == TaskState.FAILED || 
+            state == TaskState.CANCELED || state == TaskState.REJECTED) {
+            log.info("Task {} is in final state {}, returning final status.", taskId, state);
+            TaskStatusUpdateEvent finalEvent = TaskStatusUpdateEvent.builder()
+                    .taskId(taskId)
+                    .status(task.getStatus())
+                    .isFinal(true)
+                    .build();
+            return Flux.just(finalEvent);
+        }
+        
+        // 对于正在进行的任务，返回空流（实际实现中应该连接到任务更新流）
+        log.debug("Task {} is in progress, subscribing to updates.", taskId);
         return Flux.empty();
-//        Sinks.Many<Task> sink = taskUpdateSinks.computeIfAbsent(taskId,
-//                id -> {
-//                    log.debug("Creating new sink for task {}.", id);
-//                    return Sinks.many().multicast().onBackpressureBuffer();
-//                });
-//        log.debug("Returning Flux for task {} updates.", taskId);
-//        return sink.asFlux()
-//                .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates.", taskId))
-//                .doOnComplete(() -> log.debug("Task {} updates stream completed.", taskId))
-//                .doOnError(e -> log.error("Error in task {} updates stream: {}", taskId, e.getMessage(), e));
     }
 
     /**

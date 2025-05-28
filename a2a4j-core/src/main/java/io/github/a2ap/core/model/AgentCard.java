@@ -68,6 +68,16 @@ public class AgentCard {
     private AgentAuthentication authentication;
 
     /**
+     * Security scheme details used for authenticating with this agent.
+     */
+    private java.util.Map<String, SecurityScheme> securitySchemes;
+
+    /**
+     * Security requirements for contacting the agent.
+     */
+    private java.util.List<java.util.Map<String, java.util.List<String>>> security;
+
+    /**
      * Default input modes supported by the agent (e.g., 'text', 'file', 'json').
      * Defaults to ["text"] if not specified.
      */
