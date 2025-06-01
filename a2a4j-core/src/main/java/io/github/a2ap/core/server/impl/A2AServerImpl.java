@@ -1,11 +1,12 @@
 package io.github.a2ap.core.server.impl;
 
-import io.github.a2ap.core.event.TaskArtifactUpdateEvent;
-import io.github.a2ap.core.event.TaskStatusUpdateEvent;
-import io.github.a2ap.core.event.TaskUpdateEvent;
+import io.github.a2ap.core.model.SendMessageResponse;
+import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
+import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.Artifact;
+import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
@@ -54,7 +55,7 @@ public class A2AServerImpl implements A2AServer {
      * @throws IllegalArgumentException if the task is invalid 
      */
     @Override
-    public Task handleMessage(MessageSendParams params) {
+    public SendMessageResponse handleMessage(MessageSendParams params) {
         log.info("Attempting to handle the message: {}", params);
         if (params == null || params.getMessage() == null || params.getMessage().getParts() == null 
                 || params.getMessage().getParts().isEmpty()) {
@@ -72,13 +73,13 @@ public class A2AServerImpl implements A2AServer {
     }
 
     @Override
-    public Flux<TaskUpdateEvent> handleMessageStream(MessageSendParams params) {
+    public Flux<SendStreamingMessageResponse> handleMessageStream(MessageSendParams params) {
         log.info("Attempting to handle and subscribe to task: {}", params);
         TaskContext taskContext = taskManager.loadOrCreateTask(params);
         log.info("Task context loaded: {}", taskContext.getTask());
         return taskHandler.handle(taskContext).map(update -> {
              TaskContext updateTaskContext = taskManager.applyTaskUpdate(taskContext, update).block();
-             TaskUpdateEvent updateEvent = null;
+             SendStreamingMessageResponse updateEvent = null;
              if (update instanceof TaskStatus) {
                  // todo some check status and 
                  boolean isComplete = ((TaskStatus) update).getState() == TaskState.COMPLETED;
@@ -183,7 +184,7 @@ public class A2AServerImpl implements A2AServer {
      * @return A Flux of Task objects representing the updates.
      */
     @Override
-    public Flux<TaskUpdateEvent> subscribeToTaskUpdates(String taskId) {
+    public Flux<SendStreamingMessageResponse> subscribeToTaskUpdates(String taskId) {
         log.info("Subscribing to task updates for ID: {}", taskId);
         
         // 检查任务是否存在

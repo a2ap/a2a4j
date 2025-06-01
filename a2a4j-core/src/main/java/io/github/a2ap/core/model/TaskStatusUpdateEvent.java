@@ -1,8 +1,7 @@
-package io.github.a2ap.core.event;
+package io.github.a2ap.core.model;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.a2ap.core.model.TaskStatus;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class TaskStatusUpdateEvent implements TaskUpdateEvent {
+public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * The ID of the task being updated.
@@ -50,8 +49,4 @@ public class TaskStatusUpdateEvent implements TaskUpdateEvent {
     @JsonProperty("metadata")
     private Map<String, Object> metadata;
     
-    @Override
-    public String getTaskId() {
-        return taskId;
-    }
 }

@@ -1,7 +1,6 @@
-package io.github.a2ap.core.event;
+package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.a2ap.core.model.Artifact;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class TaskArtifactUpdateEvent implements TaskUpdateEvent {
+public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * The ID of the task being updated.
@@ -60,9 +59,5 @@ public class TaskArtifactUpdateEvent implements TaskUpdateEvent {
      */
     @JsonProperty("metadata")
     private Map<String, Object> metadata;
-   
-    @Override
-    public String getTaskId() {
-        return taskId;
-    }
+    
 }

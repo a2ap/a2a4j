@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Task implements MessageOrTask {
+public class Task implements SendMessageResponse, SendStreamingMessageResponse {
 
     /**
      * The unique identifier of the task.

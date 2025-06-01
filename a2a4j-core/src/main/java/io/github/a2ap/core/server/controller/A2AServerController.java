@@ -5,6 +5,7 @@ import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
@@ -55,8 +56,8 @@ public class A2AServerController {
             switch (method) {
                 case "message/send":
                     MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
-                    Task messageTask = a2aServer.handleMessage(taskSendParams);
-                    response.setResult(messageTask);
+                    SendMessageResponse messageResponse = a2aServer.handleMessage(taskSendParams);
+                    response.setResult(messageResponse);
                     break;
                 case "tasks/get":
                     TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
@@ -110,12 +111,11 @@ public class A2AServerController {
         try {
             switch (method) {
                 case "message/stream":
-                    // First, create the task
                     MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
                     return a2aServer.handleMessageStream(taskSendParams).map(event -> {
                         response.setResult(event);
                         return ServerSentEvent.<JSONRPCResponse>builder()
-                                .data(response).id(event.getTaskId()).event("task-update").build();
+                                .data(response).event("task-update").build();
                     });
                 case "tasks/resubscribe":
                     // Params expected: TaskIdParams { taskId: string }
@@ -126,7 +126,6 @@ public class A2AServerController {
                                 response.setResult(event);
                                 return ServerSentEvent.<JSONRPCResponse>builder()
                                         .data(response)
-                                        .id(event.getTaskId())
                                         .event("task-update")
                                         .build();
                             });

@@ -1,7 +1,7 @@
 package io.github.a2ap.core.client;
 
-import io.github.a2ap.core.event.TaskUpdateEvent;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
@@ -41,7 +41,7 @@ public interface A2AClient {
      * @param params The parameters for the tasks/sendSubscribe method.
      * @return A Flux of task update events.
      */
-    Flux<TaskUpdateEvent> sendTaskSubscribe(MessageSendParams params);
+    Flux<SendStreamingMessageResponse> sendTaskSubscribe(MessageSendParams params);
 
     /**
      * Retrieves the current state of a task.
@@ -77,7 +77,7 @@ public interface A2AClient {
      * @param params The parameters for the tasks/resubscribe method.
      * @return A Flux of task update events.
      */
-    Flux<TaskUpdateEvent> resubscribeTask(TaskQueryParams params);
+    Flux<SendStreamingMessageResponse> resubscribeTask(TaskQueryParams params);
 
     /**
      * Optional: Checks if the server likely supports optional methods based on agent card.

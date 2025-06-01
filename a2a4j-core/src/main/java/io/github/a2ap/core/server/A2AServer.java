@@ -1,7 +1,8 @@
 package io.github.a2ap.core.server;
 
-import io.github.a2ap.core.event.TaskUpdateEvent;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.SendMessageResponse;
+import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
@@ -17,16 +18,16 @@ public interface A2AServer {
      * Handle send message task.
      * 
      * @param params The task params to send
-     * @return The task with a generated ID
+     * @return SendMessageResponse The task or Message
      */
-    Task handleMessage(MessageSendParams params);
+    SendMessageResponse handleMessage(MessageSendParams params);
 
     /**
      * Handle send task streaming.
      * @param params The task params to send
      * @return Streaming events
      */
-    Flux<TaskUpdateEvent> handleMessageStream(MessageSendParams params);
+    Flux<SendStreamingMessageResponse> handleMessageStream(MessageSendParams params);
 
     /**
      * Gets a task by its ID.
@@ -74,5 +75,5 @@ public interface A2AServer {
      * @param taskId The ID of the task to subscribe to
      * @return A Flux of Task objects representing updates
      */
-    Flux<TaskUpdateEvent> subscribeToTaskUpdates(String taskId);
+    Flux<SendStreamingMessageResponse> subscribeToTaskUpdates(String taskId);
 }

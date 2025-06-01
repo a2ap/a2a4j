@@ -2,8 +2,8 @@ package io.github.a2ap.core.client.impl;
 
 import io.github.a2ap.core.client.A2AClient;
 import io.github.a2ap.core.client.CardResolver;
-import io.github.a2ap.core.event.TaskUpdateEvent;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
@@ -87,14 +87,14 @@ public class A2AClientImpl implements A2AClient {
     }
 
     @Override
-    public Flux<TaskUpdateEvent> sendTaskSubscribe(MessageSendParams params) {
+    public Flux<SendStreamingMessageResponse> sendTaskSubscribe(MessageSendParams params) {
         log.info("Subscribing to task updates for {} from {}", params, this.baseUrl);
         WebClient client = WebClient.create(this.baseUrl);
         return client.get()
                 .uri("/tasks/sendSubscribe")
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
-                .bodyToFlux(TaskUpdateEvent.class)
+                .bodyToFlux(SendStreamingMessageResponse.class)
                 .doOnError(e -> log.error("Error receiving task updates for {}: {}", params, e.getMessage(), e))
                 .doOnComplete(() -> log.info("Task updates stream completed for {}.", params));
     }
@@ -208,7 +208,7 @@ public class A2AClientImpl implements A2AClient {
     }
 
     @Override
-    public Flux<TaskUpdateEvent> resubscribeTask(TaskQueryParams params) {
+    public Flux<SendStreamingMessageResponse> resubscribeTask(TaskQueryParams params) {
         log.info("Resubscribing to task updates for {} from {}", params.getTaskId(), this.baseUrl);
         WebClient client = WebClient.create(this.baseUrl);
         
@@ -254,7 +254,7 @@ public class A2AClientImpl implements A2AClient {
         }
     }
     
-    private TaskUpdateEvent parseServerSentEvent(String eventData) {
+    private SendStreamingMessageResponse parseServerSentEvent(String eventData) {
         try {
             // 解析SSE数据中的JSON-RPC响应
             ObjectMapper mapper = new ObjectMapper();
@@ -263,7 +263,7 @@ public class A2AClientImpl implements A2AClient {
             if (jsonRpcResponse.containsKey("result")) {
                 Object result = jsonRpcResponse.get("result");
                 // 根据结果类型创建相应的事件
-                return mapper.convertValue(result, TaskUpdateEvent.class);
+                return mapper.convertValue(result, SendStreamingMessageResponse.class);
             }
             return null;
         } catch (Exception e) {
