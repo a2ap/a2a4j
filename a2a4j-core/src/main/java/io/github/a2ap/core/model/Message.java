@@ -29,6 +29,7 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
     /**
      * task id
      */
+    @JsonProperty("taskId")
     private String taskId;
     
     /**
