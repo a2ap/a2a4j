@@ -15,9 +15,15 @@ import io.github.a2ap.core.model.TaskState;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.server.A2AServer;
+import io.github.a2ap.core.server.AgentExecutor;
+import io.github.a2ap.core.server.EventQueue;
+import io.github.a2ap.core.server.QueueManager;
 import io.github.a2ap.core.server.TaskHandler;
 import io.github.a2ap.core.server.TaskManager;
+import io.github.a2ap.core.server.TaskQueueExistsException;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -33,18 +39,27 @@ public class A2AServerImpl implements A2AServer {
     
     private final TaskManager taskManager;
     private final TaskHandler taskHandler;
+    private final AgentExecutor agentExecutor;
+    private final QueueManager queueManager;
+    private final ConcurrentMap<String, Mono<Void>> runningAgents = new ConcurrentHashMap<>();
     
     /**
-     * Constructs a new A2AServerImpl with the specified TaskStore and TaskHandler.
+     * Constructs a new A2AServerImpl with the specified components.
      *
-     * @param taskStore The TaskStore to use for task management.
      * @param taskHandler The TaskHandler to use for task processing.
+     * @param taskManager The TaskManager to use for task management.
+     * @param agentExecutor The AgentExecutor to use for agent execution.
+     * @param queueManager The QueueManager to use for event queue management.
      */
-    public A2AServerImpl(TaskHandler taskHandler, TaskManager taskManager) {
+    public A2AServerImpl(TaskHandler taskHandler, TaskManager taskManager, 
+                        AgentExecutor agentExecutor, QueueManager queueManager) {
         this.taskHandler = taskHandler;
         this.taskManager = taskManager;
-        log.info("A2AServerImpl initialized with TaskManager: {} and TaskHandler: {}",
-                taskManager.getClass().getSimpleName(), taskHandler.getClass().getSimpleName());
+        this.agentExecutor = agentExecutor;
+        this.queueManager = queueManager;
+        log.info("A2AServerImpl initialized with TaskManager: {}, TaskHandler: {}, AgentExecutor: {}, QueueManager: {}",
+                taskManager.getClass().getSimpleName(), taskHandler.getClass().getSimpleName(),
+                agentExecutor.getClass().getSimpleName(), queueManager.getClass().getSimpleName());
     }
 
     /**
@@ -64,10 +79,28 @@ public class A2AServerImpl implements A2AServer {
         }
         TaskContext taskContext = taskManager.loadOrCreateTask(params);
         log.info("Task context loaded: {}", taskContext.getTask());
-        Flux<TaskUpdate> taskFlux = taskHandler.handle(taskContext);
-        List<TaskUpdate> taskUpdates = taskFlux.collectList().block();
-        Mono<TaskContext> taskMono = taskManager.applyTaskUpdate(taskContext, taskUpdates);
-        Task task = taskMono.block().getTask();
+        
+        // Create event queue for this task
+        EventQueue tempQueue1;
+        try {
+            tempQueue1 = queueManager.create(taskContext.getTask().getId());
+        } catch (TaskQueueExistsException e) {
+            tempQueue1 = queueManager.get(taskContext.getTask().getId());
+        }
+        final EventQueue eventQueue = tempQueue1;
+        
+        // Execute agent and collect final result
+        Mono<Task> resultMono = agentExecutor.execute(taskContext, eventQueue)
+                .then(eventQueue.asFlux()
+                        .filter(event -> event instanceof TaskStatusUpdateEvent && ((TaskStatusUpdateEvent) event).getIsFinal())
+                        .cast(TaskStatusUpdateEvent.class)
+                        .next()
+                        .map(event -> {
+                            TaskContext updatedContext = taskManager.applyTaskUpdate(taskContext, event.getStatus()).block();
+                            return updatedContext.getTask();
+                        }));
+        
+        Task task = resultMono.block();
         log.info("Task handle success: {}", task);
         return task;
     }
@@ -75,32 +108,37 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public Flux<SendStreamingMessageResponse> handleMessageStream(MessageSendParams params) {
         log.info("Attempting to handle and subscribe to task: {}", params);
-        TaskContext taskContext = taskManager.loadOrCreateTask(params);
+        final TaskContext taskContext = taskManager.loadOrCreateTask(params);
         log.info("Task context loaded: {}", taskContext.getTask());
-        return taskHandler.handle(taskContext).map(update -> {
-             TaskContext updateTaskContext = taskManager.applyTaskUpdate(taskContext, update).block();
-             SendStreamingMessageResponse updateEvent = null;
-             if (update instanceof TaskStatus) {
-                 // todo some check status and 
-                 boolean isComplete = ((TaskStatus) update).getState() == TaskState.COMPLETED;
-                 updateEvent = TaskStatusUpdateEvent.builder()
-                         .taskId(taskContext.getTask().getId())
-                         .status((TaskStatus) update)
-                         .isFinal(isComplete)
-                         .build();
-             } else if (update instanceof Artifact) {
-                 // todo some
-                 updateEvent = TaskArtifactUpdateEvent.builder()
-                         .taskId(taskContext.getTask().getId())
-                         .artifact((Artifact) update)
-                         .build();
-             } else {
-                 // todo 
-             }
-             return updateEvent;
-        }).doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleSubscribeTask.", taskContext.getTask().getId()))
-                .doOnComplete(() -> log.debug("Task {} updates stream completed via handleSubscribeTask.", taskContext.getTask().getId()))
-                .doOnError(e -> log.error("Error in task {} updates stream via handleSubscribeTask: {}", taskContext.getTask().getId(), e.getMessage(), e));
+        
+        String taskId = taskContext.getTask().getId();
+        
+        // Create or get event queue for this task
+        EventQueue tempQueue;
+        try {
+            tempQueue = queueManager.create(taskId);
+        } catch (TaskQueueExistsException e) {
+            tempQueue = queueManager.get(taskId);
+        }
+        final EventQueue eventQueue = tempQueue;
+        
+        // Start agent execution if not already running
+        runningAgents.computeIfAbsent(taskId, id -> {
+            log.debug("Starting agent execution for task: {}", id);
+            return agentExecutor.execute(taskContext, eventQueue)
+                    .doOnTerminate(() -> {
+                        log.debug("Agent execution completed for task: {}", id);
+                        runningAgents.remove(id);
+                        queueManager.remove(id);
+                    })
+                    .cache(); // Cache to prevent multiple executions
+        });
+        
+        // Return the event stream
+        return eventQueue.asFlux()
+                .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleMessageStream.", taskId))
+                .doOnComplete(() -> log.debug("Task {} updates stream completed via handleMessageStream.", taskId))
+                .doOnError(e -> log.error("Error in task {} updates stream via handleMessageStream: {}", taskId, e.getMessage(), e));
     }
 
     /**
@@ -130,12 +168,49 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public Task cancelTask(String taskId) {
         log.info("Attempting to cancel task with ID: {}", taskId);
-        // Use taskStore to cancel task
-        Task cancelledTask = taskManager.cancelTask(taskId);
+        
+        TaskContext taskContext = TaskContext.builder()
+                .task(taskManager.getTask(taskId))
+                .build();
+        
+        if (taskContext.getTask() == null) {
+            log.warn("Task with ID {} not found for cancellation.", taskId);
+            return null;
+        }
+        
+        // Get or create event queue for cancellation
+        EventQueue eventQueue = queueManager.get(taskId);
+        if (eventQueue == null) {
+            try {
+                eventQueue = queueManager.create(taskId);
+            } catch (TaskQueueExistsException e) {
+                eventQueue = queueManager.get(taskId);
+            }
+        }
+        
+        // Cancel the running agent if exists
+        Mono<Void> runningAgent = runningAgents.remove(taskId);
+        if (runningAgent != null) {
+            // Cancel the running execution
+            log.debug("Cancelling running agent for task: {}", taskId);
+        }
+        
+        // Execute cancellation
+        Task cancelledTask = agentExecutor.cancel(taskContext, eventQueue)
+                .then(eventQueue.asFlux()
+                        .filter(event -> event instanceof TaskStatusUpdateEvent && ((TaskStatusUpdateEvent) event).getIsFinal())
+                        .cast(TaskStatusUpdateEvent.class)
+                        .next()
+                        .map(event -> {
+                            TaskContext updatedContext = taskManager.applyTaskUpdate(taskContext, event.getStatus()).block();
+                            return updatedContext.getTask();
+                        }))
+                .block();
+        
         if (cancelledTask != null) {
             log.info("Task {} cancelled successfully.", taskId);
         } else {
-            log.warn("Failed to cancel task with ID {}. Task not found or already completed/failed.", taskId);
+            log.warn("Failed to cancel task with ID {}.", taskId);
         }
         return cancelledTask;
     }
@@ -207,9 +282,18 @@ public class A2AServerImpl implements A2AServer {
             return Flux.just(finalEvent);
         }
         
-        // 对于正在进行的任务，返回空流（实际实现中应该连接到任务更新流）
-        log.debug("Task {} is in progress, subscribing to updates.", taskId);
-        return Flux.empty();
+        // 对于正在进行的任务，尝试tap到现有的事件队列
+        EventQueue eventQueue = queueManager.tap(taskId);
+        if (eventQueue != null) {
+            log.debug("Task {} is in progress, subscribing to updates via tapped queue.", taskId);
+            return eventQueue.asFlux()
+                    .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via subscribeToTaskUpdates.", taskId))
+                    .doOnComplete(() -> log.debug("Task {} updates stream completed via subscribeToTaskUpdates.", taskId))
+                    .doOnError(e -> log.error("Error in task {} updates stream via subscribeToTaskUpdates: {}", taskId, e.getMessage(), e));
+        } else {
+            log.warn("No active event queue found for task {}.", taskId);
+            return Flux.empty();
+        }
     }
 
     /**
