@@ -2,6 +2,7 @@ package io.github.a2ap.core.server.impl;
 
 import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.SendMessageResponse;
+import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.model.AgentCapabilities;
@@ -81,14 +82,21 @@ public class A2AServerImpl implements A2AServer {
         final EventQueue eventQueue = queueManager.create(taskContext.getTaskId());
         
         // Execute agent and collect final result
+        eventQueue.enqueueEvent(currentTask);
         Mono<List<SendMessageResponse>> resultMono = agentExecutor.execute(taskContext, eventQueue)
                 .then(eventQueue.asFlux()
+                        .doOnNext(sendMessageResponse -> {
+                            log.info("Task agent received event: {}", sendMessageResponse);
+                        })
                         .filter(event -> {
                             if (event instanceof TaskStatusUpdateEvent) {
                                 taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus()).block();
                                 return false;
                             } else if (event instanceof Task) {
                                 return true;
+                            } else if (event instanceof TaskArtifactUpdateEvent) {
+                                // todo merge artifact into task
+                                return false;
                             } else if (event instanceof Message) {
                                 // todo merge message and others
                                 return true;
