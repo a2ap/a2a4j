@@ -12,9 +12,8 @@ public interface QueueManager {
      *
      * @param taskId The ID of the task.
      * @return The EventQueue for the task.
-     * @throws TaskQueueExistsException if the queue already exists and cannot be created again.
      */
-    EventQueue create(String taskId) throws TaskQueueExistsException;
+    EventQueue create(String taskId);
     
     /**
      * Taps into an existing task's event queue to create a child queue.

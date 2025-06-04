@@ -3,7 +3,7 @@ package io.github.a2ap.core.server.impl;
 import io.github.a2ap.core.model.Artifact;
 import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
-import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.TaskState;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
@@ -18,7 +18,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Demo implementation of AgentExecutor that simulates various types of events
@@ -29,7 +28,7 @@ import java.util.UUID;
 public class DemoAgentExecutor implements AgentExecutor {
     
     @Override
-    public Mono<Void> execute(TaskContext context, EventQueue eventQueue) {
+    public Mono<Void> execute(RequestContext context, EventQueue eventQueue) {
         String taskId = context.getTask().getId();
         String contextId = context.getTask().getContextId();
         log.info("Demo agent starting execution for task: {}", taskId);
@@ -87,28 +86,10 @@ public class DemoAgentExecutor implements AgentExecutor {
     }
     
     @Override
-    public Mono<Void> cancel(TaskContext context, EventQueue eventQueue) {
-        String taskId = context.getTask().getId();
-        String contextId = context.getTask().getContextId();
+    public Mono<Void> cancel(String taskId) {
         log.info("Demo agent cancelling task: {}", taskId);
-        
-        return Mono.fromRunnable(() -> {
-            // 发送取消状态
-            TaskStatusUpdateEvent cancelledEvent = TaskStatusUpdateEvent.builder()
-                    .taskId(taskId)
-                    .contextId(contextId)
-                    .status(TaskStatus.builder()
-                            .state(TaskState.CANCELED)
-                            .timestamp(String.valueOf(Instant.now().toEpochMilli()))
-                            .message(createAgentMessage("任务已被用户取消"))
-                            .build())
-                    .isFinal(true)
-                    .build();
-            eventQueue.enqueueEvent(cancelledEvent);
-            eventQueue.close();
-            
-            log.info("Demo agent cancelled task: {}", taskId);
-        });
+        // todo some more cancel
+        return Mono.empty();
     }
     
     /**

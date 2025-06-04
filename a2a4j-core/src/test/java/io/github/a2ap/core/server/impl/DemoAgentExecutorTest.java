@@ -4,7 +4,7 @@ import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
-import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.TaskState;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DemoAgentExecutorTest {
     
     private DemoAgentExecutor agentExecutor;
-    private TaskContext taskContext;
+    private RequestContext taskContext;
     private EventQueue eventQueue;
     
     @BeforeEach
@@ -51,10 +51,8 @@ class DemoAgentExecutorTest {
                         .build()))
                 .build();
         
-        taskContext = TaskContext.builder()
+        taskContext = RequestContext.builder()
                 .task(task)
-                .userMessage(userMessage)
-                .history(List.of(userMessage))
                 .build();
         
         eventQueue = new EventQueue();
@@ -130,7 +128,7 @@ class DemoAgentExecutorTest {
     @Test
     void testCancel_ShouldEmitCancelledStatus() {
         // 执行取消操作
-        agentExecutor.cancel(taskContext, eventQueue).subscribe();
+        agentExecutor.cancel("id").subscribe();
         
         // 验证取消事件
         Flux<SendStreamingMessageResponse> eventFlux = eventQueue.asFlux();

@@ -45,6 +45,15 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
     private List<Artifact> artifacts;
 
     /**
+     * An optional array of recent messages exchanged within this task,
+     * ordered chronologically (oldest first).
+     * This history is included if requested by the client via the `historyLength` parameter
+     * in `TaskSendParams` or `TaskQueryParams`.
+     */
+    @JsonProperty("history")
+    private List<Message> history;
+
+    /**
      * The metadata associated with the task.
      */
     @JsonProperty("metadata")

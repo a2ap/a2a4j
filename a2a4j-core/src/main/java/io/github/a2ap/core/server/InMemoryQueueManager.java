@@ -18,18 +18,18 @@ public class InMemoryQueueManager implements QueueManager {
     private final ConcurrentMap<String, EventQueue> queues = new ConcurrentHashMap<>();
     
     @Override
-    public EventQueue create(String taskId) throws TaskQueueExistsException {
+    public EventQueue create(String taskId) {
         log.debug("Creating EventQueue for task: {}", taskId);
         
         EventQueue newQueue = new EventQueue();
         EventQueue existingQueue = queues.putIfAbsent(taskId, newQueue);
         
         if (existingQueue != null) {
-            log.warn("EventQueue already exists for task: {}", taskId);
-            throw new TaskQueueExistsException("EventQueue already exists for task: " + taskId);
+            log.debug("EventQueue already exists for task: {}", taskId);
+        } else {
+            log.debug("EventQueue created successfully for task: {}", taskId);    
         }
         
-        log.debug("EventQueue created successfully for task: {}", taskId);
         return newQueue;
     }
     

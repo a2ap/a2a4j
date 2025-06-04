@@ -1,29 +1,26 @@
 package io.github.a2ap.core.server.impl;
 
+import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.SendMessageResponse;
-import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
+import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
-import io.github.a2ap.core.model.Artifact;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
-import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.TaskState;
-import io.github.a2ap.core.model.TaskStatus;
-import io.github.a2ap.core.model.TaskUpdate;
+import io.github.a2ap.core.model.TextPart;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.AgentExecutor;
 import io.github.a2ap.core.server.EventQueue;
 import io.github.a2ap.core.server.QueueManager;
 import io.github.a2ap.core.server.TaskHandler;
 import io.github.a2ap.core.server.TaskManager;
-import io.github.a2ap.core.server.TaskQueueExistsException;
+import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -41,7 +38,6 @@ public class A2AServerImpl implements A2AServer {
     private final TaskHandler taskHandler;
     private final AgentExecutor agentExecutor;
     private final QueueManager queueManager;
-    private final ConcurrentMap<String, Mono<Void>> runningAgents = new ConcurrentHashMap<>();
     
     /**
      * Constructs a new A2AServerImpl with the specified components.
@@ -77,68 +73,86 @@ public class A2AServerImpl implements A2AServer {
             log.error("Task handle failed: Task params must have at least one message.");
             throw new IllegalArgumentException("Task params must have at least one message");
         }
-        TaskContext taskContext = taskManager.loadOrCreateTask(params);
-        log.info("Task context loaded: {}", taskContext.getTask());
+        RequestContext taskContext = taskManager.loadOrCreateContext(params);
+        Task currentTask = taskContext.getTask();
+        log.info("Task request context loaded: {}", taskContext.getTask());
         
         // Create event queue for this task
-        EventQueue tempQueue1;
-        try {
-            tempQueue1 = queueManager.create(taskContext.getTask().getId());
-        } catch (TaskQueueExistsException e) {
-            tempQueue1 = queueManager.get(taskContext.getTask().getId());
-        }
-        final EventQueue eventQueue = tempQueue1;
+        final EventQueue eventQueue = queueManager.create(taskContext.getTaskId());
         
         // Execute agent and collect final result
-        Mono<Task> resultMono = agentExecutor.execute(taskContext, eventQueue)
+        Mono<List<SendMessageResponse>> resultMono = agentExecutor.execute(taskContext, eventQueue)
                 .then(eventQueue.asFlux()
-                        .filter(event -> event instanceof TaskStatusUpdateEvent && ((TaskStatusUpdateEvent) event).getIsFinal())
-                        .cast(TaskStatusUpdateEvent.class)
-                        .next()
-                        .map(event -> {
-                            TaskContext updatedContext = taskManager.applyTaskUpdate(taskContext, event.getStatus()).block();
-                            return updatedContext.getTask();
-                        }));
-        
-        Task task = resultMono.block();
-        log.info("Task handle success: {}", task);
-        return task;
+                        .filter(event -> {
+                            if (event instanceof TaskStatusUpdateEvent) {
+                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus()).block();
+                                return false;
+                            } else if (event instanceof Task) {
+                                return true;
+                            } else if (event instanceof Message) {
+                                // todo merge message and others
+                                return true;
+                            } else {
+                                log.error("Queue received unknown SendMessageResponse event: {}", event);
+                                return false;
+                            }
+                            
+                        })
+                        .cast(SendMessageResponse.class)
+                        .collectList());
+
+        List<SendMessageResponse> response = resultMono.block();
+        if (response == null || response.isEmpty()) {
+            log.error("Task handle failed: Task params must have at least one message.");
+            return Message.builder()
+                    .role("agent")
+                    .parts(List.of(TextPart.builder()
+                            .text("Handle Message failed, not response successfully")
+                            .build()))
+                    .build();
+        } else if (response.size() == 1) {
+            log.info("Handle message success: {}", response.get(0));
+            return response.get(0);
+        } else {
+            // todo combine all to one task or message
+            return null;
+        }
     }
 
     @Override
     public Flux<SendStreamingMessageResponse> handleMessageStream(MessageSendParams params) {
-        log.info("Attempting to handle and subscribe to task: {}", params);
-        final TaskContext taskContext = taskManager.loadOrCreateTask(params);
-        log.info("Task context loaded: {}", taskContext.getTask());
-        
-        String taskId = taskContext.getTask().getId();
-        
-        // Create or get event queue for this task
-        EventQueue tempQueue;
-        try {
-            tempQueue = queueManager.create(taskId);
-        } catch (TaskQueueExistsException e) {
-            tempQueue = queueManager.get(taskId);
+        log.info("Attempting to handle the streaming message: {}", params);
+        if (params == null || params.getMessage() == null || params.getMessage().getParts() == null
+                || params.getMessage().getParts().isEmpty()) {
+            log.error("Streaming handle failed: Task params must have at least one message.");
+            throw new IllegalArgumentException("Task params must have at least one message");
         }
-        final EventQueue eventQueue = tempQueue;
-        
-        // Start agent execution if not already running
-        runningAgents.computeIfAbsent(taskId, id -> {
-            log.debug("Starting agent execution for task: {}", id);
-            return agentExecutor.execute(taskContext, eventQueue)
-                    .doOnTerminate(() -> {
-                        log.debug("Agent execution completed for task: {}", id);
-                        runningAgents.remove(id);
-                        queueManager.remove(id);
-                    })
-                    .cache(); // Cache to prevent multiple executions
-        });
-        
-        // Return the event stream
-        return eventQueue.asFlux()
-                .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleMessageStream.", taskId))
-                .doOnComplete(() -> log.debug("Task {} updates stream completed via handleMessageStream.", taskId))
-                .doOnError(e -> log.error("Error in task {} updates stream via handleMessageStream: {}", taskId, e.getMessage(), e));
+
+        RequestContext taskContext = taskManager.loadOrCreateContext(params);
+        Task currentTask = taskContext.getTask();
+        log.info("Task request context loaded: {}", taskContext.getTask());
+
+
+        // Create event queue for this task
+        final EventQueue eventQueue = queueManager.create(taskContext.getTaskId());
+
+        // Execute agent and collect final result
+        return agentExecutor.execute(taskContext, eventQueue)
+                .thenMany(eventQueue.asFlux()
+                        .doOnNext(event -> {
+                            if (event instanceof TaskStatusUpdateEvent) {
+                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus()).block();
+                            }
+                            // todo merge message or others
+                        })
+                        .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleMessageStream.", taskContext.getTaskId()))
+                        .doOnComplete(() -> log.debug("Task {} updates stream completed via handleMessageStream.", taskContext.getTaskId()))
+                        .doOnError(e -> log.error("Error in task {} updates stream via handleMessageStream: {}", taskContext.getTaskId(), e.getMessage(), e))
+                        .doOnTerminate(() -> {
+                            log.debug("Agent execution completed for task: {}", taskContext.getTaskId());
+                            queueManager.remove(taskContext.getTaskId());
+                        })
+                );
     }
 
     /**
@@ -167,51 +181,38 @@ public class A2AServerImpl implements A2AServer {
      */
     @Override
     public Task cancelTask(String taskId) {
+        if (taskId == null) {
+            throw new IllegalArgumentException("Cancel Task id must not be null");
+        }
         log.info("Attempting to cancel task with ID: {}", taskId);
         
-        TaskContext taskContext = TaskContext.builder()
-                .task(taskManager.getTask(taskId))
-                .build();
+        Task cancelledTask = taskManager.getTask(taskId);
         
-        if (taskContext.getTask() == null) {
+        if (cancelledTask == null) {
             log.warn("Task with ID {} not found for cancellation.", taskId);
-            return null;
+            throw new IllegalArgumentException("Cancel Task id not found for cancellation.");
         }
         
         // Get or create event queue for cancellation
         EventQueue eventQueue = queueManager.get(taskId);
-        if (eventQueue == null) {
-            try {
-                eventQueue = queueManager.create(taskId);
-            } catch (TaskQueueExistsException e) {
-                eventQueue = queueManager.get(taskId);
-            }
-        }
-        
-        // Cancel the running agent if exists
-        Mono<Void> runningAgent = runningAgents.remove(taskId);
-        if (runningAgent != null) {
-            // Cancel the running execution
-            log.debug("Cancelling running agent for task: {}", taskId);
+        TaskStatus taskStatus = TaskStatus.builder()
+                .state(TaskState.CANCELED)
+                .timestamp(String.valueOf(Instant.now().toEpochMilli()))
+                .build();
+        if (eventQueue != null) {
+            TaskStatusUpdateEvent event = TaskStatusUpdateEvent.builder()
+                    .taskId(taskId)
+                    .status(taskStatus)
+                    .isFinal(true)
+                    .build();
+            eventQueue.enqueueEvent(event);
+            eventQueue.close();
         }
         
         // Execute cancellation
-        Task cancelledTask = agentExecutor.cancel(taskContext, eventQueue)
-                .then(eventQueue.asFlux()
-                        .filter(event -> event instanceof TaskStatusUpdateEvent && ((TaskStatusUpdateEvent) event).getIsFinal())
-                        .cast(TaskStatusUpdateEvent.class)
-                        .next()
-                        .map(event -> {
-                            TaskContext updatedContext = taskManager.applyTaskUpdate(taskContext, event.getStatus()).block();
-                            return updatedContext.getTask();
-                        }))
-                .block();
-        
-        if (cancelledTask != null) {
-            log.info("Task {} cancelled successfully.", taskId);
-        } else {
-            log.warn("Failed to cancel task with ID {}.", taskId);
-        }
+        agentExecutor.cancel(taskId).block();
+        taskManager.applyTaskUpdate(cancelledTask, taskStatus).block();
+        log.info("Task {} cancelled successfully.", taskId);
         return cancelledTask;
     }
 

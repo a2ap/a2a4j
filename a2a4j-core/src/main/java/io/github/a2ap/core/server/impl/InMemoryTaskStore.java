@@ -1,6 +1,7 @@
 package io.github.a2ap.core.server.impl;
 
-import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.RequestContext;
+import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.server.TaskStore;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,15 +12,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InMemoryTaskStore implements TaskStore {
 
-    private final Map<String, TaskContext> store = new ConcurrentHashMap<>();
+    private final Map<String, Task> store = new ConcurrentHashMap<>();
 
     @Override
-    public void save(TaskContext taskContext) {
-        store.put(taskContext.getTask().getId(), taskContext);
+    public void save(Task task) {
+        store.put(task.getId(), task);
     }
 
     @Override
-    public TaskContext load(String taskId) {
+    public Task load(String taskId) {
         return store.get(taskId);
     }
 }

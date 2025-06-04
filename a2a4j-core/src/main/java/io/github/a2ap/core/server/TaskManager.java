@@ -1,7 +1,7 @@
 package io.github.a2ap.core.server;
 
 import io.github.a2ap.core.model.Task;
-import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.TaskUpdate;
@@ -20,7 +20,7 @@ public interface TaskManager {
      * @param params The task param to create
      * @return The created task with a generated ID
      */
-    TaskContext loadOrCreateTask(MessageSendParams params);
+    RequestContext loadOrCreateContext(MessageSendParams params);
 
     /**
      * Gets a task by its ID.
@@ -44,7 +44,7 @@ public interface TaskManager {
      * @param taskUpdates taskUpdate TaskStatus or Artifact update
      * @return mono of task
      */
-    Mono<TaskContext> applyTaskUpdate(TaskContext taskContext, List<TaskUpdate> taskUpdates);
+    Mono<Task> applyTaskUpdate(Task task, List<TaskUpdate> taskUpdates);
 
     /**
      * apply task update for task
@@ -52,7 +52,7 @@ public interface TaskManager {
      * @param update tash update TaskStatus or Artifact update
      * @return mono of task
      */
-    Mono<TaskContext> applyTaskUpdate(TaskContext taskContext, TaskUpdate update);
+    Mono<Task> applyTaskUpdate(Task task, TaskUpdate update);
 
     /**
      * register task notification config

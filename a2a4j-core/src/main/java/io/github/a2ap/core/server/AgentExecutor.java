@@ -1,6 +1,6 @@
 package io.github.a2ap.core.server;
 
-import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.RequestContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -26,7 +26,7 @@ public interface AgentExecutor {
      * @param eventQueue The queue to publish events to.
      * @return A Mono that completes when the agent execution is finished.
      */
-    Mono<Void> execute(TaskContext context, EventQueue eventQueue);
+    Mono<Void> execute(RequestContext context, EventQueue eventQueue);
     
     /**
      * Request the agent to cancel an ongoing task.
@@ -35,9 +35,8 @@ public interface AgentExecutor {
      * in the context and publish a `TaskStatusUpdateEvent` with state
      * `TaskState.canceled` to the `eventQueue`.
      *
-     * @param context The request context containing the task ID to cancel.
-     * @param eventQueue The queue to publish the cancellation status update to.
+     * @param taskId The task ID to cancel.
      * @return A Mono that completes when the cancellation is processed.
      */
-    Mono<Void> cancel(TaskContext context, EventQueue eventQueue);
+    Mono<Void> cancel(String taskId);
 } 

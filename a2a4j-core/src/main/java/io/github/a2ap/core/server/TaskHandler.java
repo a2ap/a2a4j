@@ -1,6 +1,6 @@
 package io.github.a2ap.core.server;
 
-import io.github.a2ap.core.model.TaskContext;
+import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.TaskUpdate;
 import reactor.core.publisher.Flux;
 
@@ -17,5 +17,5 @@ public interface TaskHandler {
      * @param context The context for the task handling.
      * @return A Flux of updated Task TaskUpdate objects.
      */
-    Flux<TaskUpdate> handle(TaskContext context);
+    Flux<TaskUpdate> handle(RequestContext context);
 }
