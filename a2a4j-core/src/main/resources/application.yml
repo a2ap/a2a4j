@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: a2a-server
+  
+logging:
+  level:
+    io.github.a2ap: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# A2A specific configuration
+a2a:
+  server:
+    name: "A2A Java Server"
+    description: "A sample A2A agent implemented in Java"
+    version: "1.0.0"
+    url: "http://localhost:8080"
+    capabilities:
+      streaming: true
+      pushNotifications: false
+      stateTransitionHistory: true 
