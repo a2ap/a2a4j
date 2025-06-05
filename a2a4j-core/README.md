@@ -56,15 +56,18 @@ curl -X POST http://localhost:8080/a2a/server \
 ## 支持的JSON-RPC方法
 
 ### 核心方法
+
 - `message/send` - 发送消息并创建任务
 - `message/stream` - 发送消息并订阅流式更新
 
 ### 任务管理
+
 - `tasks/get` - 获取任务状态
 - `tasks/cancel` - 取消任务
 - `tasks/resubscribe` - 重新订阅任务更新
 
 ### 推送通知
+
 - `tasks/pushNotificationConfig/set` - 设置推送通知配置
 - `tasks/pushNotificationConfig/get` - 获取推送通知配置
 
