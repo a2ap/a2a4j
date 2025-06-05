@@ -115,28 +115,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task cancelTask(String taskId) {
-        Task task = taskStore.load(taskId);
-        if (task == null) {
-            throw new IllegalArgumentException("Cancel Task with ID " + taskId + " not found.");
-        }
-        // todo Emit the cancelled task and complete the sink
-        Sinks.Many<Task> sink = taskUpdateSinks.get(taskId);
-        if (sink != null) {
-            sink.tryEmitNext(task);
-            sink.tryEmitComplete();
-            taskUpdateSinks.remove(taskId);
-            log.debug("Emitted cancelled task {} and completed/removed sink.", taskId);
-        } else {
-            log.warn("No active sink found for task {}. Cannot emit cancellation update.", taskId);
-        }
-        TaskStatus cancelledStatus = new TaskStatus();
-        cancelledStatus.setState(TaskState.CANCELED);
-        task.setStatus(cancelledStatus);
-        return task;
-    }
-
-    @Override
     public Mono<Task> applyTaskUpdate(Task task, List<TaskUpdate> taskUpdates) {
         if (taskUpdates == null || taskUpdates.isEmpty()) {
             return Mono.just(task);

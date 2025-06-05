@@ -33,14 +33,6 @@ public interface TaskManager {
     Task getTask(String taskId);
 
     /**
-     * Cancels a task.
-     * 
-     * @param taskId The ID of the task to cancel
-     * @return true if the task was successfully cancelled, false otherwise
-     */
-    Task cancelTask(String taskId);
-
-    /**
      * apply take update for task
      * @param taskContext TaskContext
      * @param taskUpdates taskUpdate TaskStatus or Artifact update
