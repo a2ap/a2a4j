@@ -1,11 +1,9 @@
 package io.github.a2ap.core.server.impl;
 
-import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
-import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
@@ -13,7 +11,6 @@ import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.TaskState;
-import io.github.a2ap.core.model.TextPart;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.AgentExecutor;
 import io.github.a2ap.core.server.EventQueue;
@@ -21,7 +18,6 @@ import io.github.a2ap.core.server.QueueManager;
 import io.github.a2ap.core.server.TaskHandler;
 import io.github.a2ap.core.server.TaskManager;
 import java.time.Instant;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -303,17 +299,6 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public AgentCard getSelfAgentCard() {
         log.info("Getting self agent card.");
-        // TODO: Provide actual agent card information
-        AgentCard selfCard = AgentCard.builder()
-                .name("Example Java Agent")
-                .description("A sample A2A agent implemented in Java.")
-                .url("http://localhost:8080/a2a/server") 
-                .version("1.0.0")
-                // Placeholder capabilities - replace with actual capabilities
-                .capabilities(new AgentCapabilities())
-                .skills(List.of())
-                .build();
-        log.debug("Returning self agent card: {}", selfCard);
-        return selfCard;
+        return a2aServerSelfCard;
     }
 }
