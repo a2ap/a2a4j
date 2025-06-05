@@ -2,18 +2,12 @@ package io.github.a2ap.core.jsonrpc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 /**
  * Represents a JSON-RPC request.
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JSONRPCRequest {
 
@@ -43,4 +37,108 @@ public class JSONRPCRequest {
      */
     @JsonProperty("id")
     private String id;
+
+    public JSONRPCRequest() {
+    }
+
+    public JSONRPCRequest(String method, Object params, String id) {
+        this.method = method;
+        this.params = params;
+        this.id = id;
+    }
+
+    public static JSONRPCRequestBuilder builder() {
+        return new JSONRPCRequestBuilder();
+    }
+
+    public String getJsonrpc() {
+        return jsonrpc;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public Object getParams() {
+        return params;
+    }
+
+    public void setParams(Object params) {
+        this.params = params;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JSONRPCRequest that = (JSONRPCRequest) o;
+        return Objects.equals(jsonrpc, that.jsonrpc) &&
+                Objects.equals(method, that.method) &&
+                Objects.equals(params, that.params) &&
+                Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(jsonrpc, method, params, id);
+    }
+
+    @Override
+    public String toString() {
+        return "JSONRPCRequest{" +
+                "jsonrpc='" + jsonrpc + '\'' +
+                ", method='" + method + '\'' +
+                ", params=" + params +
+                ", id='" + id + '\'' +
+                '}';
+    }
+
+    public static class JSONRPCRequestBuilder {
+        private String method;
+        private Object params;
+        private String id;
+
+        JSONRPCRequestBuilder() {
+        }
+
+        public JSONRPCRequestBuilder method(String method) {
+            this.method = method;
+            return this;
+        }
+
+        public JSONRPCRequestBuilder params(Object params) {
+            this.params = params;
+            return this;
+        }
+
+        public JSONRPCRequestBuilder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public JSONRPCRequest build() {
+            return new JSONRPCRequest(method, params, id);
+        }
+
+        @Override
+        public String toString() {
+            return "JSONRPCRequest.JSONRPCRequestBuilder(method=" + this.method +
+                    ", params=" + this.params +
+                    ", id=" + this.id + ")";
+        }
+    }
 }

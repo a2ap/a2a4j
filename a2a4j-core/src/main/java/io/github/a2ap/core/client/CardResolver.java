@@ -1,7 +1,6 @@
 package io.github.a2ap.core.client;
 
 import io.github.a2ap.core.model.AgentCard;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface for resolving AgentCard information.

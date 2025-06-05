@@ -22,7 +22,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
@@ -32,10 +33,11 @@ import reactor.core.publisher.Sinks;
  * This implementation stores all tasks in memory and is suitable for testing
  * and demonstration purposes.
  */
-@Slf4j
 @Component
 public class InMemoryTaskManager implements TaskManager {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(InMemoryTaskManager.class);
+
     private final Map<String, Sinks.Many<Task>> taskUpdateSinks = new ConcurrentHashMap<>();
     private final TaskStore taskStore = new InMemoryTaskStore();
     private final Map<String, TaskPushNotificationConfig> notificationConfigMap = new ConcurrentHashMap<>();
@@ -66,8 +68,11 @@ public class InMemoryTaskManager implements TaskManager {
             log.info("Create new message task: {}", currentTask);
         } else {
             TaskState taskState = currentTask.getStatus().getState();
-            if (taskState == TaskState.COMPLETED || taskState == TaskState.FAILED || taskState == TaskState.CANCELED || taskState == TaskState.REJECTED) {
-                log.warn("Received message for task {} already in final state {}. Handling as new submission (keeping history)", taskId, taskState);
+            if (taskState == TaskState.COMPLETED || taskState == TaskState.FAILED || taskState == TaskState.CANCELED
+                    || taskState == TaskState.REJECTED) {
+                log.warn(
+                        "Received message for task {} already in final state {}. Handling as new submission (keeping history)",
+                        taskId, taskState);
                 TaskStatus taskStatusUpdate = TaskStatus.builder()
                         .state(TaskState.SUBMITTED)
                         .timestamp(String.valueOf(Instant.now().toEpochMilli()))
@@ -95,7 +100,8 @@ public class InMemoryTaskManager implements TaskManager {
                 return null;
             } else {
                 return taskStore.load(id);
-            }}).filter(Objects::nonNull).toList();
+            }
+        }).filter(Objects::nonNull).toList();
         contextBuilder.relatedTasks(relatedTasksList);
         return contextBuilder.build();
     }
@@ -145,37 +151,39 @@ public class InMemoryTaskManager implements TaskManager {
             } else if (taskUpdate instanceof Artifact artifact) {
                 log.info("apply task {} updated with artifact {}", task.getId(), artifact);
                 List<Artifact> artifacts = task.getArtifacts();
-//                Optional<Artifact> previousArtifactOption = artifacts.stream().filter(item -> 
-//                        Objects.equals(item.getIndex(), artifact.getIndex()) 
-//                                || Objects.equals(item.getName(), artifact.getName())).findFirst();
-//                if (previousArtifactOption.isPresent()) {
-//                    Artifact previousArtifact = previousArtifactOption.get();
-//                    int previousIndex = artifacts.indexOf(previousArtifact);
-//                    if (artifact.getAppend() != null && artifact.getAppend()) {
-//                        // combine pre and current
-//                        if (StringUtils.hasText(artifact.getDescription())) {
-//                            previousArtifact.setDescription(artifact.getDescription());
-//                        }
-//                        if (Objects.nonNull(artifact.getLastChunk())) {
-//                            previousArtifact.setLastChunk(artifact.getLastChunk());
-//                        }
-//                        if (artifact.getMetadata() != null && !artifact.getMetadata().isEmpty()) {
-//                            Map<String, Object> metadata = previousArtifact.getMetadata() == null ? new HashMap<>(8) : previousArtifact.getMetadata();
-//                            metadata.putAll(artifact.getMetadata());
-//                            previousArtifact.setMetadata(metadata);
-//                        }
-//                        if (artifact.getParts() != null && !artifact.getParts().isEmpty()) {
-//                            List<Part> parts = previousArtifact.getParts() == null ? new LinkedList<>() : previousArtifact.getParts();
-//                            parts.addAll(artifact.getParts());
-//                            previousArtifact.setParts(parts);
-//                        }
-//                        artifacts.set(previousIndex, previousArtifact);
-//                    } else {
-//                        artifacts.set(previousIndex, artifact);
-//                    }
-//                } else {
-//                    artifacts.add(artifact);
-//                }
+                // Optional<Artifact> previousArtifactOption = artifacts.stream().filter(item ->
+                // Objects.equals(item.getIndex(), artifact.getIndex())
+                // || Objects.equals(item.getName(), artifact.getName())).findFirst();
+                // if (previousArtifactOption.isPresent()) {
+                // Artifact previousArtifact = previousArtifactOption.get();
+                // int previousIndex = artifacts.indexOf(previousArtifact);
+                // if (artifact.getAppend() != null && artifact.getAppend()) {
+                // // combine pre and current
+                // if (StringUtils.hasText(artifact.getDescription())) {
+                // previousArtifact.setDescription(artifact.getDescription());
+                // }
+                // if (Objects.nonNull(artifact.getLastChunk())) {
+                // previousArtifact.setLastChunk(artifact.getLastChunk());
+                // }
+                // if (artifact.getMetadata() != null && !artifact.getMetadata().isEmpty()) {
+                // Map<String, Object> metadata = previousArtifact.getMetadata() == null ? new
+                // HashMap<>(8) : previousArtifact.getMetadata();
+                // metadata.putAll(artifact.getMetadata());
+                // previousArtifact.setMetadata(metadata);
+                // }
+                // if (artifact.getParts() != null && !artifact.getParts().isEmpty()) {
+                // List<Part> parts = previousArtifact.getParts() == null ? new LinkedList<>() :
+                // previousArtifact.getParts();
+                // parts.addAll(artifact.getParts());
+                // previousArtifact.setParts(parts);
+                // }
+                // artifacts.set(previousIndex, previousArtifact);
+                // } else {
+                // artifacts.set(previousIndex, artifact);
+                // }
+                // } else {
+                // artifacts.add(artifact);
+                // }
             } else {
                 log.error("Received taskUpdate {} but not a TaskUpdate {}", taskUpdate, taskUpdate.getClass());
             }

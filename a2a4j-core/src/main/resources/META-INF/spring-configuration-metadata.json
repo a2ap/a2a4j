@@ -1,0 +1,65 @@
+{
+  "groups": [
+    {
+      "name": "a2a.server",
+      "type": "io.github.a2ap.core.server.config.A2aServerProperties",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties",
+      "description": "Configuration properties for A2A protocol."
+    },
+    {
+      "name": "a2a.server.capabilities",
+      "type": "io.github.a2ap.core.server.config.A2aServerProperties$Capabilities",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties",
+      "sourceMethod": "getCapabilities()",
+      "description": "Agent capabilities configuration."
+    }
+  ],
+  "properties": [
+    {
+      "name": "a2a.server.name",
+      "type": "java.lang.String",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties",
+      "description": "Agent name."
+    },
+    {
+      "name": "a2a.server.description",
+      "type": "java.lang.String",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties",
+      "description": "Agent description."
+    },
+    {
+      "name": "a2a.server.version",
+      "type": "java.lang.String",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties",
+      "description": "Agent version."
+    },
+    {
+      "name": "a2a.server.url",
+      "type": "java.lang.String",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties",
+      "description": "Agent URL."
+    },
+    {
+      "name": "a2a.server.capabilities.streaming",
+      "type": "java.lang.Boolean",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties$Capabilities",
+      "defaultValue": true,
+      "description": "Whether the agent supports streaming responses."
+    },
+    {
+      "name": "a2a.server.capabilities.push-notifications",
+      "type": "java.lang.Boolean",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties$Capabilities",
+      "defaultValue": false,
+      "description": "Whether the agent supports push notifications."
+    },
+    {
+      "name": "a2a.server.capabilities.state-transition-history",
+      "type": "java.lang.Boolean",
+      "sourceType": "io.github.a2ap.core.server.config.A2aServerProperties$Capabilities",
+      "defaultValue": true,
+      "description": "Whether the agent supports state transition history."
+    }
+  ],
+  "hints": []
+}

@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8089
 
 spring:
   application:
@@ -18,7 +18,7 @@ a2a:
     name: "A2A Java Server"
     description: "A sample A2A agent implemented in Java"
     version: "1.0.0"
-    url: "http://localhost:8080"
+    url: "http://localhost:${server.port}"
     capabilities:
       streaming: true
       pushNotifications: false

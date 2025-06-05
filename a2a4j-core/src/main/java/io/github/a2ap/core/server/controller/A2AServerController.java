@@ -11,7 +11,8 @@ import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.server.A2AServer;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +26,13 @@ import reactor.core.publisher.Flux;
 /**
  * Spring Boot Controller to handle A2A protocol JSON-RPC requests.
  */
-@Slf4j
 @RestController
 public class A2AServerController {
+    
+    private static final Logger log = LoggerFactory.getLogger(A2AServerController.class);
 
     private final A2AServer a2aServer;
+    
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -84,16 +87,16 @@ public class A2AServerController {
                 default:
                     // Method not found error
                     log.warn("Unsupported method: {}", method);
-                    response.setError(new JSONRPCError(-32601, "Method not found",
+                    response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
                             "Method '" + method + "' not supported"));
                     break;
             }
         } catch (IllegalArgumentException e) {
             // Handle validation errors from A2AServerImpl
-            response.setError(new JSONRPCError(-32602, "Invalid params", e.getMessage()));
+            response.setError(new JSONRPCError(JSONRPCError.INVALID_PARAMS, "Invalid params", e.getMessage()));
         } catch (Exception e) {
             // Handle other internal errors
-            response.setError(new JSONRPCError(-32603, "Internal error", e.getMessage()));
+            response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
             // Log the error with more context
             log.error("Internal error processing method {}.", method, e);
         }
@@ -132,16 +135,16 @@ public class A2AServerController {
                 default:
                     // Method not found error
                     log.warn("Unsupported method: {}", method);
-                    response.setError(new JSONRPCError(-32601, "Method not found",
+                    response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
                             "Method '" + method + "' not supported"));
                     break;
             }
         } catch (IllegalArgumentException e) {
             // Handle validation errors from A2AServerImpl
-            response.setError(new JSONRPCError(-32602, "Invalid params", e.getMessage()));
+            response.setError(new JSONRPCError(JSONRPCError.INVALID_REQUEST, "Invalid params", e.getMessage()));
         } catch (Exception e) {
             // Handle other internal errors
-            response.setError(new JSONRPCError(-32603, "Internal error", e.getMessage()));
+            response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
             // Log the error with more context
             log.error("Internal error processing method {}.", method, e);
         }

@@ -2,26 +2,20 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 /**
  * Represents the status of a task.
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskStatus implements TaskUpdate {
-    
+
     /**
      * Completed task status constant.
      */
     public static final TaskStatus COMPLETED = TaskStatus.builder().state(TaskState.COMPLETED).build();
-    
+
     /**
      * Cancelled task status constant.
      */
@@ -51,4 +45,120 @@ public class TaskStatus implements TaskUpdate {
      */
     @JsonProperty("error")
     private String error;
+
+    public TaskStatus() {
+    }
+
+    public TaskStatus(TaskState state, Message message, String timestamp, String error) {
+        this.state = state;
+        this.message = message;
+        this.timestamp = timestamp;
+        this.error = error;
+    }
+
+    public static TaskStatusBuilder builder() {
+        return new TaskStatusBuilder();
+    }
+
+    public TaskState getState() {
+        return state;
+    }
+
+    public void setState(TaskState state) {
+        this.state = state;
+    }
+
+    public Message getMessage() {
+        return message;
+    }
+
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        TaskStatus that = (TaskStatus) o;
+        return state == that.state &&
+                Objects.equals(message, that.message) &&
+                Objects.equals(timestamp, that.timestamp) &&
+                Objects.equals(error, that.error);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(state, message, timestamp, error);
+    }
+
+    @Override
+    public String toString() {
+        return "TaskStatus{" +
+                "state=" + state +
+                ", message=" + message +
+                ", timestamp='" + timestamp + '\'' +
+                ", error='" + error + '\'' +
+                '}';
+    }
+
+    public static class TaskStatusBuilder {
+        private TaskState state;
+        private Message message;
+        private String timestamp;
+        private String error;
+
+        TaskStatusBuilder() {
+        }
+
+        public TaskStatusBuilder state(TaskState state) {
+            this.state = state;
+            return this;
+        }
+
+        public TaskStatusBuilder message(Message message) {
+            this.message = message;
+            return this;
+        }
+
+        public TaskStatusBuilder timestamp(String timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+
+        public TaskStatusBuilder error(String error) {
+            this.error = error;
+            return this;
+        }
+
+        public TaskStatus build() {
+            return new TaskStatus(state, message, timestamp, error);
+        }
+
+        @Override
+        public String toString() {
+            return "TaskStatus.TaskStatusBuilder(state=" + this.state +
+                    ", message=" + this.message +
+                    ", timestamp=" + this.timestamp +
+                    ", error=" + this.error + ")";
+        }
+    }
 }
