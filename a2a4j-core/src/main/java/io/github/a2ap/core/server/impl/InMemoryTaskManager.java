@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 
 /**
  * In-memory implementation of the TaskManager interface.
@@ -41,7 +40,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     private static final Logger log = LoggerFactory.getLogger(InMemoryTaskManager.class);
 
-    private final Map<String, Sinks.Many<Task>> taskUpdateSinks = new ConcurrentHashMap<>();
     private final TaskStore taskStore = new InMemoryTaskStore();
     private final Map<String, TaskPushNotificationConfig> notificationConfigMap = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> contextTaskIdMap = new ConcurrentHashMap<>();
@@ -143,12 +141,10 @@ public class InMemoryTaskManager implements TaskManager {
                 String artifactId = artifact.getArtifactId();
                 
                 // Find existing artifact with the same ID
-                Artifact existingArtifact = null;
                 int existingArtifactIndex = -1;
                 for (int i = 0; i < artifacts.size(); i++) {
                     Artifact art = artifacts.get(i);
                     if (art.getArtifactId() != null && art.getArtifactId().equals(artifactId)) {
-                        existingArtifact = art;
                         existingArtifactIndex = i;
                         break;
                     }
