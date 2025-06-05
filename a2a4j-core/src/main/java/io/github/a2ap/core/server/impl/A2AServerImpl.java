@@ -16,12 +16,10 @@
 
 package io.github.a2ap.core.server.impl;
 
-import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
 import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
-import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
@@ -29,15 +27,12 @@ import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.TaskState;
-import io.github.a2ap.core.model.TextPart;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.AgentExecutor;
 import io.github.a2ap.core.server.EventQueue;
 import io.github.a2ap.core.server.QueueManager;
-import io.github.a2ap.core.server.TaskHandler;
 import io.github.a2ap.core.server.TaskManager;
 import java.time.Instant;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -54,7 +49,6 @@ public class A2AServerImpl implements A2AServer {
     private static final Logger log = LoggerFactory.getLogger(A2AServerImpl.class);
 
     private final TaskManager taskManager;
-    private final TaskHandler taskHandler;
     private final AgentExecutor agentExecutor;
     private final QueueManager queueManager;
 
@@ -68,14 +62,13 @@ public class A2AServerImpl implements A2AServer {
      * @param agentExecutor The AgentExecutor to use for agent execution.
      * @param queueManager  The QueueManager to use for event queue management.
      */
-    public A2AServerImpl(TaskHandler taskHandler, TaskManager taskManager,
+    public A2AServerImpl(TaskManager taskManager,
             AgentExecutor agentExecutor, QueueManager queueManager, AgentCard a2aServerSelfCard) {
-        this.taskHandler = taskHandler;
         this.taskManager = taskManager;
         this.agentExecutor = agentExecutor;
         this.queueManager = queueManager;
-        log.info("A2AServerImpl initialized with TaskManager: {}, TaskHandler: {}, AgentExecutor: {}, QueueManager: {}",
-                taskManager.getClass().getSimpleName(), taskHandler.getClass().getSimpleName(),
+        log.info("A2AServerImpl initialized with TaskManager: {}, AgentExecutor: {}, QueueManager: {}",
+                taskManager.getClass().getSimpleName(),
                 agentExecutor.getClass().getSimpleName(), queueManager.getClass().getSimpleName());
 
         this.a2aServerSelfCard = a2aServerSelfCard;
@@ -105,49 +98,34 @@ public class A2AServerImpl implements A2AServer {
 
         // Execute agent and collect final result
         eventQueue.enqueueEvent(currentTask);
-        Mono<List<SendMessageResponse>> resultMono = agentExecutor.execute(taskContext, eventQueue)
+        Mono<SendMessageResponse> resultMono = agentExecutor.execute(taskContext, eventQueue)
                 .then(eventQueue.asFlux()
                         .doOnNext(sendMessageResponse -> {
                             log.info("Task agent received event: {}", sendMessageResponse);
                         })
-                        .filter(event -> {
+                        .flatMap(event -> {
                             if (event instanceof TaskStatusUpdateEvent) {
-                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus())
-                                        .block();
-                                return false;
-                            } else if (event instanceof Task) {
-                                return true;
+                                return taskManager.applyStatusUpdate(currentTask, (TaskStatusUpdateEvent) event);
                             } else if (event instanceof TaskArtifactUpdateEvent) {
-                                // todo merge artifact into task
-                                return false;
-                            } else if (event instanceof Message) {
-                                // todo merge message and others
-                                return true;
+                                return taskManager.applyArtifactUpdate(currentTask, (TaskArtifactUpdateEvent) event);
                             } else {
-                                log.error("Queue received unknown SendMessageResponse event: {}", event);
-                                return false;
+                                return Mono.just(event);
                             }
-
                         })
+                        .filter(event -> !(event instanceof Task))
                         .cast(SendMessageResponse.class)
-                        .collectList());
+                        .next()
+                        .doOnError(e -> log.error("Error in task {} updates stream via handleMessage: {}", taskContext.getTaskId(), e.getMessage(), e))
+                        .doOnTerminate(() -> {
+                            log.debug("Agent execution completed for task: {}", taskContext.getTaskId());
+                            queueManager.remove(taskContext.getTaskId());
+                        })
+                );
 
-        List<SendMessageResponse> response = resultMono.block();
-        if (response == null || response.isEmpty()) {
-            log.error("Task handle failed: Task params must have at least one message.");
-            return Message.builder()
-                    .role("agent")
-                    .parts(List.of(TextPart.builder()
-                            .text("Handle Message failed, not response successfully")
-                            .build()))
-                    .build();
-        } else if (response.size() == 1) {
-            log.info("Handle message success: {}", response.get(0));
-            return response.get(0);
-        } else {
-            // todo combine all to one task or message
-            return null;
-        }
+        SendMessageResponse response = resultMono.block();
+        response = response == null ? currentTask : response;
+        log.info("Handle message success: {}", response);
+        return response;
     }
 
     @Override
@@ -171,21 +149,18 @@ public class A2AServerImpl implements A2AServer {
                 .thenMany(eventQueue.asFlux()
                         .doOnNext(event -> {
                             if (event instanceof TaskStatusUpdateEvent) {
-                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus())
-                                        .block();
+                                taskManager.applyStatusUpdate(currentTask, (TaskStatusUpdateEvent) event).block();
+                            } else if (event instanceof TaskArtifactUpdateEvent) {
+                                taskManager.applyArtifactUpdate(currentTask, (TaskArtifactUpdateEvent) event).block();
                             }
-                            // todo merge message or others
                         })
-                        .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleMessageStream.",
-                                taskContext.getTaskId()))
-                        .doOnComplete(() -> log.debug("Task {} updates stream completed via handleMessageStream.",
-                                taskContext.getTaskId()))
-                        .doOnError(e -> log.error("Error in task {} updates stream via handleMessageStream: {}",
-                                taskContext.getTaskId(), e.getMessage(), e))
+                        .doOnComplete(() -> log.debug("Task {} updates stream completed via handleMessageStream.", taskContext.getTaskId()))
+                        .doOnError(e -> log.error("Error in task {} updates stream via handleMessageStream: {}", taskContext.getTaskId(), e.getMessage(), e))
                         .doOnTerminate(() -> {
                             log.debug("Agent execution completed for task: {}", taskContext.getTaskId());
                             queueManager.remove(taskContext.getTaskId());
-                        }));
+                        })
+                );
     }
 
     /**
@@ -341,17 +316,6 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public AgentCard getSelfAgentCard() {
         log.info("Getting self agent card.");
-        // // TODO: Provide actual agent card information
-        // AgentCard selfCard = AgentCard.builder()
-        // .name("Example Java Agent")
-        // .description("A sample A2A agent implemented in Java.")
-        // .url("http://localhost:8080/a2a/server")
-        // .version("1.0.0")
-        // // Placeholder capabilities - replace with actual capabilities
-        // .capabilities(new AgentCapabilities())
-        // .skills(List.of())
-        // .build();
-        // log.debug("Returning self agent card: {}", selfCard);
         return a2aServerSelfCard;
     }
 }

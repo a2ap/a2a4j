@@ -20,7 +20,9 @@ import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
+import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.model.TaskUpdate;
+import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
 import java.util.List;
 import reactor.core.publisher.Mono;
 
@@ -47,14 +49,6 @@ public interface TaskManager {
     Task getTask(String taskId);
 
     /**
-     * Cancels a task.
-     * 
-     * @param taskId The ID of the task to cancel
-     * @return true if the task was successfully cancelled, false otherwise
-     */
-    Task cancelTask(String taskId);
-
-    /**
      * apply take update for task
      * @param taskContext TaskContext
      * @param taskUpdates taskUpdate TaskStatus or Artifact update
@@ -69,6 +63,22 @@ public interface TaskManager {
      * @return mono of task
      */
     Mono<Task> applyTaskUpdate(Task task, TaskUpdate update);
+
+    /**
+     * Apply status update with append support from TaskStatusUpdateEvent
+     * @param task The task to update
+     * @param event The TaskStatusUpdateEvent containing status information
+     * @return Updated task
+     */
+    Mono<Task> applyStatusUpdate(Task task, TaskStatusUpdateEvent event);
+    
+    /**
+     * Apply artifact update with append support from TaskArtifactUpdateEvent
+     * @param task The task to update
+     * @param event The TaskArtifactUpdateEvent containing artifact and append information
+     * @return Updated task
+     */
+    Mono<Task> applyArtifactUpdate(Task task, TaskArtifactUpdateEvent event);
 
     /**
      * register task notification config
