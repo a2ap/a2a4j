@@ -96,9 +96,9 @@ public class A2AServerImpl implements A2AServer {
                         })
                         .flatMap(event -> {
                             if (event instanceof TaskStatusUpdateEvent) {
-                                return taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus());
+                                return taskManager.applyStatusUpdate(currentTask, (TaskStatusUpdateEvent) event);
                             } else if (event instanceof TaskArtifactUpdateEvent) {
-                                return taskManager.applyTaskUpdate(currentTask, ((TaskArtifactUpdateEvent) event).getArtifact());
+                                return taskManager.applyArtifactUpdate(currentTask, (TaskArtifactUpdateEvent) event);
                             } else {
                                 return Mono.just(event);
                             }
@@ -134,7 +134,9 @@ public class A2AServerImpl implements A2AServer {
                 .thenMany(eventQueue.asFlux()
                         .doOnNext(event -> {
                             if (event instanceof TaskStatusUpdateEvent) {
-                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus()).block();
+                                taskManager.applyStatusUpdate(currentTask, (TaskStatusUpdateEvent) event).block();
+                            } else if (event instanceof TaskArtifactUpdateEvent) {
+                                taskManager.applyArtifactUpdate(currentTask, (TaskArtifactUpdateEvent) event).block();
                             }
                             // todo merge message or others
                         })
