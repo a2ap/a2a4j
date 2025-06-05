@@ -30,6 +30,7 @@ import reactor.core.publisher.Flux;
 public class A2AServerController {
 
     private final A2AServer a2aServer;
+    
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -84,16 +85,16 @@ public class A2AServerController {
                 default:
                     // Method not found error
                     log.warn("Unsupported method: {}", method);
-                    response.setError(new JSONRPCError(-32601, "Method not found",
+                    response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
                             "Method '" + method + "' not supported"));
                     break;
             }
         } catch (IllegalArgumentException e) {
             // Handle validation errors from A2AServerImpl
-            response.setError(new JSONRPCError(-32602, "Invalid params", e.getMessage()));
+            response.setError(new JSONRPCError(JSONRPCError.INVALID_PARAMS, "Invalid params", e.getMessage()));
         } catch (Exception e) {
             // Handle other internal errors
-            response.setError(new JSONRPCError(-32603, "Internal error", e.getMessage()));
+            response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
             // Log the error with more context
             log.error("Internal error processing method {}.", method, e);
         }
@@ -132,16 +133,16 @@ public class A2AServerController {
                 default:
                     // Method not found error
                     log.warn("Unsupported method: {}", method);
-                    response.setError(new JSONRPCError(-32601, "Method not found",
+                    response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
                             "Method '" + method + "' not supported"));
                     break;
             }
         } catch (IllegalArgumentException e) {
             // Handle validation errors from A2AServerImpl
-            response.setError(new JSONRPCError(-32602, "Invalid params", e.getMessage()));
+            response.setError(new JSONRPCError(JSONRPCError.INVALID_REQUEST, "Invalid params", e.getMessage()));
         } catch (Exception e) {
             // Handle other internal errors
-            response.setError(new JSONRPCError(-32603, "Internal error", e.getMessage()));
+            response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
             // Log the error with more context
             log.error("Internal error processing method {}.", method, e);
         }

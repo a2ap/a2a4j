@@ -1,6 +1,5 @@
 package io.github.a2ap.core.server;
 
-import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.model.Task;
 
 /**

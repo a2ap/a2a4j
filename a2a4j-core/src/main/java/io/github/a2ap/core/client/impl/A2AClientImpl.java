@@ -30,7 +30,7 @@ public class A2AClientImpl implements A2AClient {
     
     private String baseUrl;
     
-    private CardResolver cardResolver;
+    private final CardResolver cardResolver;
 
     /**
      * Constructs a new A2AClientImpl with the specified CardResolver.
@@ -144,6 +144,7 @@ public class A2AClientImpl implements A2AClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public TaskPushNotificationConfig setTaskPushNotification(TaskPushNotificationConfig params) {
         log.info("Setting push notification config for task {} on {}", params.getTaskId(), this.baseUrl);
         WebClient client = WebClient.create(this.baseUrl);
@@ -176,6 +177,7 @@ public class A2AClientImpl implements A2AClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public TaskPushNotificationConfig getTaskPushNotification(TaskIdParams params) {
         log.info("Getting push notification config for task {} from {}", params.getId(), this.baseUrl);
         WebClient client = WebClient.create(this.baseUrl);
@@ -244,16 +246,14 @@ public class A2AClientImpl implements A2AClient {
         }
         
         // 检查代理能力
-        switch (capability.toLowerCase()) {
-            case "streaming":
-                return agentCard.getCapabilities().isStreaming();
-            case "pushnotifications":
-                return agentCard.getCapabilities().isPushNotifications();
-            default:
-                return false;
-        }
+        return switch (capability.toLowerCase()) {
+            case "streaming" -> agentCard.getCapabilities().isStreaming();
+            case "pushnotifications" -> agentCard.getCapabilities().isPushNotifications();
+            default -> false;
+        };
     }
     
+    @SuppressWarnings("unchecked")
     private SendStreamingMessageResponse parseServerSentEvent(String eventData) {
         try {
             // 解析SSE数据中的JSON-RPC响应
