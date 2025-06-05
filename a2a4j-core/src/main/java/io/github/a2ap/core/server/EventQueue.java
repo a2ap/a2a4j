@@ -11,11 +11,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Event queue for A2A responses from agent.
- * 
+ * <p>
  * Acts as a buffer between the agent's asynchronous execution and the
  * server's response handling (e.g., streaming via SSE). Supports tapping
  * to create child queues that receive the same events.
- * 
+ * <p>
  * This is the Java equivalent of Python's EventQueue using Reactor's Sinks.Many.
  */
 @Slf4j
@@ -69,7 +69,7 @@ public class EventQueue {
      * Taps the event queue to create a new child queue that receives all future events.
      *
      * @return A new EventQueue instance that will receive all events enqueued
-     *         to this parent queue from this point forward.
+     * to this parent queue from this point forward.
      */
     public EventQueue tap() {
         log.debug("Tapping EventQueue to create a child queue.");
@@ -80,7 +80,7 @@ public class EventQueue {
     
     /**
      * Closes the queue for future push events.
-     * 
+     * <p>
      * Once closed, the underlying Flux will complete.
      * Also closes all child queues.
      */
