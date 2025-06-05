@@ -40,6 +40,8 @@ public class A2AServerImpl implements A2AServer {
     private final AgentExecutor agentExecutor;
     private final QueueManager queueManager;
     
+    private final AgentCard a2aServerSelfCard;
+    
     /**
      * Constructs a new A2AServerImpl with the specified components.
      *
@@ -49,7 +51,8 @@ public class A2AServerImpl implements A2AServer {
      * @param queueManager The QueueManager to use for event queue management.
      */
     public A2AServerImpl(TaskHandler taskHandler, TaskManager taskManager, 
-                        AgentExecutor agentExecutor, QueueManager queueManager) {
+                        AgentExecutor agentExecutor, QueueManager queueManager
+            , AgentCard a2aServerSelfCard) {
         this.taskHandler = taskHandler;
         this.taskManager = taskManager;
         this.agentExecutor = agentExecutor;
@@ -57,6 +60,8 @@ public class A2AServerImpl implements A2AServer {
         log.info("A2AServerImpl initialized with TaskManager: {}, TaskHandler: {}, AgentExecutor: {}, QueueManager: {}",
                 taskManager.getClass().getSimpleName(), taskHandler.getClass().getSimpleName(),
                 agentExecutor.getClass().getSimpleName(), queueManager.getClass().getSimpleName());
+        
+        this.a2aServerSelfCard = a2aServerSelfCard;
     }
 
     /**
@@ -313,17 +318,17 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public AgentCard getSelfAgentCard() {
         log.info("Getting self agent card.");
-        // TODO: Provide actual agent card information
-        AgentCard selfCard = AgentCard.builder()
-                .name("Example Java Agent")
-                .description("A sample A2A agent implemented in Java.")
-                .url("http://localhost:8080/a2a/server") 
-                .version("1.0.0")
-                // Placeholder capabilities - replace with actual capabilities
-                .capabilities(new AgentCapabilities())
-                .skills(List.of())
-                .build();
-        log.debug("Returning self agent card: {}", selfCard);
-        return selfCard;
+//        // TODO: Provide actual agent card information
+//        AgentCard selfCard = AgentCard.builder()
+//                .name("Example Java Agent")
+//                .description("A sample A2A agent implemented in Java.")
+//                .url("http://localhost:8080/a2a/server")
+//                .version("1.0.0")
+//                // Placeholder capabilities - replace with actual capabilities
+//                .capabilities(new AgentCapabilities())
+//                .skills(List.of())
+//                .build();
+//        log.debug("Returning self agent card: {}", selfCard);
+        return a2aServerSelfCard;
     }
 }
