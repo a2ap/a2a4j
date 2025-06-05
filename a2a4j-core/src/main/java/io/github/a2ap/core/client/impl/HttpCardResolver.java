@@ -2,7 +2,8 @@ package io.github.a2ap.core.client.impl;
 
 import io.github.a2ap.core.client.CardResolver;
 import io.github.a2ap.core.model.AgentCard;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -10,9 +11,10 @@ import org.springframework.web.reactive.function.client.WebClient;
  * An implementation of {@link CardResolver} that fetches AgentCard from a URL
  * via HTTP.
  */
-@Slf4j
 @Component
 public class HttpCardResolver implements CardResolver {
+
+    private static final Logger log = LoggerFactory.getLogger(HttpCardResolver.class);
 
     @Override
     public AgentCard resolveCard(String agentIdentifier) {

@@ -4,22 +4,20 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.Map;
+import java.util.Objects;
 
 /**
- * Base class for different types of parts that can be included in messages or artifacts.
+ * Base class for different types of parts that can be included in messages or
+ * artifacts.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = TextPart.class, name = "text"),
-    @JsonSubTypes.Type(value = FilePart.class, name = "file"),
-    @JsonSubTypes.Type(value = DataPart.class, name = "data")
+        @JsonSubTypes.Type(value = TextPart.class, name = "text"),
+        @JsonSubTypes.Type(value = FilePart.class, name = "file"),
+        @JsonSubTypes.Type(value = DataPart.class, name = "data")
 })
 public abstract class Part {
 
@@ -34,5 +32,53 @@ public abstract class Part {
      * Optional metadata associated with the part.
      */
     @JsonProperty("metadata")
-    private java.util.Map<String, Object> metadata;
+    private Map<String, Object> metadata;
+
+    protected Part() {
+    }
+
+    protected Part(String kind, Map<String, Object> metadata) {
+        this.kind = kind;
+        this.metadata = metadata;
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
+
+    public Map<String, Object> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Part part = (Part) o;
+        return Objects.equals(kind, part.kind) &&
+                Objects.equals(metadata, part.metadata);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(kind, metadata);
+    }
+
+    @Override
+    public String toString() {
+        return "Part{" +
+                "kind='" + kind + '\'' +
+                ", metadata=" + metadata +
+                '}';
+    }
 }

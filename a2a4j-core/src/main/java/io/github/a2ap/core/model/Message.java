@@ -4,19 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Objects;
 
 /**
  * Represents a message exchanged between agents.
  * A message can contain multiple parts of different types (text, file, data).
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Message implements SendMessageResponse, SendStreamingMessageResponse {
 
@@ -31,13 +24,13 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
      */
     @JsonProperty("taskId")
     private String taskId;
-    
+
     /**
      * context id
      */
     @JsonProperty("contextId")
     private String contextId;
-    
+
     /**
      * The role of the message sender (e.g., "user", "assistant").
      * Required field.
@@ -65,4 +58,174 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
     @JsonProperty("kind")
     private String kind;
 
+    public Message() {
+    }
+
+    public Message(String messageId, String taskId, String contextId, String role,
+            List<Part> parts, Map<String, Object> metadata, String kind) {
+        this.messageId = messageId;
+        this.taskId = taskId;
+        this.contextId = contextId;
+        this.role = role;
+        this.parts = parts;
+        this.metadata = metadata;
+        this.kind = kind;
+    }
+
+    public static MessageBuilder builder() {
+        return new MessageBuilder();
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getContextId() {
+        return contextId;
+    }
+
+    public void setContextId(String contextId) {
+        this.contextId = contextId;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public List<Part> getParts() {
+        return parts;
+    }
+
+    public void setParts(List<Part> parts) {
+        this.parts = parts;
+    }
+
+    public Map<String, Object> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Message message = (Message) o;
+        return Objects.equals(messageId, message.messageId) &&
+                Objects.equals(taskId, message.taskId) &&
+                Objects.equals(contextId, message.contextId) &&
+                Objects.equals(role, message.role) &&
+                Objects.equals(parts, message.parts) &&
+                Objects.equals(metadata, message.metadata) &&
+                Objects.equals(kind, message.kind);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(messageId, taskId, contextId, role, parts, metadata, kind);
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "messageId='" + messageId + '\'' +
+                ", taskId='" + taskId + '\'' +
+                ", contextId='" + contextId + '\'' +
+                ", role='" + role + '\'' +
+                ", parts=" + parts +
+                ", metadata=" + metadata +
+                ", kind='" + kind + '\'' +
+                '}';
+    }
+
+    public static class MessageBuilder {
+        private String messageId;
+        private String taskId;
+        private String contextId;
+        private String role;
+        private List<Part> parts;
+        private Map<String, Object> metadata;
+        private String kind;
+
+        MessageBuilder() {
+        }
+
+        public MessageBuilder messageId(String messageId) {
+            this.messageId = messageId;
+            return this;
+        }
+
+        public MessageBuilder taskId(String taskId) {
+            this.taskId = taskId;
+            return this;
+        }
+
+        public MessageBuilder contextId(String contextId) {
+            this.contextId = contextId;
+            return this;
+        }
+
+        public MessageBuilder role(String role) {
+            this.role = role;
+            return this;
+        }
+
+        public MessageBuilder parts(List<Part> parts) {
+            this.parts = parts;
+            return this;
+        }
+
+        public MessageBuilder metadata(Map<String, Object> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        public MessageBuilder kind(String kind) {
+            this.kind = kind;
+            return this;
+        }
+
+        public Message build() {
+            return new Message(messageId, taskId, contextId, role, parts, metadata, kind);
+        }
+
+        @Override
+        public String toString() {
+            return "Message.MessageBuilder(messageId=" + this.messageId +
+                    ", taskId=" + this.taskId +
+                    ", contextId=" + this.contextId +
+                    ", role=" + this.role +
+                    ", parts=" + this.parts +
+                    ", metadata=" + this.metadata +
+                    ", kind=" + this.kind + ")";
+        }
+    }
 }
