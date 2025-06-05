@@ -16,10 +16,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import reactor.core.publisher.Flux;
 
 /**
- * Queue for task event notifications
- *
- * @author aias
- * @date 2024/1/10
+ * Event queue for A2A responses from agent.
+ * <p>
+ * Acts as a buffer between the agent's asynchronous execution and the
+ * server's response handling (e.g., streaming via SSE). Supports tapping
+ * to create child queues that receive the same events.
+ * <p>
+ * This is the Java equivalent of Python's EventQueue using Reactor's Sinks.Many.
  */
 public class EventQueue {
 
@@ -140,8 +143,8 @@ public class EventQueue {
      * Taps the event queue to create a new child queue that receives all future
      * events.
      *
-     * @return A new EventQueue instance that will receive all events published
-     *         to this parent queue from this point forward.
+     * @return A new EventQueue instance that will receive all events enqueued
+     * to this parent queue from this point forward.
      */
     public EventQueue tap() {
         if (isClosed.get()) {
@@ -157,8 +160,7 @@ public class EventQueue {
 
     /**
      * Closes the queue for future push events.
-     * 
-     * Once closed, no more events can be published or consumed.
+     * Once closed, the underlying Flux will complete.
      * Also closes all child queues.
      */
     public void close() {
