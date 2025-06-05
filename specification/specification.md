@@ -832,12 +832,12 @@ Sends a message to an agent to initiate/continue a task AND subscribes the clien
 
 - **Request `params` type**: [`MessageSendParams`](#711-messagesendparams-object) (same as `message/send`).
 - **Response (on successful subscription)**:
-    - HTTP Status: `200 OK`.
-    - HTTP `Content-Type`: `text/event-stream`.
-    - HTTP Body: A stream of Server-Sent Events. Each SSE `data` field contains a [`SendStreamingMessageResponse`](#721-sendstreamingmessageresponse-object) JSON object.
+  - HTTP Status: `200 OK`.
+  - HTTP `Content-Type`: `text/event-stream`.
+  - HTTP Body: A stream of Server-Sent Events. Each SSE `data` field contains a [`SendStreamingMessageResponse`](#721-sendstreamingmessageresponse-object) JSON object.
 - **Response (on initial subscription failure)**:
-    - Standard HTTP error code (e.g., 4xx, 5xx).
-    - The HTTP body MAY contain a standard `JSONRPCResponse` with an `error` object detailing the failure.
+  - Standard HTTP error code (e.g., 4xx, 5xx).
+  - The HTTP body MAY contain a standard `JSONRPCResponse` with an `error` object detailing the failure.
 
 #### 7.2.1. `SendStreamingMessageResponse` Object
 
@@ -1008,12 +1008,12 @@ The purpose is to resume receiving _subsequent_ updates. The server's behavior r
 
 - **Request `params` type**: [`TaskIdParams`](#731-taskqueryparams-object)
 - **Response (on successful resubscription)**:
-    - HTTP Status: `200 OK`.
-    - HTTP `Content-Type`: `text/event-stream`.
-    - HTTP Body: A stream of Server-Sent Events, identical in format to `message/stream`, carrying _subsequent_ [`SendStreamingMessageResponse`](#721-sendstreamingmessageresponse-object) events for the task.
+  - HTTP Status: `200 OK`.
+  - HTTP `Content-Type`: `text/event-stream`.
+  - HTTP Body: A stream of Server-Sent Events, identical in format to `message/stream`, carrying _subsequent_ [`SendStreamingMessageResponse`](#721-sendstreamingmessageresponse-object) events for the task.
 - **Response (on resubscription failure)**:
-    - Standard HTTP error code (e.g., 4xx, 5xx).
-    - The HTTP body MAY contain a standard `JSONRPCResponse` with an `error` object. Failures can occur if the task is no longer active, doesn't exist, or streaming is not supported/enabled for it.
+  - Standard HTTP error code (e.g., 4xx, 5xx).
+  - The HTTP body MAY contain a standard `JSONRPCResponse` with an `error` object. Failures can occur if the task is no longer active, doesn't exist, or streaming is not supported/enabled for it.
 
 ### 7.8. `agent/authenticatedExtendedCard`
 
@@ -1025,10 +1025,10 @@ Retrieves a potentially more detailed version of the Agent Card after the client
 - **Request `params`**: None (HTTP GET request).
 - **Response `result` type (on success)**: `AgentCard` (A complete Agent Card object, which may contain additional details or skills not present in the public card).
 - **Response `error` type (on failure)**: Standard HTTP error codes.
-    - `401 Unauthorized`: Authentication failed (missing or invalid credentials). The server **SHOULD** include a `WWW-Authenticate` header.
-    - `403 Forbidden`: Authentication succeeded, but the client/user is not authorized to access the extended card.
-    - `404 Not Found`: The `supportsAuthenticatedExtendedCard` capability is declared, but the server has not implemented this endpoint at the specified path.
-    - `5xx Server Error`: An internal server error occurred.
+  - `401 Unauthorized`: Authentication failed (missing or invalid credentials). The server **SHOULD** include a `WWW-Authenticate` header.
+  - `403 Forbidden`: Authentication succeeded, but the client/user is not authorized to access the extended card.
+  - `404 Not Found`: The `supportsAuthenticatedExtendedCard` capability is declared, but the server has not implemented this endpoint at the specified path.
+  - `5xx Server Error`: An internal server error occurred.
 
 Clients retrieving this authenticated card **SHOULD** replace their cached public Agent Card with the content received from this endpoint for the duration of their authenticated session or until the card's version changes.
 
@@ -1788,19 +1788,19 @@ Security is a paramount concern in A2A. Key considerations include:
 
 - **Transport Security:** Always use HTTPS with strong TLS configurations in production environments.
 - **Authentication:**
-    - Handled via standard HTTP mechanisms (e.g., `Authorization` header with Bearer tokens, API keys).
-    - Requirements are declared in the `AgentCard`.
-    - Credentials MUST be obtained out-of-band by the client.
-    - A2A Servers MUST authenticate every request.
+  - Handled via standard HTTP mechanisms (e.g., `Authorization` header with Bearer tokens, API keys).
+  - Requirements are declared in the `AgentCard`.
+  - Credentials MUST be obtained out-of-band by the client.
+  - A2A Servers MUST authenticate every request.
 - **Authorization:**
-    - A server-side responsibility based on the authenticated identity.
-    - Implement the principle of least privilege.
-    - Can be granular, based on skills, actions, or data.
+  - A server-side responsibility based on the authenticated identity.
+  - Implement the principle of least privilege.
+  - Can be granular, based on skills, actions, or data.
 - **Push Notification Security:**
-    - Webhook URL validation (by the A2A Server sending notifications) is crucial to prevent SSRF.
-    - Authentication of the A2A Server to the client's webhook is essential.
-    - Authentication of the notification by the client's webhook receiver (verifying it came from the legitimate A2A Server and is relevant) is critical.
-    - See the [Streaming & Asynchronous Operations guide](./topics/streaming-and-async.md#security-considerations-for-push-notifications) for detailed push notification security.
+  - Webhook URL validation (by the A2A Server sending notifications) is crucial to prevent SSRF.
+  - Authentication of the A2A Server to the client's webhook is essential.
+  - Authentication of the notification by the client's webhook receiver (verifying it came from the legitimate A2A Server and is relevant) is critical.
+  - See the [Streaming & Asynchronous Operations guide](./topics/streaming-and-async.md#security-considerations-for-push-notifications) for detailed push notification security.
 - **Input Validation:** Servers MUST rigorously validate all RPC parameters and the content/structure of data in `Message` and `Artifact` parts to prevent injection attacks or processing errors.
 - **Resource Management:** Implement rate limiting, concurrency controls, and resource limits to protect agents from abuse or overload.
 - **Data Privacy:** Adhere to all applicable privacy regulations for data exchanged in `Message` and `Artifact` parts. Minimize sensitive data transfer.

@@ -22,4 +22,4 @@ a2a:
     capabilities:
       streaming: true
       pushNotifications: false
-      stateTransitionHistory: true 
+      stateTransitionHistory: true
