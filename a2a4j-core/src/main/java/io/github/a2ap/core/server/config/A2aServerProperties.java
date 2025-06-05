@@ -1,4 +1,4 @@
-package io.github.a2ap.core.config;
+package io.github.a2ap.core.server.config;
 
 import lombok.Getter;
 import lombok.Setter;

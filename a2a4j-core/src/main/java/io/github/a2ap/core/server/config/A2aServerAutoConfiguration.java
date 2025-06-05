@@ -1,4 +1,4 @@
-package io.github.a2ap.core.config;
+package io.github.a2ap.core.server.config;
 
 import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
