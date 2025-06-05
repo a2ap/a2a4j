@@ -22,13 +22,11 @@ public class EventQueue {
    private static final Logger log = LoggerFactory.getLogger(EventQueue.class); 
     
     private final Sinks.Many<SendStreamingMessageResponse> sink;
-    private final Flux<SendStreamingMessageResponse> flux;
     private final List<EventQueue> children = new CopyOnWriteArrayList<>();
     private final AtomicBoolean isClosed = new AtomicBoolean(false);
 
     public EventQueue() {
         this.sink = Sinks.many().multicast().onBackpressureBuffer();
-        this.flux = sink.asFlux();
         log.debug("EventQueue initialized.");
     }
 
@@ -42,7 +40,7 @@ public class EventQueue {
             log.warn("Queue is closed. Event will not be enqueued.");
             return;
         }
-
+        
         log.debug("Enqueuing event of type: {}", event.getClass().getSimpleName());
 
         Sinks.EmitResult result = sink.tryEmitNext(event);
@@ -62,7 +60,7 @@ public class EventQueue {
      * @return A Flux of events from the queue.
      */
     public Flux<SendStreamingMessageResponse> asFlux() {
-        return flux;
+        return sink.asFlux();
     }
 
     /**
@@ -80,7 +78,6 @@ public class EventQueue {
 
     /**
      * Closes the queue for future push events.
-     *
      * Once closed, the underlying Flux will complete.
      * Also closes all child queues.
      */
