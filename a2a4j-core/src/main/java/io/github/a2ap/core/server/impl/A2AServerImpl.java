@@ -22,7 +22,8 @@ import io.github.a2ap.core.server.TaskHandler;
 import io.github.a2ap.core.server.TaskManager;
 import java.time.Instant;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,28 +32,28 @@ import reactor.core.publisher.Mono;
  * Implementation of the A2AServer interface.
  * This class provides the core functionality for an A2A server.
  */
-@Slf4j
 @Component
 public class A2AServerImpl implements A2AServer {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(A2AServerImpl.class);
+
     private final TaskManager taskManager;
     private final TaskHandler taskHandler;
     private final AgentExecutor agentExecutor;
     private final QueueManager queueManager;
-    
+
     private final AgentCard a2aServerSelfCard;
-    
+
     /**
      * Constructs a new A2AServerImpl with the specified components.
      *
-     * @param taskHandler The TaskHandler to use for task processing.
-     * @param taskManager The TaskManager to use for task management.
+     * @param taskHandler   The TaskHandler to use for task processing.
+     * @param taskManager   The TaskManager to use for task management.
      * @param agentExecutor The AgentExecutor to use for agent execution.
-     * @param queueManager The QueueManager to use for event queue management.
+     * @param queueManager  The QueueManager to use for event queue management.
      */
-    public A2AServerImpl(TaskHandler taskHandler, TaskManager taskManager, 
-                        AgentExecutor agentExecutor, QueueManager queueManager
-            , AgentCard a2aServerSelfCard) {
+    public A2AServerImpl(TaskHandler taskHandler, TaskManager taskManager,
+            AgentExecutor agentExecutor, QueueManager queueManager, AgentCard a2aServerSelfCard) {
         this.taskHandler = taskHandler;
         this.taskManager = taskManager;
         this.agentExecutor = agentExecutor;
@@ -60,7 +61,7 @@ public class A2AServerImpl implements A2AServer {
         log.info("A2AServerImpl initialized with TaskManager: {}, TaskHandler: {}, AgentExecutor: {}, QueueManager: {}",
                 taskManager.getClass().getSimpleName(), taskHandler.getClass().getSimpleName(),
                 agentExecutor.getClass().getSimpleName(), queueManager.getClass().getSimpleName());
-        
+
         this.a2aServerSelfCard = a2aServerSelfCard;
     }
 
@@ -69,12 +70,12 @@ public class A2AServerImpl implements A2AServer {
      *
      * @param params The Task params object to handle.
      * @return The Task object with updated status and ID.
-     * @throws IllegalArgumentException if the task is invalid 
+     * @throws IllegalArgumentException if the task is invalid
      */
     @Override
     public SendMessageResponse handleMessage(MessageSendParams params) {
         log.info("Attempting to handle the message: {}", params);
-        if (params == null || params.getMessage() == null || params.getMessage().getParts() == null 
+        if (params == null || params.getMessage() == null || params.getMessage().getParts() == null
                 || params.getMessage().getParts().isEmpty()) {
             log.error("Task handle failed: Task params must have at least one message.");
             throw new IllegalArgumentException("Task params must have at least one message");
@@ -82,10 +83,10 @@ public class A2AServerImpl implements A2AServer {
         RequestContext taskContext = taskManager.loadOrCreateContext(params);
         Task currentTask = taskContext.getTask();
         log.info("Task request context loaded: {}", taskContext.getTask());
-        
+
         // Create event queue for this task
         final EventQueue eventQueue = queueManager.create(taskContext.getTaskId());
-        
+
         // Execute agent and collect final result
         eventQueue.enqueueEvent(currentTask);
         Mono<List<SendMessageResponse>> resultMono = agentExecutor.execute(taskContext, eventQueue)
@@ -95,7 +96,8 @@ public class A2AServerImpl implements A2AServer {
                         })
                         .filter(event -> {
                             if (event instanceof TaskStatusUpdateEvent) {
-                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus()).block();
+                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus())
+                                        .block();
                                 return false;
                             } else if (event instanceof Task) {
                                 return true;
@@ -109,7 +111,7 @@ public class A2AServerImpl implements A2AServer {
                                 log.error("Queue received unknown SendMessageResponse event: {}", event);
                                 return false;
                             }
-                            
+
                         })
                         .cast(SendMessageResponse.class)
                         .collectList());
@@ -145,7 +147,6 @@ public class A2AServerImpl implements A2AServer {
         Task currentTask = taskContext.getTask();
         log.info("Task request context loaded: {}", taskContext.getTask());
 
-
         // Create event queue for this task
         final EventQueue eventQueue = queueManager.create(taskContext.getTaskId());
 
@@ -154,18 +155,21 @@ public class A2AServerImpl implements A2AServer {
                 .thenMany(eventQueue.asFlux()
                         .doOnNext(event -> {
                             if (event instanceof TaskStatusUpdateEvent) {
-                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus()).block();
+                                taskManager.applyTaskUpdate(currentTask, ((TaskStatusUpdateEvent) event).getStatus())
+                                        .block();
                             }
                             // todo merge message or others
                         })
-                        .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleMessageStream.", taskContext.getTaskId()))
-                        .doOnComplete(() -> log.debug("Task {} updates stream completed via handleMessageStream.", taskContext.getTaskId()))
-                        .doOnError(e -> log.error("Error in task {} updates stream via handleMessageStream: {}", taskContext.getTaskId(), e.getMessage(), e))
+                        .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via handleMessageStream.",
+                                taskContext.getTaskId()))
+                        .doOnComplete(() -> log.debug("Task {} updates stream completed via handleMessageStream.",
+                                taskContext.getTaskId()))
+                        .doOnError(e -> log.error("Error in task {} updates stream via handleMessageStream: {}",
+                                taskContext.getTaskId(), e.getMessage(), e))
                         .doOnTerminate(() -> {
                             log.debug("Agent execution completed for task: {}", taskContext.getTaskId());
                             queueManager.remove(taskContext.getTaskId());
-                        })
-                );
+                        }));
     }
 
     /**
@@ -198,14 +202,14 @@ public class A2AServerImpl implements A2AServer {
             throw new IllegalArgumentException("Cancel Task id must not be null");
         }
         log.info("Attempting to cancel task with ID: {}", taskId);
-        
+
         Task cancelledTask = taskManager.getTask(taskId);
-        
+
         if (cancelledTask == null) {
             log.warn("Task with ID {} not found for cancellation.", taskId);
             throw new IllegalArgumentException("Cancel Task id not found for cancellation.");
         }
-        
+
         // Get or create event queue for cancellation
         EventQueue eventQueue = queueManager.get(taskId);
         TaskStatus taskStatus = TaskStatus.builder()
@@ -221,7 +225,7 @@ public class A2AServerImpl implements A2AServer {
             eventQueue.enqueueEvent(event);
             eventQueue.close();
         }
-        
+
         // Execute cancellation
         agentExecutor.cancel(taskId).block();
         taskManager.applyTaskUpdate(cancelledTask, taskStatus).block();
@@ -275,18 +279,18 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public Flux<SendStreamingMessageResponse> subscribeToTaskUpdates(String taskId) {
         log.info("Subscribing to task updates for ID: {}", taskId);
-        
+
         // 检查任务是否存在
         Task task = taskManager.getTask(taskId);
         if (task == null) {
             log.warn("Task with ID {} not found for subscription.", taskId);
             return Flux.error(new IllegalArgumentException("Task not found: " + taskId));
         }
-        
+
         // 如果任务已经完成，返回最终状态
         TaskState state = task.getStatus().getState();
-        if (state == TaskState.COMPLETED || state == TaskState.FAILED || 
-            state == TaskState.CANCELED || state == TaskState.REJECTED) {
+        if (state == TaskState.COMPLETED || state == TaskState.FAILED ||
+                state == TaskState.CANCELED || state == TaskState.REJECTED) {
             log.info("Task {} is in final state {}, returning final status.", taskId, state);
             TaskStatusUpdateEvent finalEvent = TaskStatusUpdateEvent.builder()
                     .taskId(taskId)
@@ -295,15 +299,18 @@ public class A2AServerImpl implements A2AServer {
                     .build();
             return Flux.just(finalEvent);
         }
-        
+
         // 对于正在进行的任务，尝试tap到现有的事件队列
         EventQueue eventQueue = queueManager.tap(taskId);
         if (eventQueue != null) {
             log.debug("Task {} is in progress, subscribing to updates via tapped queue.", taskId);
             return eventQueue.asFlux()
-                    .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via subscribeToTaskUpdates.", taskId))
-                    .doOnComplete(() -> log.debug("Task {} updates stream completed via subscribeToTaskUpdates.", taskId))
-                    .doOnError(e -> log.error("Error in task {} updates stream via subscribeToTaskUpdates: {}", taskId, e.getMessage(), e));
+                    .doOnSubscribe(s -> log.debug("Subscriber attached to task {} updates via subscribeToTaskUpdates.",
+                            taskId))
+                    .doOnComplete(
+                            () -> log.debug("Task {} updates stream completed via subscribeToTaskUpdates.", taskId))
+                    .doOnError(e -> log.error("Error in task {} updates stream via subscribeToTaskUpdates: {}", taskId,
+                            e.getMessage(), e));
         } else {
             log.warn("No active event queue found for task {}.", taskId);
             return Flux.empty();
@@ -318,17 +325,17 @@ public class A2AServerImpl implements A2AServer {
     @Override
     public AgentCard getSelfAgentCard() {
         log.info("Getting self agent card.");
-//        // TODO: Provide actual agent card information
-//        AgentCard selfCard = AgentCard.builder()
-//                .name("Example Java Agent")
-//                .description("A sample A2A agent implemented in Java.")
-//                .url("http://localhost:8080/a2a/server")
-//                .version("1.0.0")
-//                // Placeholder capabilities - replace with actual capabilities
-//                .capabilities(new AgentCapabilities())
-//                .skills(List.of())
-//                .build();
-//        log.debug("Returning self agent card: {}", selfCard);
+        // // TODO: Provide actual agent card information
+        // AgentCard selfCard = AgentCard.builder()
+        // .name("Example Java Agent")
+        // .description("A sample A2A agent implemented in Java.")
+        // .url("http://localhost:8080/a2a/server")
+        // .version("1.0.0")
+        // // Placeholder capabilities - replace with actual capabilities
+        // .capabilities(new AgentCapabilities())
+        // .skills(List.of())
+        // .build();
+        // log.debug("Returning self agent card: {}", selfCard);
         return a2aServerSelfCard;
     }
 }

@@ -2,18 +2,12 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 /**
  * Configuration for push notifications.
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PushNotificationConfig {
 
@@ -29,4 +23,84 @@ public class PushNotificationConfig {
      */
     @JsonProperty("auth_token")
     private String authToken;
+
+    public PushNotificationConfig() {
+    }
+
+    public PushNotificationConfig(String url, String authToken) {
+        this.url = url;
+        this.authToken = authToken;
+    }
+
+    public static PushNotificationConfigBuilder builder() {
+        return new PushNotificationConfigBuilder();
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        PushNotificationConfig that = (PushNotificationConfig) o;
+        return Objects.equals(url, that.url) &&
+                Objects.equals(authToken, that.authToken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, authToken);
+    }
+
+    @Override
+    public String toString() {
+        return "PushNotificationConfig{" +
+                "url='" + url + '\'' +
+                ", authToken='" + authToken + '\'' +
+                '}';
+    }
+
+    public static class PushNotificationConfigBuilder {
+        private String url;
+        private String authToken;
+
+        PushNotificationConfigBuilder() {
+        }
+
+        public PushNotificationConfigBuilder url(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public PushNotificationConfigBuilder authToken(String authToken) {
+            this.authToken = authToken;
+            return this;
+        }
+
+        public PushNotificationConfig build() {
+            return new PushNotificationConfig(url, authToken);
+        }
+
+        @Override
+        public String toString() {
+            return "PushNotificationConfig.PushNotificationConfigBuilder(url=" + this.url +
+                    ", authToken=" + this.authToken + ")";
+        }
+    }
 }

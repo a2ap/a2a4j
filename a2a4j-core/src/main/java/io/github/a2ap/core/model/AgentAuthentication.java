@@ -3,18 +3,11 @@ package io.github.a2ap.core.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Objects;
 
 /**
  * Represents authentication information for an agent.
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentAuthentication {
 
@@ -30,4 +23,84 @@ public class AgentAuthentication {
      */
     @JsonProperty("credentials")
     private String credentials;
+
+    public AgentAuthentication() {
+    }
+
+    public AgentAuthentication(List<String> schemes, String credentials) {
+        this.schemes = schemes;
+        this.credentials = credentials;
+    }
+
+    public static AgentAuthenticationBuilder builder() {
+        return new AgentAuthenticationBuilder();
+    }
+
+    public List<String> getSchemes() {
+        return schemes;
+    }
+
+    public void setSchemes(List<String> schemes) {
+        this.schemes = schemes;
+    }
+
+    public String getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(String credentials) {
+        this.credentials = credentials;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        AgentAuthentication that = (AgentAuthentication) o;
+        return Objects.equals(schemes, that.schemes) &&
+                Objects.equals(credentials, that.credentials);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(schemes, credentials);
+    }
+
+    @Override
+    public String toString() {
+        return "AgentAuthentication{" +
+                "schemes=" + schemes +
+                ", credentials='" + credentials + '\'' +
+                '}';
+    }
+
+    public static class AgentAuthenticationBuilder {
+        private List<String> schemes;
+        private String credentials;
+
+        AgentAuthenticationBuilder() {
+        }
+
+        public AgentAuthenticationBuilder schemes(List<String> schemes) {
+            this.schemes = schemes;
+            return this;
+        }
+
+        public AgentAuthenticationBuilder credentials(String credentials) {
+            this.credentials = credentials;
+            return this;
+        }
+
+        public AgentAuthentication build() {
+            return new AgentAuthentication(schemes, credentials);
+        }
+
+        @Override
+        public String toString() {
+            return "AgentAuthentication.AgentAuthenticationBuilder(schemes=" + this.schemes +
+                    ", credentials=" + this.credentials + ")";
+        }
+    }
 }

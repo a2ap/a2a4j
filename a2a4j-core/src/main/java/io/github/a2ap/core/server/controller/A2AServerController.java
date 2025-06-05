@@ -11,7 +11,8 @@ import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.server.A2AServer;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,10 @@ import reactor.core.publisher.Flux;
 /**
  * Spring Boot Controller to handle A2A protocol JSON-RPC requests.
  */
-@Slf4j
 @RestController
 public class A2AServerController {
+    
+    private static final Logger log = LoggerFactory.getLogger(A2AServerController.class);
 
     private final A2AServer a2aServer;
     

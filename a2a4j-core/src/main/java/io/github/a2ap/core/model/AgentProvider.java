@@ -2,18 +2,12 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 /**
  * Represents information about the provider of an agent.
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentProvider {
     /**
@@ -26,4 +20,84 @@ public class AgentProvider {
      * An optional URL pointing to the provider's website or information.
      */
     private String url;
+
+    public AgentProvider() {
+    }
+
+    public AgentProvider(String organization, String url) {
+        this.organization = organization;
+        this.url = url;
+    }
+
+    public static AgentProviderBuilder builder() {
+        return new AgentProviderBuilder();
+    }
+
+    public String getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        AgentProvider that = (AgentProvider) o;
+        return Objects.equals(organization, that.organization) &&
+                Objects.equals(url, that.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(organization, url);
+    }
+
+    @Override
+    public String toString() {
+        return "AgentProvider{" +
+                "organization='" + organization + '\'' +
+                ", url='" + url + '\'' +
+                '}';
+    }
+
+    public static class AgentProviderBuilder {
+        private String organization;
+        private String url;
+
+        AgentProviderBuilder() {
+        }
+
+        public AgentProviderBuilder organization(String organization) {
+            this.organization = organization;
+            return this;
+        }
+
+        public AgentProviderBuilder url(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public AgentProvider build() {
+            return new AgentProvider(organization, url);
+        }
+
+        @Override
+        public String toString() {
+            return "AgentProvider.AgentProviderBuilder(organization=" + this.organization +
+                    ", url=" + this.url + ")";
+        }
+    }
 }
