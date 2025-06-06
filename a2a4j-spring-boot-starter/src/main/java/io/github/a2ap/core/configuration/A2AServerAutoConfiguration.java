@@ -12,6 +12,7 @@ import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
 import io.github.a2ap.core.server.impl.InMemoryTaskManager;
 import io.github.a2ap.core.server.impl.InMemoryTaskStore;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties(A2aServerProperties.class)
+@AutoConfigureAfter(value = {A2aServerProperties.class})
 public class A2AServerAutoConfiguration {
 
     @Bean
