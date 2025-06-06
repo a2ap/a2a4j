@@ -1,11 +1,14 @@
 package io.github.a2ap.core.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.AgentExecutor;
+import io.github.a2ap.core.server.Dispatcher;
 import io.github.a2ap.core.server.QueueManager;
 import io.github.a2ap.core.server.impl.DefaultA2AServer;
+import io.github.a2ap.core.server.impl.DefaultDispatcher;
 import io.github.a2ap.core.server.impl.DemoAgentExecutor;
 import io.github.a2ap.core.server.impl.InMemoryQueueManager;
 import io.github.a2ap.core.server.TaskManager;
@@ -21,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties(A2aServerProperties.class)
 @AutoConfigureAfter(value = {A2aServerProperties.class})
-public class A2AServerAutoConfiguration {
+public class A2aServerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -39,6 +42,18 @@ public class A2AServerAutoConfiguration {
     @ConditionalOnMissingBean
     public TaskManager taskManager(TaskStore taskStore) {
         return new InMemoryTaskManager(taskStore);
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public Dispatcher dispatcher(A2AServer a2aServer, ObjectMapper objectMapper) {
+        return new DefaultDispatcher(a2aServer, objectMapper);
     }
     
     @Bean

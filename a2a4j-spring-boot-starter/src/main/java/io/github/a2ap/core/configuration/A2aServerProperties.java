@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
  * This class can be extended to include specific properties as needed.
  */
 @ConfigurationProperties(prefix = "a2a.server")
-@Component
 public class A2aServerProperties implements Serializable {
 
     @Serial
