@@ -19,9 +19,47 @@ package io.github.a2ap.core.exception;
 import java.util.Objects;
 
 /**
- * Thrown A2AError message
+ * Exception class for A2A protocol errors.
+ * This exception contains error codes, additional data, and task-specific information
+ * to provide comprehensive error context in A2A protocol communications.
  */
 public class A2AError extends RuntimeException {
+
+    // Common error codes
+    /**
+     * Invalid parameters error code
+     */
+    public static final int INVALID_PARAMS = -32602;
+    
+    /**
+     * Method not found error code
+     */
+    public static final int METHOD_NOT_FOUND = -32601;
+    
+    /**
+     * Task not found error code
+     */
+    public static final int TASK_NOT_FOUND = 1001;
+    
+    /**
+     * Task already cancelled error code
+     */
+    public static final int TASK_CANCELLED = 1002;
+    
+    /**
+     * Agent execution error code
+     */
+    public static final int AGENT_EXECUTION_ERROR = 1003;
+    
+    /**
+     * Authentication error code
+     */
+    public static final int AUTHENTICATION_ERROR = 1004;
+    
+    /**
+     * Authorization error code
+     */
+    public static final int AUTHORIZATION_ERROR = 1005;
 
     private int code;
 
