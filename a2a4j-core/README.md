@@ -62,7 +62,7 @@ curl -X POST http://localhost:8089/a2a/server \
 ### Streaming Messages
 
 ```bash
-curl -X POST http://localhost:8089/a2a/server/stream \
+curl -X POST http://localhost:8089/a2a/server \
   -H "Content-Type: application/json" \
   -H "Accept: text/event-stream" \
   -d '{

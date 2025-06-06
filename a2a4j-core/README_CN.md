@@ -2,18 +2,20 @@
 
 A2A4J 是 Agent2Agent (A2A) 协议的 Java 实现，提供了完整的服务器端和客户端支持。
 
-📖 **[English Documentation](README_EN.md)**
+📖 **[English Documentation](README.md)**
 
 ## 功能特性
 
-- ✅ 完整的 A2A 协议支持
-- ✅ JSON-RPC 2.0 通信
-- ✅ Server-Sent Events 流式处理
-- ✅ Agent Card 发现机制
-- ✅ 任务生命周期管理
-- ✅ 推送通知配置
-- ✅ Spring Boot 集成
-- ✅ 响应式编程支持
+- ✅ **完整的 A2A 协议支持** - Agent2Agent 规范的完整实现
+- ✅ **JSON-RPC 2.0 通信** - 基于标准的请求/响应消息传递
+- ✅ **Server-Sent Events 流式处理** - 实时任务更新和流式响应
+- ✅ **任务生命周期管理** - 全面的任务状态管理和监控
+- ✅ **Spring Boot 集成** - 与 Spring Boot 应用程序轻松集成
+- ✅ **响应式编程支持** - 基于 Reactor 构建，可扩展的非阻塞操作
+- ✅ **多种内容类型** - 支持文本、文件和结构化数据交换
+- ⚪️ **推送通知配置** - 通过 webhooks 进行异步任务更新
+- ⚪️ **Agent Card 发现机制** - 动态能力发现机制
+- ⚪️ **企业级安全** - 身份验证和授权支持
 
 ## 快速开始
 
@@ -132,10 +134,7 @@ mvn test
 
 要了解更多详细信息，包括配置、安全、性能优化等，请参考：
 
-- 📖 **[完整英文文档](README_EN.md)** - 包含详细的使用指南、架构说明和最佳实践
-- 🚀 [快速开始指南](docs/quick-start.md)
-- 🔧 [配置指南](docs/configuration.md)
-- 🔐 [安全指南](docs/security.md)
+- 📖 **[完整英文文档](README.md)** - 包含详细的使用指南、架构说明和最佳实践
 
 ## 贡献
 
