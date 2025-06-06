@@ -138,9 +138,8 @@ public class MyAgentApplication {
 
 Your A2A server will be available at the configured URL with the following endpoints:
 
-- `GET /.well-known/agent.json` - Agent card discovery
-- `POST /a2a/server` - JSON-RPC endpoint for synchronous requests
-- `POST /a2a/server/stream` - Server-Sent Events endpoint for streaming requests
+- `GET /.well-known/agent.json` - Agent Card discovery
+- `POST /a2a/server` - JSON-RPC endpoint for synchronous and streaming requests
 
 ## Configuration Properties
 

@@ -3,7 +3,6 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.a2ap/a2a4j-parent)](https://search.maven.org/artifact/io.github.a2ap/a2a4j-parent)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Java Version](https://img.shields.io/badge/Java-17%2B-green.svg)](https://openjdk.org/projects/jdk/17/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4%2B-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
 📖 **[English Documentation](README.md)**
 
@@ -13,19 +12,18 @@ A2A4J 是 Agent2Agent (A2A) 协议的全面 Java 实现，为独立 AI 智能体
 
 - ✅ **完整的 A2A 协议支持** - Agent2Agent 规范的完整实现
 - ✅ **JSON-RPC 2.0 通信** - 基于标准的请求/响应消息传递
-- ✅ **Server-Sent Events (SSE) 流式处理** - 实时任务更新和流式响应
-- ✅ **Agent Card 发现机制** - 动态能力发现机制
+- ✅ **Server-Sent Events 流式处理** - 实时任务更新和流式响应
 - ✅ **任务生命周期管理** - 全面的任务状态管理和监控
-- ✅ **推送通知配置** - 通过 webhooks 进行异步任务更新
 - ✅ **Spring Boot 集成** - 与 Spring Boot 应用程序轻松集成
-- ✅ **响应式编程支持** - 基于 Spring WebFlux 构建，可扩展的非阻塞操作
-- ✅ **企业级安全** - 身份验证和授权支持
+- ✅ **响应式编程支持** - 基于 Reactor 构建，可扩展的非阻塞操作
 - ✅ **多种内容类型** - 支持文本、文件和结构化数据交换
+- ⚪️ **推送通知配置** - 通过 webhooks 进行异步任务更新
+- ⚪️ **Agent Card 发现机制** - 动态能力发现机制
+- ⚪️ **企业级安全** - 身份验证和授权支持
 
 ## 📋 环境要求
 
 - **Java 17+** - 运行应用程序所需
-- **Spring Boot 3.4+** - 框架依赖
 - **Maven 3.6+** - 构建工具
 
 ## 🏗️ 项目结构
@@ -40,7 +38,6 @@ a2a4j/
 │   └── server-hello-world/        # Hello World 服务器示例
 ├── specification/                 # A2A 协议规范
 ├── tools/                        # 开发工具和配置
-└── js/                          # JavaScript/TypeScript 定义
 ```
 
 ## 🚀 快速开始
@@ -65,18 +62,18 @@ cd a2a4j-samples/server-hello-world
 mvn spring-boot:run
 ```
 
-服务器将在 `http://localhost:8080` 启动。
+服务器将在 `http://localhost:8089` 启动。
 
 ### 4. 测试智能体
 
 #### 获取 Agent Card
 ```bash
-curl http://localhost:8080/.well-known/agent.json
+curl http://localhost:8089/.well-known/agent.json
 ```
 
 #### 发送消息
 ```bash
-curl -X POST http://localhost:8080/a2a/server \
+curl -X POST http://localhost:8089/a2a/server \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -99,7 +96,7 @@ curl -X POST http://localhost:8080/a2a/server \
 
 #### 流式消息
 ```bash
-curl -X POST http://localhost:8080/a2a/server/stream \
+curl -X POST http://localhost:8089/a2a/server \
   -H "Content-Type: application/json" \
   -H "Accept: text/event-stream" \
   -d '{
@@ -162,17 +159,28 @@ curl -X POST http://localhost:8080/a2a/server/stream \
 
 ```java
 @RestController
-@RequestMapping("/a2a")
 public class MyA2AController {
     
     @Autowired
     private A2AServer a2aServer;
-    
-    @PostMapping("/server")
-    public Mono<ResponseEntity<?>> handleRequest(@RequestBody JSONRPCRequest request) {
-        return a2aServer.processRequest(request)
-            .map(ResponseEntity::ok)
-            .onErrorReturn(ResponseEntity.badRequest().build());
+    @Autowired
+    private final Dispatcher a2aDispatch;
+
+    @GetMapping(".well-known/agent.json")
+    public ResponseEntity<AgentCard> getAgentCard() {
+        AgentCard card = a2aServer.getSelfAgentCard();
+        return ResponseEntity.ok(card);
+    }
+
+    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
+        return ResponseEntity.ok(a2aDispatch.dispatch(request));
+    }
+
+    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
+        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder()
+                .data(event).event("task-update").build());
     }
 }
 
@@ -180,9 +188,25 @@ public class MyA2AController {
 public class MyAgentExecutor implements AgentExecutor {
     
     @Override
-    public Mono<String> executeTask(Task task) {
+    public Mono<Void> execute(RequestContext context, EventQueue eventQueue) {
         // 你的智能体逻辑
-        return Mono.just("来自我的智能体的问候！");
+        TaskStatusUpdateEvent completedEvent = TaskStatusUpdateEvent.builder()
+                .taskId(taskId)
+                .contextId(contextId)
+                .status(TaskStatus.builder()
+                        .state(TaskState.COMPLETED)
+                        .timestamp(String.valueOf(Instant.now().toEpochMilli()))
+                        .message(createAgentMessage("Task completed successfully! Hi you."))
+                        .build())
+                .isFinal(true)
+                .metadata(Map.of(
+                        "executionTime", "3000ms",
+                        "artifactsGenerated", 4,
+                        "success", true))
+                .build();
+
+        eventQueue.enqueueEvent(completedEvent);
+        return Mono.empty();
     }
 }
 ```
@@ -193,7 +217,7 @@ public class MyAgentExecutor implements AgentExecutor {
 // 创建 agent card
 AgentCard agentCard = AgentCard.builder()
     .name("目标智能体")
-    .url("http://localhost:8080")
+    .url("http://localhost:8089")
     .version("1.0.0")
     .capabilities(AgentCapabilities.builder().streaming(true).build())
     .skills(List.of())
@@ -240,15 +264,6 @@ stream.subscribe(
 );
 ```
 
-## 🔒 安全性
-
-A2A4J 实现了企业级安全功能：
-
-- **身份验证**: 支持各种身份验证方案（Bearer tokens、API keys、Basic auth）
-- **授权**: 基于角色的智能体能力访问控制
-- **HTTPS**: TLS 加密安全通信
-- **输入验证**: 全面的请求验证和清理
-
 ## 📊 JSON-RPC 方法
 
 ### 核心方法
@@ -264,19 +279,6 @@ A2A4J 实现了企业级安全功能：
 - `tasks/pushNotificationConfig/set` - 配置推送通知
 - `tasks/pushNotificationConfig/get` - 获取通知配置
 
-## 🧪 测试
-
-运行完整测试套件：
-
-```bash
-mvn test
-```
-
-运行集成测试：
-
-```bash
-mvn verify
-```
 
 ## 📖 文档
 
@@ -305,11 +307,11 @@ mvn verify
 - **讨论**: [GitHub Discussions](https://github.com/a2ap/a2a4j/discussions)
 - **CI/CD**: [GitHub Actions](https://github.com/a2ap/a2a4j/actions)
 
-## 🔗 相关项目
+## 🔗 参考来自
 
 - [A2A 协议规范](https://google-a2a.github.io/A2A/specification/)
 - [A2A 协议官网](https://google-a2a.github.io)
 
 ---
 
-由 A2A 社区用 ❤️ 构建
+由 A2AP 社区用 ❤️ 构建

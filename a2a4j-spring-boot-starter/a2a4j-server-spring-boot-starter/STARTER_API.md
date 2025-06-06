@@ -194,7 +194,7 @@ spring:
       on-profile: development
 a2a:
   server:
-    url: "http://localhost:8080"
+    url: "http://localhost:8089"
     capabilities:
       streaming: true
       push-notifications: false
