@@ -28,7 +28,6 @@ import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
-import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
 import java.time.Instant;

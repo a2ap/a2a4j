@@ -25,10 +25,10 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  * Main application class for A2A Server.
  */
 @SpringBootApplication
-public class A2AServerApplication implements WebFluxConfigurer {
+public class A2aServerApplication implements WebFluxConfigurer {
     
     public static void main(String[] args) {
-        SpringApplication.run(A2AServerApplication.class, args);
+        SpringApplication.run(A2aServerApplication.class, args);
     }
     
     @Override

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core.server.impl;
+package io.github.a2ap.samples.agent;
 
 import io.github.a2ap.core.model.Artifact;
 import io.github.a2ap.core.model.Message;

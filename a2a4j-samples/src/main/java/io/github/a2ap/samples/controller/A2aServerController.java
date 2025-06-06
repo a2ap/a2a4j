@@ -36,14 +36,14 @@ import reactor.core.publisher.Flux;
  * Spring Boot Controller to handle A2A protocol JSON-RPC requests.
  */
 @RestController
-public class A2AServerController {
+public class A2aServerController {
     
-    private static final Logger log = LoggerFactory.getLogger(A2AServerController.class);
+    private static final Logger log = LoggerFactory.getLogger(A2aServerController.class);
 
     private final A2AServer a2aServer;
     private final Dispatcher a2aDispatch;
     
-    public A2AServerController(A2AServer a2aServer, Dispatcher a2aDispatch) {
+    public A2aServerController(A2AServer a2aServer, Dispatcher a2aDispatch) {
         this.a2aServer = a2aServer;
         this.a2aDispatch = a2aDispatch;
     }

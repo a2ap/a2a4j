@@ -3,13 +3,14 @@ package io.github.a2ap.core.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.AgentExecutor;
 import io.github.a2ap.core.server.Dispatcher;
+import io.github.a2ap.core.server.EventQueue;
 import io.github.a2ap.core.server.QueueManager;
 import io.github.a2ap.core.server.impl.DefaultA2AServer;
 import io.github.a2ap.core.server.impl.DefaultDispatcher;
-import io.github.a2ap.core.server.impl.DemoAgentExecutor;
 import io.github.a2ap.core.server.impl.InMemoryQueueManager;
 import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
@@ -20,6 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Mono;
 
 @Configuration
 @EnableConfigurationProperties(A2aServerProperties.class)
@@ -59,7 +61,18 @@ public class A2aServerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AgentExecutor agentExecutor() {
-        return new DemoAgentExecutor();
+        return new AgentExecutor() {
+            @Override
+            public Mono<Void> execute(RequestContext context, EventQueue eventQueue) {
+                eventQueue.close();
+                return Mono.empty();
+            }
+
+            @Override
+            public Mono<Void> cancel(String taskId) {
+                return Mono.empty();
+            }
+        };
     }
 
     @Bean(name = "a2aServerSelfCard")
