@@ -28,33 +28,17 @@
 
 	<artifactId>a2a4j-spring-boot-starter</artifactId>
 	<version>${revision}</version>
-	<url>https://github.com/a2ap/a2a4j</url>
+    <packaging>pom</packaging>
+    <url>https://github.com/a2ap/a2a4j</url>
+    <modules>
+        <module>a2a4j-server-spring-boot-starter</module>
+        <module>a2a4j-client-spring-boot-starter</module>
+    </modules>
 
-	<scm>
+    <scm>
 		<connection>git://github.com/a2ap/a2a4j.git</connection>
 		<developerConnection>git@github.com:a2ap/a2a4j.git</developerConnection>
 		<url>https://github.com/a2ap/a2a4j</url>
 	</scm>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-autoconfigure</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.github.a2ap</groupId>
-			<artifactId>a2a4j-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
 
 </project>

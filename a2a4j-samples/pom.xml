@@ -27,34 +27,18 @@
 	</parent>
 
 	<artifactId>a2a4j-samples</artifactId>
-	<version>${revision}</version>
-    <url>https://github.com/a2ap/a2a4j</url>
+	<packaging>pom</packaging>
+	<url>https://github.com/a2ap/a2a4j</url>
 
-    <scm>
-        <connection>git://github.com/a2ap/a2a4j.git</connection>
-        <developerConnection>git@github.com:a2ap/a2a4j.git</developerConnection>
-        <url>https://github.com/a2ap/a2a4j</url>
-    </scm>
+	<modules>
+		<module>server-hello-world</module>
+	</modules>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-        
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-        <dependency>
-            <groupId>io.github.a2ap</groupId>
-            <artifactId>a2a4j-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-    </dependencies>
+	<scm>
+		<connection>git://github.com/a2ap/a2a4j.git</connection>
+		<developerConnection>git@github.com:a2ap/a2a4j.git</developerConnection>
+		<url>https://github.com/a2ap/a2a4j</url>
+	</scm>
 
 	<build>
 		<plugins>

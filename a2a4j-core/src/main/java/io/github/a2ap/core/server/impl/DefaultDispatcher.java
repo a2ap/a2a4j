@@ -14,35 +14,60 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core.server;
+package io.github.a2ap.core.server.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
-import io.github.a2ap.core.jsonrpc.JSONRPCResponse;<<<<<<<HEAD
+import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
+import io.github.a2ap.core.server.A2AServer;
+import io.github.a2ap.core.server.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
-import org.springframework.stereotype.Component;
+/**
+ * Default implementation of the Dispatcher interface. This implementation routes JSON-RPC
+ * requests to the appropriate A2A server methods and handles both synchronous and
+ * streaming operations.
+ *
+ * Supported methods include: - message/send: Send a message and create a task -
+ * message/stream: Send a message and subscribe to streaming updates - tasks/get: Retrieve
+ * task information - tasks/cancel: Cancel a running task -
+ * tasks/pushNotificationConfig/set: Set push notification configuration -
+ * tasks/pushNotificationConfig/get: Get push notification configuration -
+ * tasks/resubscribe: Resubscribe to task updates
+ */
+public class DefaultDispatcher implements Dispatcher {
 
-@Component
-public class Dispatcher {
-
-	private static final Logger log = LoggerFactory.getLogger(Dispatcher.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultDispatcher.class);
 
 	private final A2AServer a2aServer;
 
 	private final ObjectMapper objectMapper;
 
-	public Dispatcher(A2AServer a2aServer, ObjectMapper objectMapper) {
+	/**
+	 * Constructs a new DefaultDispatcher.
+	 * @param a2aServer The A2A server instance to delegate operations to
+	 * @param objectMapper The Jackson ObjectMapper for parameter conversion
+	 */
+	public DefaultDispatcher(A2AServer a2aServer, ObjectMapper objectMapper) {
 		this.a2aServer = a2aServer;
 		this.objectMapper = objectMapper;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * This implementation supports the following methods: - message/send - tasks/get -
+	 * tasks/cancel - tasks/pushNotificationConfig/set - tasks/pushNotificationConfig/get
+	 */
+	@Override
 	public JSONRPCResponse dispatch(JSONRPCRequest request) {
 		JSONRPCResponse response = new JSONRPCResponse();
 		response.setId(request.getId());
@@ -95,6 +120,13 @@ public class Dispatcher {
 		return response;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * This implementation supports the following streaming methods: - message/stream -
+	 * tasks/resubscribe
+	 */
+	@Override
 	public Flux<JSONRPCResponse> dispatchStream(JSONRPCRequest request) {
 		JSONRPCResponse response = new JSONRPCResponse();
 		response.setId(request.getId());
@@ -132,31 +164,4 @@ public class Dispatcher {
 		return Flux.just(response);
 	}
 
-}=======
-import reactor.core.publisher.Flux;
-
-/**
- * Interface for dispatching JSON-RPC requests to appropriate handlers. The Dispatcher is
- * responsible for routing incoming JSON-RPC requests to the correct method handlers and
- * managing both synchronous and streaming responses.
- */
-public interface Dispatcher {
-
-	/**
-	 * Dispatches a JSON-RPC request for synchronous processing.
-	 * @param request The JSON-RPC request to be processed
-	 * @return A JSON-RPC response containing the result or error
-	 */
-	JSONRPCResponse dispatch(JSONRPCRequest request);
-
-	/**
-     * Dispatches a JSON-RPC request for streaming/asynchronous processing.
-     * This method is used for operations that return multiple responses over time,
-     * such as streaming updates or event subscriptions.
-     *
-     * @param request The JSON-RPC request to be processed
-     * @return A Flux of JSON-RPC responses for streaming results
-     */
-    Flux<JSONRPCResponse> dispatchStream(JSONRPCRequest request);
-
-}>>>>>>>origin/main
+}
