@@ -28,6 +28,7 @@ import io.github.a2ap.core.model.TaskStatus;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
+import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
 import java.time.Instant;
@@ -43,7 +44,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
@@ -51,15 +51,18 @@ import reactor.core.publisher.Mono;
  * This implementation stores all tasks in memory and is suitable for testing
  * and demonstration purposes.
  */
-@Component
 public class InMemoryTaskManager implements TaskManager {
 
     private static final Logger log = LoggerFactory.getLogger(InMemoryTaskManager.class);
 
-    private final TaskStore taskStore = new InMemoryTaskStore();
+    private final TaskStore taskStore;
     private final Map<String, TaskPushNotificationConfig> notificationConfigMap = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> contextTaskIdMap = new ConcurrentHashMap<>();
 
+    public InMemoryTaskManager(TaskStore taskStore) {
+        this.taskStore = taskStore;
+    }
+    
     @Override
     public RequestContext loadOrCreateContext(MessageSendParams params) {
         String taskId = params.getMessage().getTaskId();

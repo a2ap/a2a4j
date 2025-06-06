@@ -1,76 +1,34 @@
-/*
- * Copyright 2024-2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package io.github.a2ap.core.server.controller;
+package io.github.a2ap.core.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
-import io.github.a2ap.core.model.AgentCard;
-import io.github.a2ap.core.model.SendMessageResponse;
-import io.github.a2ap.core.model.Task;
-import io.github.a2ap.core.model.TaskIdParams;
-import io.github.a2ap.core.model.TaskPushNotificationConfig;
-import io.github.a2ap.core.model.MessageSendParams;
-import io.github.a2ap.core.server.A2AServer;
+import io.github.a2ap.core.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
-/**
- * Spring Boot Controller to handle A2A protocol JSON-RPC requests.
- */
-@RestController
-public class A2AServerController {
+@Component
+public class Dispatcher {
     
-    private static final Logger log = LoggerFactory.getLogger(A2AServerController.class);
+    private static final Logger log = LoggerFactory.getLogger(Dispatcher.class);
 
     private final A2AServer a2aServer;
-    
     private final ObjectMapper objectMapper;
-
-    @Autowired
-    public A2AServerController(A2AServer a2aServer, ObjectMapper objectMapper) {
+    
+    public Dispatcher(A2AServer a2aServer, ObjectMapper objectMapper) {
         this.a2aServer = a2aServer;
         this.objectMapper = objectMapper;
     }
 
-    @GetMapping(".well-known/agent.json")
-    public ResponseEntity<AgentCard> getAgentCard() {
-        AgentCard card = a2aServer.getSelfAgentCard();
-        return ResponseEntity.ok(card);
-    }
-
-    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
+    public JSONRPCResponse dispatch(JSONRPCRequest request) {
         JSONRPCResponse response = new JSONRPCResponse();
-        // Echo the request ID
         response.setId(request.getId());
-        // params is typically a JSON object or array
         String method = request.getMethod();
         Object params = request.getParams();
+        
         try {
             switch (method) {
                 case "message/send":
@@ -101,69 +59,53 @@ public class A2AServerController {
                     response.setResult(getConfigResult);
                     break;
                 default:
-                    // Method not found error
                     log.warn("Unsupported method: {}", method);
                     response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
                             "Method '" + method + "' not supported"));
                     break;
             }
         } catch (IllegalArgumentException e) {
-            // Handle validation errors from A2AServerImpl
             response.setError(new JSONRPCError(JSONRPCError.INVALID_PARAMS, "Invalid params", e.getMessage()));
         } catch (Exception e) {
-            // Handle other internal errors
             response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
-            // Log the error with more context
             log.error("Internal error processing method {}.", method, e);
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
-    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
+    public Flux<JSONRPCResponse> dispatchStream(JSONRPCRequest request) {
         JSONRPCResponse response = new JSONRPCResponse();
-        // Echo the request ID
         response.setId(request.getId());
-        // params is typically a JSON object or array
         String method = request.getMethod();
         Object params = request.getParams();
+        
         try {
             switch (method) {
                 case "message/stream":
                     MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
                     return a2aServer.handleMessageStream(taskSendParams).map(event -> {
                         response.setResult(event);
-                        return ServerSentEvent.<JSONRPCResponse>builder()
-                                .data(response).event("task-update").build();
+                        return response;
                     });
                 case "tasks/resubscribe":
-                    // Params expected: TaskIdParams { taskId: string }
-                    // Subscribe to updates for the existing task ID
                     TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
                     return a2aServer.subscribeToTaskUpdates(taskIdParamsGet.getId())
                             .map(event -> {
                                 response.setResult(event);
-                                return ServerSentEvent.<JSONRPCResponse>builder()
-                                        .data(response)
-                                        .event("task-update")
-                                        .build();
+                                return response;
                             });
                 default:
-                    // Method not found error
                     log.warn("Unsupported method: {}", method);
                     response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
                             "Method '" + method + "' not supported"));
                     break;
             }
         } catch (IllegalArgumentException e) {
-            // Handle validation errors from A2AServerImpl
             response.setError(new JSONRPCError(JSONRPCError.INVALID_REQUEST, "Invalid params", e.getMessage()));
         } catch (Exception e) {
-            // Handle other internal errors
             response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
-            // Log the error with more context
             log.error("Internal error processing method {}.", method, e);
         }
-        return Flux.empty();
+        return Flux.just(response);
     }
-}
+} 

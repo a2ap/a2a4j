@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core;
+package io.github.a2ap.samples;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

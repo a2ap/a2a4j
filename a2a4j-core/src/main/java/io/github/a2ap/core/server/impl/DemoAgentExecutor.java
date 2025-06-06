@@ -53,50 +53,50 @@ public class DemoAgentExecutor implements AgentExecutor {
                 log.info("Demo agent starting execution for task: {}", taskId);
 
                 return Mono.fromRunnable(() -> {
-                        // 1. 发送任务开始状态
-                        sendWorkingStatus(taskId, contextId, eventQueue, "开始处理用户请求...");
+                        // 1. Send task start status
+                        sendWorkingStatus(taskId, contextId, eventQueue, "Starting to process user request...");
                 })
                                 .then(Mono.delay(Duration.ofMillis(500)))
                                 .then(Mono.fromRunnable(() -> {
-                                        // 2. 发送分析阶段状态
-                                        sendWorkingStatus(taskId, contextId, eventQueue, "正在分析用户输入内容...");
+                                        // 2. Send analysis phase status
+                                        sendWorkingStatus(taskId, contextId, eventQueue, "Analyzing user input...");
                                 }))
                                 .then(Mono.delay(Duration.ofSeconds(1)))
                                 .then(Mono.fromRunnable(() -> {
-                                        // 3. 发送处理进度状态
-                                        sendWorkingStatus(taskId, contextId, eventQueue, "正在生成响应内容...");
+                                        // 3. Send processing progress status
+                                        sendWorkingStatus(taskId, contextId, eventQueue, "Generating response...");
                                 }))
                                 .then(Mono.delay(Duration.ofMillis(800)))
                                 .then(Mono.fromRunnable(() -> {
-                                        // 4. 发送第一个文本产物（分块）
+                                        // 4. Send first text artifact (chunk)
                                         sendTextArtifact(taskId, contextId, eventQueue, "text-response",
-                                                        "AI 助手回复", "这是我对您问题的分析：\n\n", false, false);
+                                                        "AI Assistant Response", "Here's my analysis of your question:\n\n", false, false);
                                 }))
                                 .then(Mono.delay(Duration.ofMillis(300)))
                                 .then(Mono.fromRunnable(() -> {
-                                        // 5. 继续发送文本产物（分块）
+                                        // 5. Continue sending text artifact (chunk)
                                         sendTextArtifact(taskId, contextId, eventQueue, "text-response",
-                                                        "AI 助手回复", "根据您提供的信息，我建议采用以下方案：\n", true, false);
+                                                        "AI Assistant Response", "Based on the information provided, I suggest the following approach:\n", true, false);
                                 }))
                                 .then(Mono.delay(Duration.ofMillis(500)))
                                 .then(Mono.fromRunnable(() -> {
-                                        // 6. 发送代码产物
+                                        // 6. Send code artifact
                                         sendCodeArtifact(taskId, contextId, eventQueue);
                                 }))
                                 .then(Mono.delay(Duration.ofMillis(400)))
                                 .then(Mono.fromRunnable(() -> {
-                                        // 7. 完成文本产物（最后一块）
+                                        // 7. Complete text artifact (last chunk)
                                         sendTextArtifact(taskId, contextId, eventQueue, "text-response",
-                                                        "AI 助手回复", "\n\n如果您有任何问题，请随时告诉我！", true, true);
+                                                        "AI Assistant Response", "\n\nIf you have any questions, please feel free to ask!", true, true);
                                 }))
                                 .then(Mono.delay(Duration.ofMillis(300)))
                                 .then(Mono.fromRunnable(() -> {
-                                        // 8. 发送总结产物
+                                        // 8. Send summary artifact
                                         sendSummaryArtifact(taskId, contextId, eventQueue);
                                 }))
                                 .then(Mono.delay(Duration.ofMillis(200)))
                                 .then(Mono.fromRunnable(() -> {
-                                        // 9. 发送最终完成状态
+                                        // 9. Send final completion status
                                         sendCompletedStatus(taskId, contextId, eventQueue);
                                         eventQueue.close();
                                         log.info("Demo agent completed task: {}", taskId);
@@ -107,12 +107,12 @@ public class DemoAgentExecutor implements AgentExecutor {
         @Override
         public Mono<Void> cancel(String taskId) {
                 log.info("Demo agent cancelling task: {}", taskId);
-                // todo some more cancel
+                // TODO: Implement cancellation logic
                 return Mono.empty();
         }
 
         /**
-         * 发送工作中状态更新
+         * Send working status update
          */
         private void sendWorkingStatus(String taskId, String contextId, EventQueue eventQueue, String statusMessage) {
                 TaskStatusUpdateEvent workingEvent = TaskStatusUpdateEvent.builder()
@@ -131,7 +131,7 @@ public class DemoAgentExecutor implements AgentExecutor {
         }
 
         /**
-         * 发送文本产物更新
+         * Send text artifact update
          */
         private void sendTextArtifact(String taskId, String contextId, EventQueue eventQueue,
                         String artifactId, String name, String content,
@@ -139,7 +139,7 @@ public class DemoAgentExecutor implements AgentExecutor {
                 Artifact artifact = Artifact.builder()
                                 .artifactId(artifactId)
                                 .name(name)
-                                .description("AI 生成的文本回复")
+                                .description("AI generated text reply")
                                 .parts(List.of(TextPart.builder()
                                                 .text(content)
                                                 .build()))
@@ -165,29 +165,29 @@ public class DemoAgentExecutor implements AgentExecutor {
         }
 
         /**
-         * 发送代码产物
+         * Send code artifact
          */
         private void sendCodeArtifact(String taskId, String contextId, EventQueue eventQueue) {
                 String codeContent = """
-                                // 示例代码
+                                // Example code
                                 public class ExampleService {
 
                                     public String processRequest(String input) {
                                         if (input == null || input.trim().isEmpty()) {
-                                            return "输入不能为空";
+                                            return "Input cannot be empty";
                                         }
 
-                                        // 处理输入
+                                        // Process input
                                         String processed = input.trim().toLowerCase();
-                                        return "处理结果: " + processed;
+                                        return "Processed result: " + processed;
                                     }
                                 }
                                 """;
 
                 Artifact artifact = Artifact.builder()
                                 .artifactId("code-example")
-                                .name("示例代码")
-                                .description("根据需求生成的示例Java代码")
+                                .name("Example Code")
+                                .description("Example Java code generated based on requirements")
                                 .parts(List.of(TextPart.builder()
                                                 .text(codeContent)
                                                 .build()))
@@ -212,21 +212,21 @@ public class DemoAgentExecutor implements AgentExecutor {
         }
 
         /**
-         * 发送总结产物
+         * Send summary artifact
          */
         private void sendSummaryArtifact(String taskId, String contextId, EventQueue eventQueue) {
                 Artifact artifact = Artifact.builder()
                                 .artifactId("task-summary")
-                                .name("任务总结")
-                                .description("本次任务执行的总结报告")
+                                .name("Task Summary")
+                                .description("Summary report of this task execution")
                                 .parts(List.of(TextPart.builder()
-                                                .text("## 任务执行总结\n\n" +
-                                                                "✅ 已完成用户请求分析\n" +
-                                                                "✅ 已生成文本回复\n" +
-                                                                "✅ 已提供示例代码\n" +
-                                                                "✅ 任务执行成功\n\n" +
-                                                                "总执行时间: 约3秒\n" +
-                                                                "生成内容: 文本回复 + 代码示例")
+                                                .text("## Task Execution Summary\n\n" +
+                                                                "✅ User request analysis completed\n" +
+                                                                "✅ Text response generated\n" +
+                                                                "✅ Example code provided\n" +
+                                                                "✅ Task executed successfully\n\n" +
+                                                                "Total execution time: ~3 seconds\n" +
+                                                                "Generated content: Text response + Code example")
                                                 .build()))
                                 .metadata(Map.of(
                                                 "contentType", "text/markdown",
@@ -248,7 +248,7 @@ public class DemoAgentExecutor implements AgentExecutor {
         }
 
         /**
-         * 发送完成状态
+         * Send completion status
          */
         private void sendCompletedStatus(String taskId, String contextId, EventQueue eventQueue) {
                 TaskStatusUpdateEvent completedEvent = TaskStatusUpdateEvent.builder()
@@ -257,7 +257,7 @@ public class DemoAgentExecutor implements AgentExecutor {
                                 .status(TaskStatus.builder()
                                                 .state(TaskState.COMPLETED)
                                                 .timestamp(String.valueOf(Instant.now().toEpochMilli()))
-                                                .message(createAgentMessage("任务已成功完成！我已经为您生成了详细的回复和示例代码。"))
+                                                .message(createAgentMessage("Task completed successfully! I have generated a detailed response and example code for you."))
                                                 .build())
                                 .isFinal(true)
                                 .metadata(Map.of(
@@ -271,7 +271,7 @@ public class DemoAgentExecutor implements AgentExecutor {
         }
 
         /**
-         * 创建代理消息
+         * Create agent message
          */
         private Message createAgentMessage(String content) {
                 return Message.builder()

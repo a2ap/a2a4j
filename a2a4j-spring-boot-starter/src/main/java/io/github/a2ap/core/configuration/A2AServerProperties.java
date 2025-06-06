@@ -14,26 +14,38 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core.server.config;
+package io.github.a2ap.core.configuration;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
+import java.io.Serial;
 import java.io.Serializable;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * Configuration properties for A2A protocol.
  * This class can be extended to include specific properties as needed.
  */
 @ConfigurationProperties(prefix = "a2a.server")
+@Component
 public class A2aServerProperties implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -608274692651491547L;
 
+    private boolean enabled = true;
     private String name;
     private String description;
     private String version;
     private String url;
     private Capabilities capabilities = new Capabilities();
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public String getName() {
         return name;
