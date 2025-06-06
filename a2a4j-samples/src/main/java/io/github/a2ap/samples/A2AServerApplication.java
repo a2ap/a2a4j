@@ -26,16 +26,17 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  */
 @SpringBootApplication
 public class A2AServerApplication implements WebFluxConfigurer {
-    
-    public static void main(String[] args) {
-        SpringApplication.run(A2AServerApplication.class, args);
-    }
-    
-    @Override
-    public void addCorsMappings(final CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*");
-    }
+
+	public static void main(String[] args) {
+		SpringApplication.run(A2AServerApplication.class, args);
+	}
+
+	@Override
+	public void addCorsMappings(final CorsRegistry registry) {
+		registry.addMapping("/**")
+			.allowedOrigins("*")
+			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+			.allowedHeaders("*");
+	}
+
 }

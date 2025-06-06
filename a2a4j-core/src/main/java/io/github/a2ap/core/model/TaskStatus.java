@@ -27,154 +27,151 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskStatus implements TaskUpdate {
 
-    /**
-     * Completed task status constant.
-     */
-    public static final TaskStatus COMPLETED = TaskStatus.builder().state(TaskState.COMPLETED).build();
+	/**
+	 * Completed task status constant.
+	 */
+	public static final TaskStatus COMPLETED = TaskStatus.builder().state(TaskState.COMPLETED).build();
 
-    /**
-     * Cancelled task status constant.
-     */
-    public static final TaskStatus CANCELLED = TaskStatus.builder().state(TaskState.CANCELED).build();
+	/**
+	 * Cancelled task status constant.
+	 */
+	public static final TaskStatus CANCELLED = TaskStatus.builder().state(TaskState.CANCELED).build();
 
-    /**
-     * The state of the task.
-     * Required field.
-     */
-    @JsonProperty("state")
-    private TaskState state;
+	/**
+	 * The state of the task. Required field.
+	 */
+	@JsonProperty("state")
+	private TaskState state;
 
-    /**
-     * The message associated with this status update.
-     */
-    @JsonProperty("message")
-    private Message message;
+	/**
+	 * The message associated with this status update.
+	 */
+	@JsonProperty("message")
+	private Message message;
 
-    /**
-     * The timestamp when this status was created.
-     */
-    @JsonProperty("timestamp")
-    private String timestamp;
+	/**
+	 * The timestamp when this status was created.
+	 */
+	@JsonProperty("timestamp")
+	private String timestamp;
 
-    /**
-     * The error message if the task failed.
-     */
-    @JsonProperty("error")
-    private String error;
+	/**
+	 * The error message if the task failed.
+	 */
+	@JsonProperty("error")
+	private String error;
 
-    public TaskStatus() {
-    }
+	public TaskStatus() {
+	}
 
-    public TaskStatus(TaskState state, Message message, String timestamp, String error) {
-        this.state = state;
-        this.message = message;
-        this.timestamp = timestamp;
-        this.error = error;
-    }
+	public TaskStatus(TaskState state, Message message, String timestamp, String error) {
+		this.state = state;
+		this.message = message;
+		this.timestamp = timestamp;
+		this.error = error;
+	}
 
-    public static TaskStatusBuilder builder() {
-        return new TaskStatusBuilder();
-    }
+	public static TaskStatusBuilder builder() {
+		return new TaskStatusBuilder();
+	}
 
-    public TaskState getState() {
-        return state;
-    }
+	public TaskState getState() {
+		return state;
+	}
 
-    public void setState(TaskState state) {
-        this.state = state;
-    }
+	public void setState(TaskState state) {
+		this.state = state;
+	}
 
-    public Message getMessage() {
-        return message;
-    }
+	public Message getMessage() {
+		return message;
+	}
 
-    public void setMessage(Message message) {
-        this.message = message;
-    }
+	public void setMessage(Message message) {
+		this.message = message;
+	}
 
-    public String getTimestamp() {
-        return timestamp;
-    }
+	public String getTimestamp() {
+		return timestamp;
+	}
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
+	}
 
-    public String getError() {
-        return error;
-    }
+	public String getError() {
+		return error;
+	}
 
-    public void setError(String error) {
-        this.error = error;
-    }
+	public void setError(String error) {
+		this.error = error;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        TaskStatus that = (TaskStatus) o;
-        return state == that.state &&
-                Objects.equals(message, that.message) &&
-                Objects.equals(timestamp, that.timestamp) &&
-                Objects.equals(error, that.error);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		TaskStatus that = (TaskStatus) o;
+		return state == that.state && Objects.equals(message, that.message) && Objects.equals(timestamp, that.timestamp)
+				&& Objects.equals(error, that.error);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(state, message, timestamp, error);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(state, message, timestamp, error);
+	}
 
-    @Override
-    public String toString() {
-        return "TaskStatus{" +
-                "state=" + state +
-                ", message=" + message +
-                ", timestamp='" + timestamp + '\'' +
-                ", error='" + error + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "TaskStatus{" + "state=" + state + ", message=" + message + ", timestamp='" + timestamp + '\''
+				+ ", error='" + error + '\'' + '}';
+	}
 
-    public static class TaskStatusBuilder {
-        private TaskState state;
-        private Message message;
-        private String timestamp;
-        private String error;
+	public static class TaskStatusBuilder {
 
-        TaskStatusBuilder() {
-        }
+		private TaskState state;
 
-        public TaskStatusBuilder state(TaskState state) {
-            this.state = state;
-            return this;
-        }
+		private Message message;
 
-        public TaskStatusBuilder message(Message message) {
-            this.message = message;
-            return this;
-        }
+		private String timestamp;
 
-        public TaskStatusBuilder timestamp(String timestamp) {
-            this.timestamp = timestamp;
-            return this;
-        }
+		private String error;
 
-        public TaskStatusBuilder error(String error) {
-            this.error = error;
-            return this;
-        }
+		TaskStatusBuilder() {
+		}
 
-        public TaskStatus build() {
-            return new TaskStatus(state, message, timestamp, error);
-        }
+		public TaskStatusBuilder state(TaskState state) {
+			this.state = state;
+			return this;
+		}
 
-        @Override
-        public String toString() {
-            return "TaskStatus.TaskStatusBuilder(state=" + this.state +
-                    ", message=" + this.message +
-                    ", timestamp=" + this.timestamp +
-                    ", error=" + this.error + ")";
-        }
-    }
+		public TaskStatusBuilder message(Message message) {
+			this.message = message;
+			return this;
+		}
+
+		public TaskStatusBuilder timestamp(String timestamp) {
+			this.timestamp = timestamp;
+			return this;
+		}
+
+		public TaskStatusBuilder error(String error) {
+			this.error = error;
+			return this;
+		}
+
+		public TaskStatus build() {
+			return new TaskStatus(state, message, timestamp, error);
+		}
+
+		@Override
+		public String toString() {
+			return "TaskStatus.TaskStatusBuilder(state=" + this.state + ", message=" + this.message + ", timestamp="
+					+ this.timestamp + ", error=" + this.error + ")";
+		}
+
+	}
+
 }

@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core.model;
+package io.github.a2ap.core.server;
 
 /**
- * object Message | Task | TaskStatusUpdateEvent | TaskArtifactUpdateEvent
+ * Exception thrown when attempting to create a queue for a task that already has one.
  */
-public interface SendStreamingMessageResponse {
+public class TaskQueueExistsException extends Exception {
+
+	public TaskQueueExistsException(String message) {
+		super(message);
+	}
 
 }

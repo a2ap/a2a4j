@@ -16,26 +16,22 @@
 
 package io.github.a2ap.core.server;
 
-import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.RequestContext;
+import io.github.a2ap.core.model.TaskUpdate;
+import reactor.core.publisher.Flux;
 
 /**
- * Simplified interface for task storage providers. Stores and retrieves both the task and
- * its full message history together.
+ * Defines the signature for a task handler function. Handlers are implemented as
+ * functions that receive context about the task and the triggering message. They can
+ * perform work and emit status or artifact updates as a Flux of Task objects.
  */
-public interface TaskStore {
+public interface TaskHandler {
 
 	/**
-	 * Saves a task and its associated message history. Overwrites existing data if the
-	 * task ID exists.
-	 * @param taskContext The task context object to save.
+	 * Handles a task based on the provided context.
+	 * @param context The context for the task handling.
+	 * @return A Flux of updated Task TaskUpdate objects.
 	 */
-	void save(Task task);
-
-	/**
-	 * Loads a task and its history by task ID.
-	 * @param taskId The ID of the task to load.
-	 * @return an object containing the Task and its history, or null if not found.
-	 */
-	Task load(String taskId);
+	Flux<TaskUpdate> handle(RequestContext context);
 
 }

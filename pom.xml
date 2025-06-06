@@ -20,7 +20,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.github.a2ap</groupId>
-	<artifactId>a2a4j-parent</artifactId>
+	<artifactId>a2a4j</artifactId>
 	<version>${revision}</version>
 
 	<packaging>pom</packaging>

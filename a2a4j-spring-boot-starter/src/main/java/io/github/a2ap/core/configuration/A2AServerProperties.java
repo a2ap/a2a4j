@@ -22,101 +22,110 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Configuration properties for A2A protocol.
- * This class can be extended to include specific properties as needed.
+ * Configuration properties for A2A protocol. This class can be extended to include
+ * specific properties as needed.
  */
 @ConfigurationProperties(prefix = "a2a.server")
 @Component
-public class A2aServerProperties implements Serializable {
+public class A2AServerProperties implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = -608274692651491547L;
+	@Serial
+	private static final long serialVersionUID = -608274692651491547L;
 
-    private boolean enabled = true;
-    private String name;
-    private String description;
-    private String version;
-    private String url;
-    private Capabilities capabilities = new Capabilities();
+	private boolean enabled = true;
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+	private String name;
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+	private String description;
 
-    public String getName() {
-        return name;
-    }
+	private String version;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	private String url;
 
-    public String getDescription() {
-        return description;
-    }
+	private Capabilities capabilities = new Capabilities();
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public boolean isEnabled() {
+		return enabled;
+	}
 
-    public String getVersion() {
-        return version;
-    }
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public Capabilities getCapabilities() {
-        return capabilities;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public void setCapabilities(Capabilities capabilities) {
-        this.capabilities = capabilities;
-    }
+	public String getVersion() {
+		return version;
+	}
 
-    public static class Capabilities implements Serializable {
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-        private static final long serialVersionUID = 2371695651871067858L;
+	public String getUrl() {
+		return url;
+	}
 
-        private boolean streaming = true;
-        private boolean pushNotifications = false;
-        private boolean stateTransitionHistory = true;
+	public void setUrl(String url) {
+		this.url = url;
+	}
 
-        public boolean isStreaming() {
-            return streaming;
-        }
+	public Capabilities getCapabilities() {
+		return capabilities;
+	}
 
-        public void setStreaming(boolean streaming) {
-            this.streaming = streaming;
-        }
+	public void setCapabilities(Capabilities capabilities) {
+		this.capabilities = capabilities;
+	}
 
-        public boolean isPushNotifications() {
-            return pushNotifications;
-        }
+	public static class Capabilities implements Serializable {
 
-        public void setPushNotifications(boolean pushNotifications) {
-            this.pushNotifications = pushNotifications;
-        }
+		private static final long serialVersionUID = 2371695651871067858L;
 
-        public boolean isStateTransitionHistory() {
-            return stateTransitionHistory;
-        }
+		private boolean streaming = true;
 
-        public void setStateTransitionHistory(boolean stateTransitionHistory) {
-            this.stateTransitionHistory = stateTransitionHistory;
-        }
-    }
+		private boolean pushNotifications = false;
+
+		private boolean stateTransitionHistory = true;
+
+		public boolean isStreaming() {
+			return streaming;
+		}
+
+		public void setStreaming(boolean streaming) {
+			this.streaming = streaming;
+		}
+
+		public boolean isPushNotifications() {
+			return pushNotifications;
+		}
+
+		public void setPushNotifications(boolean pushNotifications) {
+			this.pushNotifications = pushNotifications;
+		}
+
+		public boolean isStateTransitionHistory() {
+			return stateTransitionHistory;
+		}
+
+		public void setStateTransitionHistory(boolean stateTransitionHistory) {
+			this.stateTransitionHistory = stateTransitionHistory;
+		}
+
+	}
+
 }

@@ -25,115 +25,116 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentCapabilities {
-    /**
-     * Indicates if the agent supports streaming responses.
-     */
-    private boolean streaming = false;
 
-    /**
-     * Indicates if the agent supports push notifications.
-     */
-    private boolean pushNotifications = false;
+	/**
+	 * Indicates if the agent supports streaming responses.
+	 */
+	private boolean streaming = false;
 
-    /**
-     * Indicates if the agent supports state transition history.
-     */
-    private boolean stateTransitionHistory = false;
+	/**
+	 * Indicates if the agent supports push notifications.
+	 */
+	private boolean pushNotifications = false;
 
-    public AgentCapabilities() {
-    }
+	/**
+	 * Indicates if the agent supports state transition history.
+	 */
+	private boolean stateTransitionHistory = false;
 
-    public AgentCapabilities(boolean streaming, boolean pushNotifications, boolean stateTransitionHistory) {
-        this.streaming = streaming;
-        this.pushNotifications = pushNotifications;
-        this.stateTransitionHistory = stateTransitionHistory;
-    }
+	public AgentCapabilities() {
+	}
 
-    public static AgentCapabilitiesBuilder builder() {
-        return new AgentCapabilitiesBuilder();
-    }
+	public AgentCapabilities(boolean streaming, boolean pushNotifications, boolean stateTransitionHistory) {
+		this.streaming = streaming;
+		this.pushNotifications = pushNotifications;
+		this.stateTransitionHistory = stateTransitionHistory;
+	}
 
-    public boolean isStreaming() {
-        return streaming;
-    }
+	public static AgentCapabilitiesBuilder builder() {
+		return new AgentCapabilitiesBuilder();
+	}
 
-    public void setStreaming(boolean streaming) {
-        this.streaming = streaming;
-    }
+	public boolean isStreaming() {
+		return streaming;
+	}
 
-    public boolean isPushNotifications() {
-        return pushNotifications;
-    }
+	public void setStreaming(boolean streaming) {
+		this.streaming = streaming;
+	}
 
-    public void setPushNotifications(boolean pushNotifications) {
-        this.pushNotifications = pushNotifications;
-    }
+	public boolean isPushNotifications() {
+		return pushNotifications;
+	}
 
-    public boolean isStateTransitionHistory() {
-        return stateTransitionHistory;
-    }
+	public void setPushNotifications(boolean pushNotifications) {
+		this.pushNotifications = pushNotifications;
+	}
 
-    public void setStateTransitionHistory(boolean stateTransitionHistory) {
-        this.stateTransitionHistory = stateTransitionHistory;
-    }
+	public boolean isStateTransitionHistory() {
+		return stateTransitionHistory;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        AgentCapabilities that = (AgentCapabilities) o;
-        return streaming == that.streaming &&
-                pushNotifications == that.pushNotifications &&
-                stateTransitionHistory == that.stateTransitionHistory;
-    }
+	public void setStateTransitionHistory(boolean stateTransitionHistory) {
+		this.stateTransitionHistory = stateTransitionHistory;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(streaming, pushNotifications, stateTransitionHistory);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		AgentCapabilities that = (AgentCapabilities) o;
+		return streaming == that.streaming && pushNotifications == that.pushNotifications
+				&& stateTransitionHistory == that.stateTransitionHistory;
+	}
 
-    @Override
-    public String toString() {
-        return "AgentCapabilities{" +
-                "streaming=" + streaming +
-                ", pushNotifications=" + pushNotifications +
-                ", stateTransitionHistory=" + stateTransitionHistory +
-                '}';
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(streaming, pushNotifications, stateTransitionHistory);
+	}
 
-    public static class AgentCapabilitiesBuilder {
-        private boolean streaming = false;
-        private boolean pushNotifications = false;
-        private boolean stateTransitionHistory = false;
+	@Override
+	public String toString() {
+		return "AgentCapabilities{" + "streaming=" + streaming + ", pushNotifications=" + pushNotifications
+				+ ", stateTransitionHistory=" + stateTransitionHistory + '}';
+	}
 
-        AgentCapabilitiesBuilder() {
-        }
+	public static class AgentCapabilitiesBuilder {
 
-        public AgentCapabilitiesBuilder streaming(boolean streaming) {
-            this.streaming = streaming;
-            return this;
-        }
+		private boolean streaming = false;
 
-        public AgentCapabilitiesBuilder pushNotifications(boolean pushNotifications) {
-            this.pushNotifications = pushNotifications;
-            return this;
-        }
+		private boolean pushNotifications = false;
 
-        public AgentCapabilitiesBuilder stateTransitionHistory(boolean stateTransitionHistory) {
-            this.stateTransitionHistory = stateTransitionHistory;
-            return this;
-        }
+		private boolean stateTransitionHistory = false;
 
-        public AgentCapabilities build() {
-            return new AgentCapabilities(streaming, pushNotifications, stateTransitionHistory);
-        }
+		AgentCapabilitiesBuilder() {
+		}
 
-        public String toString() {
-            return "AgentCapabilities.AgentCapabilitiesBuilder(streaming=" + this.streaming +
-                    ", pushNotifications=" + this.pushNotifications +
-                    ", stateTransitionHistory=" + this.stateTransitionHistory + ")";
-        }
-    }
+		public AgentCapabilitiesBuilder streaming(boolean streaming) {
+			this.streaming = streaming;
+			return this;
+		}
+
+		public AgentCapabilitiesBuilder pushNotifications(boolean pushNotifications) {
+			this.pushNotifications = pushNotifications;
+			return this;
+		}
+
+		public AgentCapabilitiesBuilder stateTransitionHistory(boolean stateTransitionHistory) {
+			this.stateTransitionHistory = stateTransitionHistory;
+			return this;
+		}
+
+		public AgentCapabilities build() {
+			return new AgentCapabilities(streaming, pushNotifications, stateTransitionHistory);
+		}
+
+		public String toString() {
+			return "AgentCapabilities.AgentCapabilitiesBuilder(streaming=" + this.streaming + ", pushNotifications="
+					+ this.pushNotifications + ", stateTransitionHistory=" + this.stateTransitionHistory + ")";
+		}
+
+	}
+
 }

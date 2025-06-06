@@ -37,31 +37,33 @@ import reactor.core.publisher.Flux;
  */
 @RestController
 public class A2AServerController {
-    
-    private static final Logger log = LoggerFactory.getLogger(A2AServerController.class);
 
-    private final A2AServer a2aServer;
-    private final Dispatcher a2aDispatch;
-    
-    public A2AServerController(A2AServer a2aServer, Dispatcher a2aDispatch) {
-        this.a2aServer = a2aServer;
-        this.a2aDispatch = a2aDispatch;
-    }
+	private static final Logger log = LoggerFactory.getLogger(A2AServerController.class);
 
-    @GetMapping(".well-known/agent.json")
-    public ResponseEntity<AgentCard> getAgentCard() {
-        AgentCard card = a2aServer.getSelfAgentCard();
-        return ResponseEntity.ok(card);
-    }
+	private final A2AServer a2aServer;
 
-    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
-        return ResponseEntity.ok(a2aDispatch.dispatch(request));
-    }
+	private final Dispatcher a2aDispatch;
 
-    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
-        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder()
-                            .data(event).event("task-update").build());
-    }
+	public A2AServerController(A2AServer a2aServer, Dispatcher a2aDispatch) {
+		this.a2aServer = a2aServer;
+		this.a2aDispatch = a2aDispatch;
+	}
+
+	@GetMapping(".well-known/agent.json")
+	public ResponseEntity<AgentCard> getAgentCard() {
+		AgentCard card = a2aServer.getSelfAgentCard();
+		return ResponseEntity.ok(card);
+	}
+
+	@PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
+		return ResponseEntity.ok(a2aDispatch.dispatch(request));
+	}
+
+	@PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
+		return a2aDispatch.dispatchStream(request)
+			.map(event -> ServerSentEvent.<JSONRPCResponse>builder().data(event).event("task-update").build());
+	}
+
 }

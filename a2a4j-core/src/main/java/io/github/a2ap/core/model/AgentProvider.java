@@ -26,94 +26,94 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentProvider {
-    /**
-     * The name of the organization providing the agent.
-     */
-    @NotNull
-    private String organization;
 
-    /**
-     * An optional URL pointing to the provider's website or information.
-     */
-    private String url;
+	/**
+	 * The name of the organization providing the agent.
+	 */
+	@NotNull
+	private String organization;
 
-    public AgentProvider() {
-    }
+	/**
+	 * An optional URL pointing to the provider's website or information.
+	 */
+	private String url;
 
-    public AgentProvider(String organization, String url) {
-        this.organization = organization;
-        this.url = url;
-    }
+	public AgentProvider() {
+	}
 
-    public static AgentProviderBuilder builder() {
-        return new AgentProviderBuilder();
-    }
+	public AgentProvider(String organization, String url) {
+		this.organization = organization;
+		this.url = url;
+	}
 
-    public String getOrganization() {
-        return organization;
-    }
+	public static AgentProviderBuilder builder() {
+		return new AgentProviderBuilder();
+	}
 
-    public void setOrganization(String organization) {
-        this.organization = organization;
-    }
+	public String getOrganization() {
+		return organization;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+	public String getUrl() {
+		return url;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        AgentProvider that = (AgentProvider) o;
-        return Objects.equals(organization, that.organization) &&
-                Objects.equals(url, that.url);
-    }
+	public void setUrl(String url) {
+		this.url = url;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(organization, url);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		AgentProvider that = (AgentProvider) o;
+		return Objects.equals(organization, that.organization) && Objects.equals(url, that.url);
+	}
 
-    @Override
-    public String toString() {
-        return "AgentProvider{" +
-                "organization='" + organization + '\'' +
-                ", url='" + url + '\'' +
-                '}';
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(organization, url);
+	}
 
-    public static class AgentProviderBuilder {
-        private String organization;
-        private String url;
+	@Override
+	public String toString() {
+		return "AgentProvider{" + "organization='" + organization + '\'' + ", url='" + url + '\'' + '}';
+	}
 
-        AgentProviderBuilder() {
-        }
+	public static class AgentProviderBuilder {
 
-        public AgentProviderBuilder organization(String organization) {
-            this.organization = organization;
-            return this;
-        }
+		private String organization;
 
-        public AgentProviderBuilder url(String url) {
-            this.url = url;
-            return this;
-        }
+		private String url;
 
-        public AgentProvider build() {
-            return new AgentProvider(organization, url);
-        }
+		AgentProviderBuilder() {
+		}
 
-        @Override
-        public String toString() {
-            return "AgentProvider.AgentProviderBuilder(organization=" + this.organization +
-                    ", url=" + this.url + ")";
-        }
-    }
+		public AgentProviderBuilder organization(String organization) {
+			this.organization = organization;
+			return this;
+		}
+
+		public AgentProviderBuilder url(String url) {
+			this.url = url;
+			return this;
+		}
+
+		public AgentProvider build() {
+			return new AgentProvider(organization, url);
+		}
+
+		@Override
+		public String toString() {
+			return "AgentProvider.AgentProviderBuilder(organization=" + this.organization + ", url=" + this.url + ")";
+		}
+
+	}
+
 }

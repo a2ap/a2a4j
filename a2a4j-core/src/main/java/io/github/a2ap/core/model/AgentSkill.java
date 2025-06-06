@@ -29,220 +29,214 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentSkill {
 
-    /**
-     * The unique identifier of the skill.
-     * Required field.
-     */
-    @NotNull
-    @JsonProperty("id")
-    private String id;
+	/**
+	 * The unique identifier of the skill. Required field.
+	 */
+	@NotNull
+	@JsonProperty("id")
+	private String id;
 
-    /**
-     * The name of the skill.
-     * Required field.
-     */
-    @NotNull
-    @JsonProperty("name")
-    private String name;
+	/**
+	 * The name of the skill. Required field.
+	 */
+	@NotNull
+	@JsonProperty("name")
+	private String name;
 
-    /**
-     * An optional description of the skill.
-     */
-    @JsonProperty("description")
-    private String description;
+	/**
+	 * An optional description of the skill.
+	 */
+	@JsonProperty("description")
+	private String description;
 
-    /**
-     * Optional tags associated with the skill.
-     */
-    @JsonProperty("tags")
-    private List<String> tags;
+	/**
+	 * Optional tags associated with the skill.
+	 */
+	@JsonProperty("tags")
+	private List<String> tags;
 
-    /**
-     * Optional examples of how to use the skill.
-     */
-    @JsonProperty("examples")
-    private List<String> examples;
+	/**
+	 * Optional examples of how to use the skill.
+	 */
+	@JsonProperty("examples")
+	private List<String> examples;
 
-    /**
-     * Optional input modes supported by the skill.
-     */
-    @JsonProperty("inputModes")
-    private List<String> inputModes;
+	/**
+	 * Optional input modes supported by the skill.
+	 */
+	@JsonProperty("inputModes")
+	private List<String> inputModes;
 
-    /**
-     * Optional output modes supported by the skill.
-     */
-    @JsonProperty("outputModes")
-    private List<String> outputModes;
+	/**
+	 * Optional output modes supported by the skill.
+	 */
+	@JsonProperty("outputModes")
+	private List<String> outputModes;
 
-    public AgentSkill() {
-    }
+	public AgentSkill() {
+	}
 
-    public AgentSkill(String id, String name, String description, List<String> tags,
-            List<String> examples, List<String> inputModes, List<String> outputModes) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.tags = tags;
-        this.examples = examples;
-        this.inputModes = inputModes;
-        this.outputModes = outputModes;
-    }
+	public AgentSkill(String id, String name, String description, List<String> tags, List<String> examples,
+			List<String> inputModes, List<String> outputModes) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.tags = tags;
+		this.examples = examples;
+		this.inputModes = inputModes;
+		this.outputModes = outputModes;
+	}
 
-    public static AgentSkillBuilder builder() {
-        return new AgentSkillBuilder();
-    }
+	public static AgentSkillBuilder builder() {
+		return new AgentSkillBuilder();
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public List<String> getTags() {
-        return tags;
-    }
+	public List<String> getTags() {
+		return tags;
+	}
 
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
+	public void setTags(List<String> tags) {
+		this.tags = tags;
+	}
 
-    public List<String> getExamples() {
-        return examples;
-    }
+	public List<String> getExamples() {
+		return examples;
+	}
 
-    public void setExamples(List<String> examples) {
-        this.examples = examples;
-    }
+	public void setExamples(List<String> examples) {
+		this.examples = examples;
+	}
 
-    public List<String> getInputModes() {
-        return inputModes;
-    }
+	public List<String> getInputModes() {
+		return inputModes;
+	}
 
-    public void setInputModes(List<String> inputModes) {
-        this.inputModes = inputModes;
-    }
+	public void setInputModes(List<String> inputModes) {
+		this.inputModes = inputModes;
+	}
 
-    public List<String> getOutputModes() {
-        return outputModes;
-    }
+	public List<String> getOutputModes() {
+		return outputModes;
+	}
 
-    public void setOutputModes(List<String> outputModes) {
-        this.outputModes = outputModes;
-    }
+	public void setOutputModes(List<String> outputModes) {
+		this.outputModes = outputModes;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        AgentSkill that = (AgentSkill) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(tags, that.tags) &&
-                Objects.equals(examples, that.examples) &&
-                Objects.equals(inputModes, that.inputModes) &&
-                Objects.equals(outputModes, that.outputModes);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		AgentSkill that = (AgentSkill) o;
+		return Objects.equals(id, that.id) && Objects.equals(name, that.name)
+				&& Objects.equals(description, that.description) && Objects.equals(tags, that.tags)
+				&& Objects.equals(examples, that.examples) && Objects.equals(inputModes, that.inputModes)
+				&& Objects.equals(outputModes, that.outputModes);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, tags, examples, inputModes, outputModes);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name, description, tags, examples, inputModes, outputModes);
+	}
 
-    @Override
-    public String toString() {
-        return "AgentSkill{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", tags=" + tags +
-                ", examples=" + examples +
-                ", inputModes=" + inputModes +
-                ", outputModes=" + outputModes +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "AgentSkill{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\''
+				+ ", tags=" + tags + ", examples=" + examples + ", inputModes=" + inputModes + ", outputModes="
+				+ outputModes + '}';
+	}
 
-    public static class AgentSkillBuilder {
-        private String id;
-        private String name;
-        private String description;
-        private List<String> tags;
-        private List<String> examples;
-        private List<String> inputModes;
-        private List<String> outputModes;
+	public static class AgentSkillBuilder {
 
-        AgentSkillBuilder() {
-        }
+		private String id;
 
-        public AgentSkillBuilder id(String id) {
-            this.id = id;
-            return this;
-        }
+		private String name;
 
-        public AgentSkillBuilder name(String name) {
-            this.name = name;
-            return this;
-        }
+		private String description;
 
-        public AgentSkillBuilder description(String description) {
-            this.description = description;
-            return this;
-        }
+		private List<String> tags;
 
-        public AgentSkillBuilder tags(List<String> tags) {
-            this.tags = tags;
-            return this;
-        }
+		private List<String> examples;
 
-        public AgentSkillBuilder examples(List<String> examples) {
-            this.examples = examples;
-            return this;
-        }
+		private List<String> inputModes;
 
-        public AgentSkillBuilder inputModes(List<String> inputModes) {
-            this.inputModes = inputModes;
-            return this;
-        }
+		private List<String> outputModes;
 
-        public AgentSkillBuilder outputModes(List<String> outputModes) {
-            this.outputModes = outputModes;
-            return this;
-        }
+		AgentSkillBuilder() {
+		}
 
-        public AgentSkill build() {
-            return new AgentSkill(id, name, description, tags, examples, inputModes, outputModes);
-        }
+		public AgentSkillBuilder id(String id) {
+			this.id = id;
+			return this;
+		}
 
-        @Override
-        public String toString() {
-            return "AgentSkill.AgentSkillBuilder(id=" + this.id +
-                    ", name=" + this.name +
-                    ", description=" + this.description +
-                    ", tags=" + this.tags +
-                    ", examples=" + this.examples +
-                    ", inputModes=" + this.inputModes +
-                    ", outputModes=" + this.outputModes + ")";
-        }
-    }
+		public AgentSkillBuilder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public AgentSkillBuilder description(String description) {
+			this.description = description;
+			return this;
+		}
+
+		public AgentSkillBuilder tags(List<String> tags) {
+			this.tags = tags;
+			return this;
+		}
+
+		public AgentSkillBuilder examples(List<String> examples) {
+			this.examples = examples;
+			return this;
+		}
+
+		public AgentSkillBuilder inputModes(List<String> inputModes) {
+			this.inputModes = inputModes;
+			return this;
+		}
+
+		public AgentSkillBuilder outputModes(List<String> outputModes) {
+			this.outputModes = outputModes;
+			return this;
+		}
+
+		public AgentSkill build() {
+			return new AgentSkill(id, name, description, tags, examples, inputModes, outputModes);
+		}
+
+		@Override
+		public String toString() {
+			return "AgentSkill.AgentSkillBuilder(id=" + this.id + ", name=" + this.name + ", description="
+					+ this.description + ", tags=" + this.tags + ", examples=" + this.examples + ", inputModes="
+					+ this.inputModes + ", outputModes=" + this.outputModes + ")";
+		}
+
+	}
+
 }

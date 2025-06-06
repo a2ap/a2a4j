@@ -27,134 +27,129 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JSONRPCRequest {
 
-    /**
-     * The JSON-RPC version, always "2.0".
-     * Required field.
-     */
-    @JsonProperty("jsonrpc")
-    private final String jsonrpc = "2.0";
+	/**
+	 * The JSON-RPC version, always "2.0". Required field.
+	 */
+	@JsonProperty("jsonrpc")
+	private final String jsonrpc = "2.0";
 
-    /**
-     * The method to be invoked.
-     * Required field.
-     */
-    @JsonProperty("method")
-    private String method;
+	/**
+	 * The method to be invoked. Required field.
+	 */
+	@JsonProperty("method")
+	private String method;
 
-    /**
-     * The parameters to the method.
-     */
-    @JsonProperty("params")
-    private Object params;
+	/**
+	 * The parameters to the method.
+	 */
+	@JsonProperty("params")
+	private Object params;
 
-    /**
-     * The request identifier.
-     * Required field.
-     */
-    @JsonProperty("id")
-    private String id;
+	/**
+	 * The request identifier. Required field.
+	 */
+	@JsonProperty("id")
+	private String id;
 
-    public JSONRPCRequest() {
-    }
+	public JSONRPCRequest() {
+	}
 
-    public JSONRPCRequest(String method, Object params, String id) {
-        this.method = method;
-        this.params = params;
-        this.id = id;
-    }
+	public JSONRPCRequest(String method, Object params, String id) {
+		this.method = method;
+		this.params = params;
+		this.id = id;
+	}
 
-    public static JSONRPCRequestBuilder builder() {
-        return new JSONRPCRequestBuilder();
-    }
+	public static JSONRPCRequestBuilder builder() {
+		return new JSONRPCRequestBuilder();
+	}
 
-    public String getJsonrpc() {
-        return jsonrpc;
-    }
+	public String getJsonrpc() {
+		return jsonrpc;
+	}
 
-    public String getMethod() {
-        return method;
-    }
+	public String getMethod() {
+		return method;
+	}
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
+	public void setMethod(String method) {
+		this.method = method;
+	}
 
-    public Object getParams() {
-        return params;
-    }
+	public Object getParams() {
+		return params;
+	}
 
-    public void setParams(Object params) {
-        this.params = params;
-    }
+	public void setParams(Object params) {
+		this.params = params;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        JSONRPCRequest that = (JSONRPCRequest) o;
-        return Objects.equals(jsonrpc, that.jsonrpc) &&
-                Objects.equals(method, that.method) &&
-                Objects.equals(params, that.params) &&
-                Objects.equals(id, that.id);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		JSONRPCRequest that = (JSONRPCRequest) o;
+		return Objects.equals(jsonrpc, that.jsonrpc) && Objects.equals(method, that.method)
+				&& Objects.equals(params, that.params) && Objects.equals(id, that.id);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(jsonrpc, method, params, id);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(jsonrpc, method, params, id);
+	}
 
-    @Override
-    public String toString() {
-        return "JSONRPCRequest{" +
-                "jsonrpc='" + jsonrpc + '\'' +
-                ", method='" + method + '\'' +
-                ", params=" + params +
-                ", id='" + id + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "JSONRPCRequest{" + "jsonrpc='" + jsonrpc + '\'' + ", method='" + method + '\'' + ", params=" + params
+				+ ", id='" + id + '\'' + '}';
+	}
 
-    public static class JSONRPCRequestBuilder {
-        private String method;
-        private Object params;
-        private String id;
+	public static class JSONRPCRequestBuilder {
 
-        JSONRPCRequestBuilder() {
-        }
+		private String method;
 
-        public JSONRPCRequestBuilder method(String method) {
-            this.method = method;
-            return this;
-        }
+		private Object params;
 
-        public JSONRPCRequestBuilder params(Object params) {
-            this.params = params;
-            return this;
-        }
+		private String id;
 
-        public JSONRPCRequestBuilder id(String id) {
-            this.id = id;
-            return this;
-        }
+		JSONRPCRequestBuilder() {
+		}
 
-        public JSONRPCRequest build() {
-            return new JSONRPCRequest(method, params, id);
-        }
+		public JSONRPCRequestBuilder method(String method) {
+			this.method = method;
+			return this;
+		}
 
-        @Override
-        public String toString() {
-            return "JSONRPCRequest.JSONRPCRequestBuilder(method=" + this.method +
-                    ", params=" + this.params +
-                    ", id=" + this.id + ")";
-        }
-    }
+		public JSONRPCRequestBuilder params(Object params) {
+			this.params = params;
+			return this;
+		}
+
+		public JSONRPCRequestBuilder id(String id) {
+			this.id = id;
+			return this;
+		}
+
+		public JSONRPCRequest build() {
+			return new JSONRPCRequest(method, params, id);
+		}
+
+		@Override
+		public String toString() {
+			return "JSONRPCRequest.JSONRPCRequestBuilder(method=" + this.method + ", params=" + this.params + ", id="
+					+ this.id + ")";
+		}
+
+	}
+
 }
