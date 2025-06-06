@@ -23,7 +23,6 @@
 		<groupId>io.github.a2ap</groupId>
 		<artifactId>a2a4j-parent</artifactId>
 		<version>${revision}</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 
     <name>Agent2Agent (A2A) Protocol Core Module For Java</name>
