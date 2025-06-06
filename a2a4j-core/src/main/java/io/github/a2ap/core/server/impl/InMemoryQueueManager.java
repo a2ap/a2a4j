@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core.server;
+package io.github.a2ap.core.server.impl;
 
+import io.github.a2ap.core.server.EventQueue;
+import io.github.a2ap.core.server.QueueManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
  * In-memory implementation of QueueManager.
- * 
  * This is the Java equivalent of Python's InMemoryQueueManager.
  */
-@Component
 public class InMemoryQueueManager implements QueueManager {
 
     private static final Logger log = LoggerFactory.getLogger(InMemoryQueueManager.class);

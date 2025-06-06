@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.github.a2ap.core.configuration.A2AServerAutoConfiguration

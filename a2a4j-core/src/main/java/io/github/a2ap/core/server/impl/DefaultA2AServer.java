@@ -35,7 +35,6 @@ import io.github.a2ap.core.server.TaskManager;
 import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -43,10 +42,9 @@ import reactor.core.publisher.Mono;
  * Implementation of the A2AServer interface.
  * This class provides the core functionality for an A2A server.
  */
-@Component
-public class A2AServerImpl implements A2AServer {
+public class DefaultA2AServer implements A2AServer {
 
-    private static final Logger log = LoggerFactory.getLogger(A2AServerImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultA2AServer.class);
 
     private final TaskManager taskManager;
     private final AgentExecutor agentExecutor;
@@ -61,8 +59,8 @@ public class A2AServerImpl implements A2AServer {
      * @param agentExecutor The AgentExecutor to use for agent execution.
      * @param queueManager  The QueueManager to use for event queue management.
      */
-    public A2AServerImpl(TaskManager taskManager,
-            AgentExecutor agentExecutor, QueueManager queueManager, AgentCard a2aServerSelfCard) {
+    public DefaultA2AServer(TaskManager taskManager,
+                            AgentExecutor agentExecutor, QueueManager queueManager, AgentCard a2aServerSelfCard) {
         this.taskManager = taskManager;
         this.agentExecutor = agentExecutor;
         this.queueManager = queueManager;

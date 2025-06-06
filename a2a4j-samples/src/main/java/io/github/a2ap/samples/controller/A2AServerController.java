@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core.server.controller;
+package io.github.a2ap.samples.controller;
 
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
@@ -23,7 +23,6 @@ import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -44,7 +43,6 @@ public class A2AServerController {
     private final A2AServer a2aServer;
     private final Dispatcher a2aDispatch;
     
-    @Autowired
     public A2AServerController(A2AServer a2aServer, Dispatcher a2aDispatch) {
         this.a2aServer = a2aServer;
         this.a2aDispatch = a2aDispatch;
