@@ -1,22 +1,35 @@
----
-name: Question
-about: how to ask a valid question
-title: ''
-labels: ''
-assignees: ''
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
 
----
+name: 🤔 Question
+description: Usage question that isn't answered in docs or discussion
+title: "[Question] <title>"
+labels: ["question"]
+body:
+- type: textarea
+  attributes:
+  label: Question
+  placeholder: >
+  your question here;
+  validations:
+  required: true
+- type: markdown
+  attributes:
+  value: |
+  Please pay attention on issues you submitted, because we maybe need more details.
+  If no response anymore and we cannot reproduce it on current information, we will **close it**.
 
-我们鼓励使用英文，如果不能直接使用，可以使用翻译软件，您仍旧可以保留中文原文。另外请按照如下要求提交相关信息节省社区维护同学的理解成本，否则该讨论极有可能直接被忽视或关闭。
-We recommend using English. If you are non-native English speaker, you can use the translation software. We recommend using English. If you are non-native English speaker, you can use the translation software. In addition, please submit relevant information according to the following requirements to save the understanding cost of community maintenances, otherwise the discussion is very likely to be ignored or closed directly.
-
-
-
-**Which Component**
-eg. A2A Core etc.
-
-**Describe what problem you have encountered**
-A clear and concise description of what you want to do.
-
-**Describe what information you have read**
-eg. I have read the reference doc of Function Calling

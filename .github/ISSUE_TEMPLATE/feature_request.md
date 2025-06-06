@@ -1,27 +1,56 @@
----
-name: Feature Request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
 
----
-
-我们鼓励使用英文，如果不能直接使用，可以使用翻译软件，您仍旧可以保留中文原文。另外请按照如下要求提交相关信息节省社区维护同学的理解成本，否则该讨论极有可能直接被忽视或关闭。
-We recommend using English. If you are non-native English speaker, you can use the translation software. In addition, please submit relevant information according to the following requirements to save the understanding cost of community maintenances, otherwise the discussion is very likely to be ignored or closed directly.
-
-
-**Which Component**
-eg. Nacos Discovery, Sentinel
-
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature regexRequest here.
+name: 🚀 Feature Request
+description: I have a suggestion (and may want to implement it 🙂)!
+title: "[Feature] <title>"
+labels: ["new feature"]
+body:
+- type: textarea
+  attributes:
+  label: Feature Request
+  description: >
+  Tip: Have you checked the docs, GitHub issues whether someone else has already reported your issue? Maybe the feature already exists?
+  placeholder: >
+  A concise description of what you're experiencing.
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Is your feature request related to a problem? Please describe
+  description: A clear and concise description of what the problem is. Ex. I have an issue when [...]
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Describe the solution you'd like
+  description: A clear and concise description of what you want to happen. Add any considered drawbacks.
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Describe alternatives you've considered
+  description: A clear and concise description of any alternative solutions or features you've considered.
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Additional context
+  validations:
+  required: false
+- type: markdown
+  value: "Please read the [Contribution Guideline](https://github.com/a2ap/a2a4j/blob/main/CONTRIBUTING.md) before submitting the PR"
