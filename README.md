@@ -3,7 +3,6 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.a2ap/a2a4j-parent)](https://search.maven.org/artifact/io.github.a2ap/a2a4j-parent)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Java Version](https://img.shields.io/badge/Java-17%2B-green.svg)](https://openjdk.org/projects/jdk/17/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4%2B-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
 📖 **[中文文档](README_CN.md)**
 
@@ -13,19 +12,18 @@ A2A4J is a comprehensive Java implementation of the Agent2Agent (A2A) Protocol, 
 
 - ✅ **Complete A2A Protocol Support** - Full implementation of the Agent2Agent specification
 - ✅ **JSON-RPC 2.0 Communication** - Standards-based request/response messaging
-- ✅ **Server-Sent Events (SSE) Streaming** - Real-time task updates and streaming responses
-- ✅ **Agent Card Discovery** - Dynamic capability discovery mechanism
+- ✅ **Server-Sent Events Streaming** - Real-time task updates and streaming responses
 - ✅ **Task Lifecycle Management** - Comprehensive task state management and monitoring
-- ✅ **Push Notification Configuration** - Asynchronous task updates via webhooks
 - ✅ **Spring Boot Integration** - Easy integration with Spring Boot applications
-- ✅ **Reactive Programming Support** - Built on Spring WebFlux for scalable, non-blocking operations
-- ✅ **Enterprise Security** - Authentication and authorization support
+- ✅ **Reactive Programming Support** - Built on Reactor for scalable, non-blocking operations
 - ✅ **Multiple Content Types** - Support for text, files, and structured data exchange
+- ⚪️ **Agent Card Discovery** - Dynamic capability discovery mechanism
+- ⚪️ **Push Notification Configuration** - Asynchronous task updates via webhooks
+- ⚪️ **Enterprise Security** - Authentication and authorization support
 
 ## 📋 Prerequisites
 
 - **Java 17+** - Required for running the application
-- **Spring Boot 3.4+** - Framework dependency
 - **Maven 3.6+** - Build tool
 
 ## 🏗️ Project Structure
@@ -40,7 +38,6 @@ a2a4j/
 │   └── server-hello-world/        # Hello World server example
 ├── specification/                 # A2A protocol specification
 ├── tools/                        # Development tools and configuration
-└── js/                          # JavaScript/TypeScript definitions
 ```
 
 ## 🚀 Quick Start
@@ -65,18 +62,18 @@ cd a2a4j-samples/server-hello-world
 mvn spring-boot:run
 ```
 
-The server will start at `http://localhost:8080`.
+The server will start at `http://localhost:8089`.
 
 ### 4. Test the Agent
 
 #### Get Agent Card
 ```bash
-curl http://localhost:8080/.well-known/agent.json
+curl http://localhost:8089/.well-known/agent.json
 ```
 
 #### Send a Message
 ```bash
-curl -X POST http://localhost:8080/a2a/server \
+curl -X POST http://localhost:8089/a2a/server \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -99,7 +96,7 @@ curl -X POST http://localhost:8080/a2a/server \
 
 #### Stream Messages
 ```bash
-curl -X POST http://localhost:8080/a2a/server/stream \
+curl -X POST http://localhost:8089/a2a/server \
   -H "Content-Type: application/json" \
   -H "Accept: text/event-stream" \
   -d '{
@@ -162,27 +159,54 @@ Complete working examples demonstrating A2A4J usage:
 
 ```java
 @RestController
-@RequestMapping("/a2a")
 public class MyA2AController {
-    
+
     @Autowired
     private A2AServer a2aServer;
-    
-    @PostMapping("/server")
-    public Mono<ResponseEntity<?>> handleRequest(@RequestBody JSONRPCRequest request) {
-        return a2aServer.processRequest(request)
-            .map(ResponseEntity::ok)
-            .onErrorReturn(ResponseEntity.badRequest().build());
+    @Autowired
+    private final Dispatcher a2aDispatch;
+
+    @GetMapping(".well-known/agent.json")
+    public ResponseEntity<AgentCard> getAgentCard() {
+        AgentCard card = a2aServer.getSelfAgentCard();
+        return ResponseEntity.ok(card);
+    }
+
+    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
+        return ResponseEntity.ok(a2aDispatch.dispatch(request));
+    }
+
+    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
+        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder()
+                .data(event).event("task-update").build());
     }
 }
 
 @Component
 public class MyAgentExecutor implements AgentExecutor {
-    
+
     @Override
-    public Mono<String> executeTask(Task task) {
-        // Your agent logic here
-        return Mono.just("Hello from my agent!");
+    public Mono<Void> execute(RequestContext context, EventQueue eventQueue) {
+        // your agent logic code
+        TaskStatusUpdateEvent completedEvent = TaskStatusUpdateEvent.builder()
+                .taskId(taskId)
+                .contextId(contextId)
+                .status(TaskStatus.builder()
+                        .state(TaskState.COMPLETED)
+                        .timestamp(String.valueOf(Instant.now().toEpochMilli()))
+                        .message(createAgentMessage("Task completed successfully! Hi you."))
+                        .build())
+                .isFinal(true)
+                .metadata(Map.of(
+                        "executionTime", "3000ms",
+                        "artifactsGenerated", 4,
+                        "success", true))
+                .build();
+
+        eventQueue.enqueueEvent(completedEvent);
+        return Mono.empty();
     }
 }
 ```
@@ -193,7 +217,7 @@ public class MyAgentExecutor implements AgentExecutor {
 // Create agent card
 AgentCard agentCard = AgentCard.builder()
     .name("Target Agent")
-    .url("http://localhost:8080")
+    .url("http://localhost:8089")
     .version("1.0.0")
     .capabilities(AgentCapabilities.builder().streaming(true).build())
     .skills(List.of())
@@ -240,15 +264,6 @@ stream.subscribe(
 );
 ```
 
-## 🔒 Security
-
-A2A4J implements enterprise-grade security features:
-
-- **Authentication**: Support for various authentication schemes (Bearer tokens, API keys, Basic auth)
-- **Authorization**: Role-based access control for agent capabilities
-- **HTTPS**: TLS encryption for secure communication
-- **Input Validation**: Comprehensive request validation and sanitization
-
 ## 📊 JSON-RPC Methods
 
 ### Core Methods
@@ -264,19 +279,6 @@ A2A4J implements enterprise-grade security features:
 - `tasks/pushNotificationConfig/set` - Configure push notifications
 - `tasks/pushNotificationConfig/get` - Get notification configuration
 
-## 🧪 Testing
-
-Run the complete test suite:
-
-```bash
-mvn test
-```
-
-Run integration tests:
-
-```bash
-mvn verify
-```
 
 ## 📖 Documentation
 
@@ -305,11 +307,11 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - **Discussions**: [GitHub Discussions](https://github.com/a2ap/a2a4j/discussions)
 - **CI/CD**: [GitHub Actions](https://github.com/a2ap/a2a4j/actions)
 
-## 🔗 Related Projects
+## 🔗 Refer Projects
 
 - [A2A Protocol Specification](https://google-a2a.github.io/A2A/specification/)
 - [A2A Protocol Website](https://google-a2a.github.io)
 
 ---
 
-Built with ❤️ by the A2A Community
+Built with ❤️ by the A2AP Community

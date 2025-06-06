@@ -29,18 +29,18 @@ A2A4J 是 Agent2Agent (A2A) 协议的 Java 实现，提供了完整的服务器�
 mvn spring-boot:run
 ```
 
-服务器将在 `http://localhost:8080` 启动。
+服务器将在 `http://localhost:8089` 启动。
 
 ### Agent Card 访问
 
 ```bash
-curl http://localhost:8080/.well-known/agent.json
+curl http://localhost:8089/.well-known/agent.json
 ```
 
 ### 发送消息
 
 ```bash
-curl -X POST http://localhost:8080/a2a/server \
+curl -X POST http://localhost:8089/a2a/server \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -85,7 +85,7 @@ curl -X POST http://localhost:8080/a2a/server \
 // 创建客户端
 AgentCard agentCard = AgentCard.builder()
     .name("Target Agent")
-    .url("http://localhost:8080")
+    .url("http://localhost:8089")
     .version("1.0.0")
     .capabilities(AgentCapabilities.builder().streaming(true).build())
     .skills(List.of())

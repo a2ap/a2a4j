@@ -27,18 +27,18 @@ A2A4J is a Java implementation of the Agent2Agent (A2A) protocol, providing comp
 mvn spring-boot:run
 ```
 
-The server will start at `http://localhost:8080`.
+The server will start at `http://localhost:8089`.
 
 ### Accessing Agent Card
 
 ```bash
-curl http://localhost:8080/.well-known/agent.json
+curl http://localhost:8089/.well-known/agent.json
 ```
 
 ### Sending a Message
 
 ```bash
-curl -X POST http://localhost:8080/a2a/server \
+curl -X POST http://localhost:8089/a2a/server \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -62,7 +62,7 @@ curl -X POST http://localhost:8080/a2a/server \
 ### Streaming Messages
 
 ```bash
-curl -X POST http://localhost:8080/a2a/server/stream \
+curl -X POST http://localhost:8089/a2a/server/stream \
   -H "Content-Type: application/json" \
   -H "Accept: text/event-stream" \
   -d '{
@@ -108,7 +108,7 @@ curl -X POST http://localhost:8080/a2a/server/stream \
 // Create agent card
 AgentCard agentCard = AgentCard.builder()
     .name("Target Agent")
-    .url("http://localhost:8080")
+    .url("http://localhost:8089")
     .version("1.0.0")
     .capabilities(AgentCapabilities.builder().streaming(true).build())
     .skills(List.of())
@@ -216,7 +216,7 @@ a2a4j-core/
 
 ```properties
 # Server configuration
-server.port=8080
+server.port=8089
 
 # Agent card configuration
 a2a.agent.name=My A2A Agent
