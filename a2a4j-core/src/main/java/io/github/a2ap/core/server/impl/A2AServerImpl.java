@@ -51,7 +51,6 @@ public class A2AServerImpl implements A2AServer {
     private final TaskManager taskManager;
     private final AgentExecutor agentExecutor;
     private final QueueManager queueManager;
-
     private final AgentCard a2aServerSelfCard;
 
     /**
@@ -100,9 +99,6 @@ public class A2AServerImpl implements A2AServer {
         eventQueue.enqueueEvent(currentTask);
         Mono<SendMessageResponse> resultMono = agentExecutor.execute(taskContext, eventQueue)
                 .then(eventQueue.asFlux()
-                        .doOnNext(sendMessageResponse -> {
-                            log.info("Task agent received event: {}", sendMessageResponse);
-                        })
                         .flatMap(event -> {
                             if (event instanceof TaskStatusUpdateEvent) {
                                 return taskManager.applyStatusUpdate(currentTask, (TaskStatusUpdateEvent) event);
