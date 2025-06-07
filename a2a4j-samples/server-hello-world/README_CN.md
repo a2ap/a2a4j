@@ -62,7 +62,7 @@ curl -X GET http://localhost:8089/actuator/health
 
 ### 1. Agent Card 发现
 
-获取代理的能力和元数据信息：
+获取智能体的能力和元数据信息：
 
 ```bash
 curl -X GET http://localhost:8089/.well-known/agent.json
@@ -291,7 +291,7 @@ curl -X POST http://localhost:8089/a2a/server \
 
 - **`A2aServerApplication`**: Spring Boot 主应用类，配置 CORS 和应用启动
 - **`A2aServerController`**: REST 控制器，实现 A2A 协议端点
-- **`DemoAgentExecutor`**: 示例代理执行器，展示各种事件类型和工件生成
+- **`DemoAgentExecutor`**: 示例智能体执行器，展示各种事件类型和工件生成
 
 ### 执行流程
 
@@ -311,8 +311,8 @@ server:
 
 a2a:
   server:
-    name: "我的 A2A 代理"  # 代理名称
-    description: "自定义描述"  # 代理描述
+    name: "我的 A2A 智能体"  # 智能体名称
+    description: "自定义描述"  # 智能体描述
     capabilities:
       streaming: true  # 是否支持流式响应
       pushNotifications: false  # 是否支持推送通知
@@ -354,7 +354,7 @@ curl http://localhost:8089/actuator/metrics
 
 ## 扩展开发
 
-### 自定义代理执行器
+### 自定义智能体执行器
 
 创建自己的 `AgentExecutor` 实现：
 
@@ -406,7 +406,7 @@ ENTRYPOINT ["java", "-jar", "/app.jar"]
 
 ```bash
 # 生产环境变量
-export SERVER_PORT=8080
+export SERVER_PORT=8089
 export A2A_SERVER_NAME="Production A2A Agent"
 export LOGGING_LEVEL_ROOT=INFO
 ```

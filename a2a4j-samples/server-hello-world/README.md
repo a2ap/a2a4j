@@ -406,7 +406,7 @@ ENTRYPOINT ["java", "-jar", "/app.jar"]
 
 ```bash
 # Production environment variables
-export SERVER_PORT=8080
+export SERVER_PORT=8089
 export A2A_SERVER_NAME="Production A2A Agent"
 export LOGGING_LEVEL_ROOT=INFO
 ```

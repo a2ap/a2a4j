@@ -8,7 +8,7 @@
 
 - ✅ **零配置**: 开箱即用，自动配置所有 A2A 服务器组件
 - ✅ **灵活覆盖**: 可以用自定义实现覆盖任何组件
-- ✅ **属性配置**: 通过应用程序属性配置代理元数据和功能
+- ✅ **属性配置**: 通过应用程序属性配置智能体元数据和功能
 - ✅ **生产就绪**: 提供合理的默认值和自定义选项
 - ✅ **Spring Boot 集成**: 与 Spring Boot 配置系统无缝集成
 
@@ -16,7 +16,7 @@
 
 ### 1. 添加依赖
 
-在你的 Spring Boot 项目中添加 starter：
+在你的 Spring Boot 项目中添加启动器：
 
 ```xml
 <dependency>
@@ -28,13 +28,13 @@
 
 ### 2. 配置属性
 
-在 `application.yml` 中配置你的代理：
+在 `application.yml` 中配置你的智能体：
 
 ```yaml
 a2a:
   server:
-    name: "我的 A2A 代理"
-    description: "一个强大的 A2A 代理"
+    name: "我的 A2A 智能体"
+    description: "一个强大的 A2A 智能体"
     version: "1.0.0"
     url: "https://my-agent.example.com"
     capabilities:
@@ -45,7 +45,7 @@ a2a:
 
 ### 3. 实现代理逻辑
 
-创建自定义的 `AgentExecutor` 来定义你的代理行为：
+创建自定义的 `AgentExecutor` 来定义你的智能体行为：
 
 ```java
 @Component
@@ -96,22 +96,21 @@ public class MyAgentApplication {
 
 你的 A2A 服务器将在配置的 URL 上可用，提供以下端点：
 
-- `GET /.well-known/agent.json` - 代理卡片发现
-- `POST /a2a/server` - 同步请求的 JSON-RPC 端点
-- `POST /a2a/server/stream` - 流式请求的 Server-Sent Events 端点
+- `GET /.well-known/agent.json` - Agent Card 发现
+- `POST /a2a/server` - 同步和流式请求的 JSON-RPC 端点
 
 ## 配置属性
 
 | 属性 | 类型 | 默认值 | 描述 |
 |------|------|--------|------|
 | `a2a.server.enabled` | `boolean` | `true` | 是否启用 A2A 服务器 |
-| `a2a.server.name` | `string` | | 代理的名称 |
-| `a2a.server.description` | `string` | | 代理的描述 |
-| `a2a.server.version` | `string` | | 代理的版本 |
-| `a2a.server.url` | `string` | | 代理可访问的基础 URL |
-| `a2a.server.capabilities.streaming` | `boolean` | `true` | 代理是否支持流式响应 |
-| `a2a.server.capabilities.push-notifications` | `boolean` | `false` | 代理是否支持推送通知 |
-| `a2a.server.capabilities.state-transition-history` | `boolean` | `true` | 代理是否维护状态转换历史 |
+| `a2a.server.name` | `string` | | 智能体的名称 |
+| `a2a.server.description` | `string` | | 智能体的描述 |
+| `a2a.server.version` | `string` | | 智能体的版本 |
+| `a2a.server.url` | `string` | | 智能体可访问的基础 URL |
+| `a2a.server.capabilities.streaming` | `boolean` | `true` | 智能体是否支持流式响应 |
+| `a2a.server.capabilities.push-notifications` | `boolean` | `false` | 智能体是否支持推送通知 |
+| `a2a.server.capabilities.state-transition-history` | `boolean` | `true` | 智能体是否维护状态转换历史 |
 
 ## 自动配置的组件
 
@@ -129,13 +128,13 @@ Starter 自动配置以下 Bean（都可以被覆盖）：
 ### 支持组件
 
 - **`ObjectMapper`**: 用于 JSON 序列化/反序列化
-- **`AgentCard`**: 基于配置属性的代理元数据
+- **`AgentCard`**: 基于配置属性的智能体元数据
 
 ## 示例项目
 
 查看 `example/` 目录中的完整示例：
 
-- [EchoAgentApplication.java](example/EchoAgentApplication.java) - 简单的回声代理实现
+- [EchoAgentApplication.java](example/EchoAgentApplication.java) - 简单的回声智能体实现
 - [application.yml](example/application.yml) - 示例配置
 
 ## 详细文档
@@ -152,7 +151,7 @@ Starter 自动配置以下 Bean（都可以被覆盖）：
 
 常见问题：
 
-1. **代理卡片无法访问**: 确保 `url` 属性配置正确
+1. **Agent Card 无法访问**: 确保 `url` 属性配置正确
 2. **自定义执行器未生效**: 确保你的执行器使用 `@Component` 注解
 3. **配置未应用**: 检查属性是否在 `a2a.server` 前缀下
 

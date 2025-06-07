@@ -1,38 +1,78 @@
----
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
 
----
+name: 🐛 Bug Report
+description: Problems and issues with code of a2a4j 🤔.
+title: "[BUG] <title>"
+labels: ["bug"]
+body:
+- type: checkboxes
+  attributes:
+  label: Is there an existing issue for this?
+  description: Please search to see if an issue already exists for the bug you encountered.
+  options:
+  - label: I have searched the existing issues
+  required: true
+- type: textarea
+  attributes:
+  label: Current Behavior
+  description: A concise description of what you're experiencing.
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Expected Behavior
+  description: A concise description of what you expected to happen.
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Steps To Reproduce
+  description: Steps to reproduce the behavior.
+  placeholder: |
+  1. In this environment...
+  2. With this config...
+  3. Run '...'
+  4. See error...
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Environment
+  description: |
+  examples:
+  - **version(s)**: v1.1.1
+  value: "version(s):"
+  render: markdown
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Debug logs
+  description: |
+  Add your debug logs here.
+  validations:
+  required: false
+- type: textarea
+  attributes:
+  label: Anything else?
+  description: |
+  Links? References? Anything that will give us more context about the issue you are encountering!
 
-我们鼓励使用英文，如果不能直接使用，可以使用翻译软件，您仍旧可以保留中文原文。另外请按照如下要求提交相关信息节省社区维护同学的理解成本，否则该讨论极有可能直接被忽视或关闭。
-We recommend using English. If you are non-native English speaker, you can use the translation software. We recommend using English. If you are non-native English speaker, you can use the translation software. In addition, please submit relevant information according to the following requirements to save the understanding cost of community maintenances, otherwise the discussion is very likely to be ignored or closed directly.
-
-
-**Which Component**
-eg. ChatModel, Function Calling, Example, etc.
-
-**Describe the bug**
-A clear and concise description of what the bug is.
-
-**Simplest demo**
-The URL of the simplest demo to reproduce the problem.
-
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Additional context**
-Add any other context about the problem here.
-e.g.  MacOS  、Java17 、 Version 1.0.0-M6.1
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+  validations:
+  required: false
