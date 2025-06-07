@@ -16,9 +16,10 @@
 
 package io.github.a2ap.core.client.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import io.github.a2ap.core.client.A2AClient;
 import io.github.a2ap.core.client.CardResolver;
+import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
+import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
@@ -30,7 +31,6 @@ import io.github.a2ap.core.util.JsonUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.internal.StringUtil;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -49,7 +49,7 @@ public class A2AClientImpl implements A2AClient {
     
     private AgentCard agentCard;
     
-    private String baseUrl;
+    private String url;
     
     private final CardResolver cardResolver;
 
@@ -62,7 +62,7 @@ public class A2AClientImpl implements A2AClient {
     public A2AClientImpl(AgentCard agentCard, CardResolver cardResolver) {
         this.agentCard = agentCard;
         this.cardResolver = cardResolver;
-        this.baseUrl = agentCard.getUrl();
+        this.url = agentCard.getUrl();
     }
 
     @Override
@@ -75,10 +75,10 @@ public class A2AClientImpl implements A2AClient {
 
     @Override
     public AgentCard retrieveAgentCard() {
-        log.info("Sending retrieve agent card to {}", this.baseUrl);
-        AgentCard card = cardResolver.resolveCard(this.baseUrl);
+        log.info("Sending retrieve agent card to {}", this.url);
+        AgentCard card = cardResolver.resolveCard(this.url);
         this.agentCard = card;
-        this.baseUrl = card.getUrl();
+        this.url = card.getUrl();
         return card;
     }
 
@@ -90,32 +90,59 @@ public class A2AClientImpl implements A2AClient {
      */
     @Override
     public Task sendMessage(MessageSendParams taskSendParams) {
-        log.info("Sending message to {} with params: {}", this.baseUrl, taskSendParams);
-        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
+        log.info("Sending message to {} with params: {}", this.url, taskSendParams);
+        HttpClient client = HttpClient.create().baseUrl(this.url);
         try {
-            Task responseTask = client.post()
-                    .uri("/message/send")
-                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(taskSendParams).getBytes(StandardCharsets.UTF_8))))
+            JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
+                    .method("message/send")
+                    .params(taskSendParams)
+                    .id(UUID.randomUUID().toString())
+                    .build();
+            
+            String responseData = client.post()
+                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
                     .asString()
-                    .map(data -> JsonUtil.fromJson(data, Task.class))
                     .block();
-            log.info("Message sent successfully. Received task: {}", responseTask);
-            return responseTask;
+            
+            if (responseData != null) {
+                JSONRPCResponse response = JsonUtil.fromJson(responseData, JSONRPCResponse.class);
+                if (response != null) {
+                    if (response.getError() != null) {
+                        log.error("JSON-RPC error when sending message: code={}, message={}, data={}", 
+                                response.getError().getCode(), 
+                                response.getError().getMessage(), 
+                                response.getError().getData());
+                        return null;
+                    }
+                    if (response.getResult() != null) {
+                        Task responseTask = JsonUtil.fromJson(JsonUtil.toJson(response.getResult()), Task.class);
+                        log.info("Message sent successfully. Received task: {}", responseTask);
+                        return responseTask;
+                    }
+                }
+            }
+            return null;
         } catch (Exception e) {
-            log.error("Error sending message to {}: {}", this.baseUrl, e.getMessage(), e);
+            log.error("Error sending message to {}: {}", this.url, e.getMessage(), e);
             return null; 
         }
     }
 
     @Override
     public Flux<SendStreamingMessageResponse> sendMessageStream(MessageSendParams params) {
-        log.info("Send stream message for {} from {}", params, this.baseUrl);
-        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
+        log.info("Send stream message for {} from {}", params, this.url);
+        HttpClient client = HttpClient.create().baseUrl(this.url);
+        
+        JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
+                .method("message/stream")
+                .params(params)
+                .id(UUID.randomUUID().toString())
+                .build();
+        
         return client.post()
-                .uri("/message/stream")
-                .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(params).getBytes(StandardCharsets.UTF_8))))
+                .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                 .responseContent()
                 .asString()
                 .map(this::parseServerSentEvent)
@@ -132,61 +159,101 @@ public class A2AClientImpl implements A2AClient {
      */
     @Override
     public Task getTask(TaskQueryParams queryParams) {
-        log.info("Getting task {} from {}", queryParams, this.baseUrl);
-        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
+        log.info("Getting task {} from {}", queryParams, this.url);
+        HttpClient client = HttpClient.create().baseUrl(this.url);
         try {
-            Task task = client.post()
-                    .uri("/tasks/get")
-                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(queryParams).getBytes(StandardCharsets.UTF_8))))
+            JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
+                    .method("tasks/get")
+                    .params(queryParams)
+                    .id(UUID.randomUUID().toString())
+                    .build();
+            
+            String responseData = client.post()
+                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
                     .asString()
-                    .map(data -> JsonUtil.fromJson(data, Task.class))
                     .block();
-            log.info("Successfully retrieved task {}: {}", queryParams, task);
-            return task;
+            
+            if (responseData != null) {
+                JSONRPCResponse response = JsonUtil.fromJson(responseData, JSONRPCResponse.class);
+                if (response != null) {
+                    if (response.getError() != null) {
+                        log.error("JSON-RPC error when getting task: code={}, message={}, data={}", 
+                                response.getError().getCode(), 
+                                response.getError().getMessage(), 
+                                response.getError().getData());
+                        return null;
+                    }
+                    if (response.getResult() != null) {
+                        Task task = JsonUtil.fromJson(JsonUtil.toJson(response.getResult()), Task.class);
+                        log.info("Successfully retrieved task {}: {}", queryParams, task);
+                        return task;
+                    }
+                }
+            }
+            return null;
         } catch (Exception e) {
-            log.error("Error getting task {} from {}: {}", queryParams, this.baseUrl, e.getMessage(), e);
+            log.error("Error getting task {} from {}: {}", queryParams, this.url, e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public Task cancelTask(TaskIdParams params) {
-        log.info("Cancelling task {} on {}", params, this.baseUrl);
-        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
+        log.info("Cancelling task {} on {}", params, this.url);
+        HttpClient client = HttpClient.create().baseUrl(this.url);
         try {
-            Task task = client.post()
-                    .uri("/tasks/cancel")
-                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(params).getBytes(StandardCharsets.UTF_8))))
+            // 构建JSON-RPC请求
+            JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
+                    .method("tasks/cancel")
+                    .params(params)
+                    .id(UUID.randomUUID().toString())
+                    .build();
+            
+            String responseData = client.post()
+                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
                     .asString()
-                    .map(data -> JsonUtil.fromJson(data, Task.class))
                     .block();
-            log.info("Task {} cancelled successfully.", params);
-            return task;
+            
+            if (responseData != null) {
+                JSONRPCResponse response = JsonUtil.fromJson(responseData, JSONRPCResponse.class);
+                if (response != null) {
+                    if (response.getError() != null) {
+                        log.error("JSON-RPC error when cancelling task: code={}, message={}, data={}", 
+                                response.getError().getCode(), 
+                                response.getError().getMessage(), 
+                                response.getError().getData());
+                        return null;
+                    }
+                    if (response.getResult() != null) {
+                        Task task = JsonUtil.fromJson(JsonUtil.toJson(response.getResult()), Task.class);
+                        log.info("Task {} cancelled successfully.", params);
+                        return task;
+                    }
+                }
+            }
+            return null;
         } catch (Exception e) {
-            log.error("Error cancelling task {} on {}: {}", params, this.baseUrl, e.getMessage(), e);
+            log.error("Error cancelling task {} on {}: {}", params, this.url, e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public TaskPushNotificationConfig setTaskPushNotification(TaskPushNotificationConfig params) {
-        log.info("Setting push notification config for task {} on {}", params.getTaskId(), this.baseUrl);
-        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
+        log.info("Setting push notification config for task {} on {}", params.getTaskId(), this.url);
+        HttpClient client = HttpClient.create().baseUrl(this.url);
         try {
-            // 构建JSON-RPC请求
-            Map<String, Object> jsonRpcRequest = Map.of(
-                "jsonrpc", "2.0",
-                "method", "tasks/pushNotificationConfig/set",
-                "params", params,
-                "id", UUID.randomUUID().toString()
-            );
+            JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
+                    .method("tasks/pushNotificationConfig/set")
+                    .params(params)
+                    .id(UUID.randomUUID().toString())
+                    .build();
             
             String responseData = client.post()
-                    .uri("/a2a/server")
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -194,35 +261,39 @@ public class A2AClientImpl implements A2AClient {
                     .block();
             
             if (responseData != null) {
-                TypeReference<HashMap<String, String>> typeRef = new TypeReference<>() {
-                };
-                Map<String, String> response = JsonUtil.fromJson(responseData, typeRef);
-                if (response != null && response.containsKey("result")) {
-                    return JsonUtil.fromJson(response.get("result"), TaskPushNotificationConfig.class);
+                JSONRPCResponse response = JsonUtil.fromJson(responseData, JSONRPCResponse.class);
+                if (response != null) {
+                    if (response.getError() != null) {
+                        log.error("JSON-RPC error when setting push notification config: code={}, message={}, data={}", 
+                                response.getError().getCode(), 
+                                response.getError().getMessage(), 
+                                response.getError().getData());
+                        return null;
+                    }
+                    if (response.getResult() != null) {
+                        return JsonUtil.fromJson(JsonUtil.toJson(response.getResult()), TaskPushNotificationConfig.class);
+                    }
                 }
             }
             return null;
         } catch (Exception e) {
-            log.error("Error setting push notification config for task {} on {}: {}", params.getTaskId(), this.baseUrl, e.getMessage(), e);
+            log.error("Error setting push notification config for task {} on {}: {}", params.getTaskId(), this.url, e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public TaskPushNotificationConfig getTaskPushNotification(TaskIdParams params) {
-        log.info("Getting push notification config for task {} from {}", params.getId(), this.baseUrl);
-        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
+        log.info("Getting push notification config for task {} from {}", params.getId(), this.url);
+        HttpClient client = HttpClient.create().baseUrl(this.url);
         try {
-            // 构建JSON-RPC请求
-            Map<String, Object> jsonRpcRequest = Map.of(
-                "jsonrpc", "2.0",
-                "method", "tasks/pushNotificationConfig/get",
-                "params", params,
-                "id", UUID.randomUUID().toString()
-            );
+            JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
+                    .method("tasks/pushNotificationConfig/get")
+                    .params(params)
+                    .id(UUID.randomUUID().toString())
+                    .build();
             
             String responseData = client.post()
-                    .uri("/a2a/server")
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -230,35 +301,39 @@ public class A2AClientImpl implements A2AClient {
                     .block();
             
             if (responseData != null) {
-                TypeReference<HashMap<String, String>> typeRef = new TypeReference<>() {
-                };
-                Map<String, String> response = JsonUtil.fromJson(responseData, typeRef);
-                if (response != null && response.containsKey("result")) {
-                    return JsonUtil.fromJson(response.get("result"), TaskPushNotificationConfig.class);
+                JSONRPCResponse response = JsonUtil.fromJson(responseData, JSONRPCResponse.class);
+                if (response != null) {
+                    if (response.getError() != null) {
+                        log.error("JSON-RPC error when getting push notification config: code={}, message={}, data={}", 
+                                response.getError().getCode(), 
+                                response.getError().getMessage(), 
+                                response.getError().getData());
+                        return null;
+                    }
+                    if (response.getResult() != null) {
+                        return JsonUtil.fromJson(JsonUtil.toJson(response.getResult()), TaskPushNotificationConfig.class);
+                    }
                 }
             }
             return null;
         } catch (Exception e) {
-            log.error("Error getting push notification config for task {} from {}: {}", params.getId(), this.baseUrl, e.getMessage(), e);
+            log.error("Error getting push notification config for task {} from {}: {}", params.getId(), this.url, e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public Flux<SendStreamingMessageResponse> resubscribeTask(TaskQueryParams params) {
-        log.info("Resubscribing to task updates for {} from {}", params.getTaskId(), this.baseUrl);
-        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
+        log.info("Resubscribing to task updates for {} from {}", params.getTaskId(), this.url);
+        HttpClient client = HttpClient.create().baseUrl(this.url);
         
-        // 构建JSON-RPC请求
-        Map<String, Object> jsonRpcRequest = Map.of(
-            "jsonrpc", "2.0",
-            "method", "tasks/resubscribe",
-            "params", Map.of("id", params.getTaskId()),
-            "id", UUID.randomUUID().toString()
-        );
+        JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
+                .method("tasks/resubscribe")
+                .params(Map.of("id", params.getTaskId()))
+                .id(UUID.randomUUID().toString())
+                .build();
         
         return client.post()
-                .uri("/a2a/server")
                 .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                 .responseContent()
                 .asString()
@@ -291,14 +366,19 @@ public class A2AClientImpl implements A2AClient {
             return null;
         }
         try {
-            // parse sse data from response
-            TypeReference<Map<String, String>> typeRef = new TypeReference<>() {
-            };
-            Map<String, String> jsonRpcResponse = JsonUtil.fromJson(eventData, typeRef);
+            JSONRPCResponse jsonRpcResponse = JsonUtil.fromJson(eventData, JSONRPCResponse.class);
             
-            if (jsonRpcResponse != null && jsonRpcResponse.containsKey("result")) {
-                String result = jsonRpcResponse.get("result");
-                return JsonUtil.fromJson(result, SendStreamingMessageResponse.class);
+            if (jsonRpcResponse != null) {
+                if (jsonRpcResponse.getError() != null) {
+                    log.error("JSON-RPC error in server-sent event: code={}, message={}, data={}", 
+                            jsonRpcResponse.getError().getCode(), 
+                            jsonRpcResponse.getError().getMessage(), 
+                            jsonRpcResponse.getError().getData());
+                    return null;
+                }
+                if (jsonRpcResponse.getResult() != null) {
+                    return JsonUtil.fromJson(JsonUtil.toJson(jsonRpcResponse.getResult()), SendStreamingMessageResponse.class);
+                }
             }
             return null;
         } catch (Exception e) {

@@ -16,7 +16,6 @@
 
 package io.github.a2ap.core.client.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.a2ap.core.client.CardResolver;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.util.JsonUtil;
@@ -32,8 +31,6 @@ public class HttpCardResolver implements CardResolver {
 
     private static final Logger log = LoggerFactory.getLogger(HttpCardResolver.class);
     
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Override
     public AgentCard resolveCard(String agentIdentifier) {
         // Assuming agentIdentifier is a URL for now
