@@ -16,7 +16,7 @@
 
 package io.github.a2ap.core.client.impl;
 
-import io.github.a2ap.core.client.A2AClient;
+import io.github.a2ap.core.client.A2aClient;
 import io.github.a2ap.core.client.CardResolver;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
@@ -43,26 +43,37 @@ import reactor.netty.http.client.HttpClient;
 /**
  * Implementation of the A2AClient interface.
  */
-public class A2AClientImpl implements A2AClient {
+public class DefaultA2aClient implements A2aClient {
 
-    private static final Logger log = LoggerFactory.getLogger(A2AClientImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultA2aClient.class);
     
     private AgentCard agentCard;
     
-    private String url;
-    
     private final CardResolver cardResolver;
+    
+    private final HttpClient client;
 
+    /**
+     * Constructs a new A2AClientImpl with the specified CardResolver.
+     * 
+     * @param cardResolver The CardResolver to use for resolving agent cards.
+     */
+    public DefaultA2aClient(CardResolver cardResolver) {
+        this.cardResolver = cardResolver;
+        this.agentCard = this.retrieveAgentCard();
+        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
+    }
+    
     /**
      * Constructs a new A2AClientImpl with the specified CardResolver.
      *
      * @param cardResolver The CardResolver to use for resolving agent cards.
      * @param agentCard The agent card info.
      */
-    public A2AClientImpl(AgentCard agentCard, CardResolver cardResolver) {
+    public DefaultA2aClient(AgentCard agentCard, CardResolver cardResolver) {
         this.agentCard = agentCard;
         this.cardResolver = cardResolver;
-        this.url = agentCard.getUrl();
+        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
     }
 
     @Override
@@ -75,10 +86,8 @@ public class A2AClientImpl implements A2AClient {
 
     @Override
     public AgentCard retrieveAgentCard() {
-        log.info("Sending retrieve agent card to {}", this.url);
-        AgentCard card = cardResolver.resolveCard(this.url);
+        AgentCard card = cardResolver.resolveCard();
         this.agentCard = card;
-        this.url = card.getUrl();
         return card;
     }
 
@@ -90,8 +99,7 @@ public class A2AClientImpl implements A2AClient {
      */
     @Override
     public Task sendMessage(MessageSendParams taskSendParams) {
-        log.info("Sending message to {} with params: {}", this.url, taskSendParams);
-        HttpClient client = HttpClient.create().baseUrl(this.url);
+        log.info("Sending message to {} with params: {}", this.agentCard.getName(), taskSendParams);
         try {
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
                     .method("message/send")
@@ -125,15 +133,14 @@ public class A2AClientImpl implements A2AClient {
             }
             return null;
         } catch (Exception e) {
-            log.error("Error sending message to {}: {}", this.url, e.getMessage(), e);
+            log.error("Error sending message to {}: {}", this.agentCard.getName(), e.getMessage(), e);
             return null; 
         }
     }
 
     @Override
     public Flux<SendStreamingMessageResponse> sendMessageStream(MessageSendParams params) {
-        log.info("Send stream message for {} from {}", params, this.url);
-        HttpClient client = HttpClient.create().baseUrl(this.url);
+        log.info("Send stream message for {} from {}", params, this.agentCard.getName());
         
         JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
                 .method("message/stream")
@@ -159,8 +166,7 @@ public class A2AClientImpl implements A2AClient {
      */
     @Override
     public Task getTask(TaskQueryParams queryParams) {
-        log.info("Getting task {} from {}", queryParams, this.url);
-        HttpClient client = HttpClient.create().baseUrl(this.url);
+        log.info("Getting task {} from {}", queryParams, this.agentCard.getName());
         try {
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
                     .method("tasks/get")
@@ -194,15 +200,14 @@ public class A2AClientImpl implements A2AClient {
             }
             return null;
         } catch (Exception e) {
-            log.error("Error getting task {} from {}: {}", queryParams, this.url, e.getMessage(), e);
+            log.error("Error getting task {} from {}: {}", queryParams, this.agentCard.getName(), e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public Task cancelTask(TaskIdParams params) {
-        log.info("Cancelling task {} on {}", params, this.url);
-        HttpClient client = HttpClient.create().baseUrl(this.url);
+        log.info("Cancelling task {} on {}", params, this.agentCard.getName());
         try {
             // 构建JSON-RPC请求
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
@@ -237,15 +242,14 @@ public class A2AClientImpl implements A2AClient {
             }
             return null;
         } catch (Exception e) {
-            log.error("Error cancelling task {} on {}: {}", params, this.url, e.getMessage(), e);
+            log.error("Error cancelling task {} on {}: {}", params, this.agentCard.getName(), e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public TaskPushNotificationConfig setTaskPushNotification(TaskPushNotificationConfig params) {
-        log.info("Setting push notification config for task {} on {}", params.getTaskId(), this.url);
-        HttpClient client = HttpClient.create().baseUrl(this.url);
+        log.info("Setting push notification config for task {} on {}", params.getTaskId(), this.agentCard.getName());
         try {
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
                     .method("tasks/pushNotificationConfig/set")
@@ -277,15 +281,14 @@ public class A2AClientImpl implements A2AClient {
             }
             return null;
         } catch (Exception e) {
-            log.error("Error setting push notification config for task {} on {}: {}", params.getTaskId(), this.url, e.getMessage(), e);
+            log.error("Error setting push notification config for task {} on {}: {}", params.getTaskId(), this.agentCard.getName(), e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public TaskPushNotificationConfig getTaskPushNotification(TaskIdParams params) {
-        log.info("Getting push notification config for task {} from {}", params.getId(), this.url);
-        HttpClient client = HttpClient.create().baseUrl(this.url);
+        log.info("Getting push notification config for task {} from {}", params.getId(), this.agentCard.getName());
         try {
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
                     .method("tasks/pushNotificationConfig/get")
@@ -317,15 +320,14 @@ public class A2AClientImpl implements A2AClient {
             }
             return null;
         } catch (Exception e) {
-            log.error("Error getting push notification config for task {} from {}: {}", params.getId(), this.url, e.getMessage(), e);
+            log.error("Error getting push notification config for task {} from {}: {}", params.getId(), this.agentCard.getName(), e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public Flux<SendStreamingMessageResponse> resubscribeTask(TaskQueryParams params) {
-        log.info("Resubscribing to task updates for {} from {}", params.getTaskId(), this.url);
-        HttpClient client = HttpClient.create().baseUrl(this.url);
+        log.info("Resubscribing to task updates for {} from {}", params.getTaskId(), this.agentCard.getName());
         
         JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
                 .method("tasks/resubscribe")

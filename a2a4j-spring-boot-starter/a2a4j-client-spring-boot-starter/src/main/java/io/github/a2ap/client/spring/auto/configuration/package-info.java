@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core.client;
-
-import io.github.a2ap.core.model.AgentCard;
-
 /**
- * Interface for resolving AgentCard information. This is used by the client to discover
- * agent capabilities and endpoints.
+ * Autoconfiguration for A2A Client components.
  */
-public interface CardResolver {
 
-    /**
-     * Resolves the AgentCard for a given agent identifier. The identifier could be a URL,
-     * a DID, or other forms.
-     *
-     * @return AgentCard info.
-     */
-    AgentCard resolveCard();
-
-}
+package io.github.a2ap.client.spring.auto.configuration;
