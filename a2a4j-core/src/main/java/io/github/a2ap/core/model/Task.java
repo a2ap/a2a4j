@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,190 +29,193 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task implements SendMessageResponse, SendStreamingMessageResponse {
 
-	/**
-	 * The unique identifier of the task. Required field.
-	 */
-	@JsonProperty("id")
-	private String id;
+    /**
+     * The unique identifier of the task. Required field.
+     */
+    @JsonProperty("id")
+    private String id;
 
-	/**
-	 * Optional identifier for the session this task belongs to.
-	 */
-	@JsonProperty("contextId")
-	private String contextId;
+    /**
+     * Optional identifier for the session this task belongs to.
+     */
+    @JsonProperty("contextId")
+    private String contextId;
 
-	/**
-	 * The current status of the task.
-	 */
-	@JsonProperty("status")
-	private TaskStatus status;
+    /**
+     * The current status of the task.
+     */
+    @JsonProperty("status")
+    private TaskStatus status;
 
-	/**
-	 * The artifacts of the task.
-	 */
-	@JsonProperty("artifacts")
-	private List<Artifact> artifacts;
+    /**
+     * The artifacts of the task.
+     */
+    @JsonProperty("artifacts")
+    private List<Artifact> artifacts;
 
-	/**
-	 * An optional array of recent messages exchanged within this task, ordered
-	 * chronologically (oldest first). This history is included if requested by the client
-	 * via the `historyLength` parameter in `TaskSendParams` or `TaskQueryParams`.
-	 */
-	@JsonProperty("history")
-	private List<Message> history;
+    /**
+     * An optional array of recent messages exchanged within this task, ordered
+     * chronologically (oldest first). This history is included if requested by the client
+     * via the `historyLength` parameter in `TaskSendParams` or `TaskQueryParams`.
+     */
+    @JsonProperty("history")
+    private List<Message> history;
 
-	/**
-	 * The metadata associated with the task.
-	 */
-	@JsonProperty("metadata")
-	private Map<String, Object> metadata;
+    /**
+     * The metadata associated with the task.
+     */
+    @JsonProperty("metadata")
+    private Map<String, Object> metadata;
 
-	public Task() {
-	}
+    public Task() {
+    }
 
-	public Task(String id, String contextId, TaskStatus status, List<Artifact> artifacts, List<Message> history,
-			Map<String, Object> metadata) {
-		this.id = id;
-		this.contextId = contextId;
-		this.status = status;
-		this.artifacts = artifacts;
-		this.history = history;
-		this.metadata = metadata;
-	}
+    public Task(String id, String contextId, TaskStatus status, List<Artifact> artifacts, List<Message> history,
+                Map<String, Object> metadata) {
+        this.id = id;
+        this.contextId = contextId;
+        this.status = status;
+        this.artifacts = artifacts;
+        this.history = history;
+        this.metadata = metadata;
+    }
 
-	public static TaskBuilder builder() {
-		return new TaskBuilder();
-	}
+    public static TaskBuilder builder() {
+        return new TaskBuilder();
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getContextId() {
-		return contextId;
-	}
+    public String getContextId() {
+        return contextId;
+    }
 
-	public void setContextId(String contextId) {
-		this.contextId = contextId;
-	}
+    public void setContextId(String contextId) {
+        this.contextId = contextId;
+    }
 
-	public TaskStatus getStatus() {
-		return status;
-	}
+    public TaskStatus getStatus() {
+        return status;
+    }
 
-	public void setStatus(TaskStatus status) {
-		this.status = status;
-	}
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
 
-	public List<Artifact> getArtifacts() {
-		return artifacts;
-	}
+    public List<Artifact> getArtifacts() {
+        return artifacts;
+    }
 
-	public void setArtifacts(List<Artifact> artifacts) {
-		this.artifacts = artifacts;
-	}
+    public void setArtifacts(List<Artifact> artifacts) {
+        this.artifacts = artifacts;
+    }
 
-	public List<Message> getHistory() {
-		return history;
-	}
+    public List<Message> getHistory() {
+        return history;
+    }
 
-	public void setHistory(List<Message> history) {
-		this.history = history;
-	}
+    public void setHistory(List<Message> history) {
+        this.history = history;
+    }
 
-	public Map<String, Object> getMetadata() {
-		return metadata;
-	}
+    public Map<String, Object> getMetadata() {
+        return metadata;
+    }
 
-	public void setMetadata(Map<String, Object> metadata) {
-		this.metadata = metadata;
-	}
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		Task task = (Task) o;
-		return Objects.equals(id, task.id) && Objects.equals(contextId, task.contextId)
-				&& Objects.equals(status, task.status) && Objects.equals(artifacts, task.artifacts)
-				&& Objects.equals(history, task.history) && Objects.equals(metadata, task.metadata);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id) && Objects.equals(contextId, task.contextId)
+                && Objects.equals(status, task.status) && Objects.equals(artifacts, task.artifacts)
+                && Objects.equals(history, task.history) && Objects.equals(metadata, task.metadata);
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, contextId, status, artifacts, history, metadata);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, contextId, status, artifacts, history, metadata);
+    }
 
-	@Override
-	public String toString() {
-		return "Task{" + "id='" + id + '\'' + ", contextId='" + contextId + '\'' + ", status=" + status + ", artifacts="
-				+ artifacts + ", history=" + history + ", metadata=" + metadata + '}';
-	}
+    @Override
+    public String toString() {
+        return "Task{" + "id='" + id + '\'' + ", contextId='" + contextId + '\'' + ", status=" + status + ", artifacts="
+                + artifacts + ", history=" + history + ", metadata=" + metadata + '}';
+    }
 
-	public static class TaskBuilder {
+    /**
+     * Builder for creating instances of Task.
+     */
+    public static class TaskBuilder {
 
-		private String id;
+        private String id;
 
-		private String contextId;
+        private String contextId;
 
-		private TaskStatus status;
+        private TaskStatus status;
 
-		private List<Artifact> artifacts;
+        private List<Artifact> artifacts;
 
-		private List<Message> history;
+        private List<Message> history;
 
-		private Map<String, Object> metadata;
+        private Map<String, Object> metadata;
 
-		TaskBuilder() {
-		}
+        TaskBuilder() {
+        }
 
-		public TaskBuilder id(String id) {
-			this.id = id;
-			return this;
-		}
+        public TaskBuilder id(String id) {
+            this.id = id;
+            return this;
+        }
 
-		public TaskBuilder contextId(String contextId) {
-			this.contextId = contextId;
-			return this;
-		}
+        public TaskBuilder contextId(String contextId) {
+            this.contextId = contextId;
+            return this;
+        }
 
-		public TaskBuilder status(TaskStatus status) {
-			this.status = status;
-			return this;
-		}
+        public TaskBuilder status(TaskStatus status) {
+            this.status = status;
+            return this;
+        }
 
-		public TaskBuilder artifacts(List<Artifact> artifacts) {
-			this.artifacts = artifacts;
-			return this;
-		}
+        public TaskBuilder artifacts(List<Artifact> artifacts) {
+            this.artifacts = artifacts;
+            return this;
+        }
 
-		public TaskBuilder history(List<Message> history) {
-			this.history = history;
-			return this;
-		}
+        public TaskBuilder history(List<Message> history) {
+            this.history = history;
+            return this;
+        }
 
-		public TaskBuilder metadata(Map<String, Object> metadata) {
-			this.metadata = metadata;
-			return this;
-		}
+        public TaskBuilder metadata(Map<String, Object> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
 
-		public Task build() {
-			return new Task(id, contextId, status, artifacts, history, metadata);
-		}
+        public Task build() {
+            return new Task(id, contextId, status, artifacts, history, metadata);
+        }
 
-		@Override
-		public String toString() {
-			return "Task.TaskBuilder(id=" + this.id + ", contextId=" + this.contextId + ", status=" + this.status
-					+ ", artifacts=" + this.artifacts + ", history=" + this.history + ", metadata=" + this.metadata
-					+ ")";
-		}
+        @Override
+        public String toString() {
+            return "Task.TaskBuilder(id=" + this.id + ", contextId=" + this.contextId + ", status=" + this.status
+                    + ", artifacts=" + this.artifacts + ", history=" + this.history + ", metadata=" + this.metadata
+                    + ")";
+        }
 
-	}
+    }
 
 }

@@ -27,95 +27,98 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PushNotificationConfig {
 
-	/**
-	 * The URL to send push notifications to. Required field.
-	 */
-	@JsonProperty("url")
-	private String url;
+    /**
+     * The URL to send push notifications to. Required field.
+     */
+    @JsonProperty("url")
+    private String url;
 
-	/**
-	 * The authentication token for push notifications.
-	 */
-	@JsonProperty("auth_token")
-	private String authToken;
+    /**
+     * The authentication token for push notifications.
+     */
+    @JsonProperty("auth_token")
+    private String authToken;
 
-	public PushNotificationConfig() {
-	}
+    public PushNotificationConfig() {
+    }
 
-	public PushNotificationConfig(String url, String authToken) {
-		this.url = url;
-		this.authToken = authToken;
-	}
+    public PushNotificationConfig(String url, String authToken) {
+        this.url = url;
+        this.authToken = authToken;
+    }
 
-	public static PushNotificationConfigBuilder builder() {
-		return new PushNotificationConfigBuilder();
-	}
+    public static PushNotificationConfigBuilder builder() {
+        return new PushNotificationConfigBuilder();
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public String getAuthToken() {
-		return authToken;
-	}
+    public String getAuthToken() {
+        return authToken;
+    }
 
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		PushNotificationConfig that = (PushNotificationConfig) o;
-		return Objects.equals(url, that.url) && Objects.equals(authToken, that.authToken);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        PushNotificationConfig that = (PushNotificationConfig) o;
+        return Objects.equals(url, that.url) && Objects.equals(authToken, that.authToken);
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(url, authToken);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, authToken);
+    }
 
-	@Override
-	public String toString() {
-		return "PushNotificationConfig{" + "url='" + url + '\'' + ", authToken='" + authToken + '\'' + '}';
-	}
+    @Override
+    public String toString() {
+        return "PushNotificationConfig{" + "url='" + url + '\'' + ", authToken='" + authToken + '\'' + '}';
+    }
 
-	public static class PushNotificationConfigBuilder {
+    /**
+     * Builder class for PushNotificationConfig.
+     */
+    public static class PushNotificationConfigBuilder {
 
-		private String url;
+        private String url;
 
-		private String authToken;
+        private String authToken;
 
-		PushNotificationConfigBuilder() {
-		}
+        PushNotificationConfigBuilder() {
+        }
 
-		public PushNotificationConfigBuilder url(String url) {
-			this.url = url;
-			return this;
-		}
+        public PushNotificationConfigBuilder url(String url) {
+            this.url = url;
+            return this;
+        }
 
-		public PushNotificationConfigBuilder authToken(String authToken) {
-			this.authToken = authToken;
-			return this;
-		}
+        public PushNotificationConfigBuilder authToken(String authToken) {
+            this.authToken = authToken;
+            return this;
+        }
 
-		public PushNotificationConfig build() {
-			return new PushNotificationConfig(url, authToken);
-		}
+        public PushNotificationConfig build() {
+            return new PushNotificationConfig(url, authToken);
+        }
 
-		@Override
-		public String toString() {
-			return "PushNotificationConfig.PushNotificationConfigBuilder(url=" + this.url + ", authToken="
-					+ this.authToken + ")";
-		}
+        @Override
+        public String toString() {
+            return "PushNotificationConfig.PushNotificationConfigBuilder(url=" + this.url + ", authToken="
+                    + this.authToken + ")";
+        }
 
-	}
+    }
 
 }

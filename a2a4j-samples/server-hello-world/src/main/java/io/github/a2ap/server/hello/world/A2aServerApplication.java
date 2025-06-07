@@ -43,30 +43,32 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @SpringBootApplication
 public class A2aServerApplication implements WebFluxConfigurer {
 
-	/**
-	 * Main entry point for the A2A server application.
-	 * @param args command line arguments
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(A2aServerApplication.class, args);
-	}
+    /**
+     * Main entry point for the A2A server application.
+     *
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(A2aServerApplication.class, args);
+    }
 
-	/**
-	 * Configures CORS (Cross-Origin Resource Sharing) settings for the WebFlux server.
-	 * This allows the A2A server to accept requests from any origin, which is useful for
-	 * development and testing scenarios.
-	 *
-	 * <p>
-	 * <strong>Note:</strong> In production environments, you should restrict
-	 * {@code allowedOrigins} to specific domains for security reasons.
-	 * @param registry the CORS registry to configure
-	 */
-	@Override
-	public void addCorsMappings(final CorsRegistry registry) {
-		registry.addMapping("/**")
-			.allowedOrigins("*")
-			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-			.allowedHeaders("*");
-	}
+    /**
+     * Configures CORS (Cross-Origin Resource Sharing) settings for the WebFlux server.
+     * This allows the A2A server to accept requests from any origin, which is useful for
+     * development and testing scenarios.
+     *
+     * <p>
+     * <strong>Note:</strong> In production environments, you should restrict
+     * {@code allowedOrigins} to specific domains for security reasons.
+     *
+     * @param registry the CORS registry to configure
+     */
+    @Override
+    public void addCorsMappings(final CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
+    }
 
 }

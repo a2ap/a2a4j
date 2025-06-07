@@ -17,139 +17,25 @@
 package io.github.a2ap.core.server;
 
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
-import io.github.a2ap.core.jsonrpc.JSONRPCResponse;<<<<<<<HEAD
-import io.github.a2ap.core.model.MessageSendParams;
-import io.github.a2ap.core.model.SendMessageResponse;
-import io.github.a2ap.core.model.Task;
-import io.github.a2ap.core.model.TaskIdParams;
-import io.github.a2ap.core.model.TaskPushNotificationConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Flux;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class Dispatcher {
-
-	private static final Logger log = LoggerFactory.getLogger(Dispatcher.class);
-
-	private final A2AServer a2aServer;
-
-	private final ObjectMapper objectMapper;
-
-	public Dispatcher(A2AServer a2aServer, ObjectMapper objectMapper) {
-		this.a2aServer = a2aServer;
-		this.objectMapper = objectMapper;
-	}
-
-	public JSONRPCResponse dispatch(JSONRPCRequest request) {
-		JSONRPCResponse response = new JSONRPCResponse();
-		response.setId(request.getId());
-		String method = request.getMethod();
-		Object params = request.getParams();
-
-		try {
-			switch (method) {
-				case "message/send":
-					MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
-					SendMessageResponse messageResponse = a2aServer.handleMessage(taskSendParams);
-					response.setResult(messageResponse);
-					break;
-				case "tasks/get":
-					TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
-					Task task = a2aServer.getTask(taskIdParamsGet.getId());
-					response.setResult(task);
-					break;
-				case "tasks/cancel":
-					TaskIdParams taskIdParamsCancel = objectMapper.convertValue(params, TaskIdParams.class);
-					Task cancelledTask = a2aServer.cancelTask(taskIdParamsCancel.getId());
-					response.setResult(cancelledTask);
-					break;
-				case "tasks/pushNotificationConfig/set":
-					TaskPushNotificationConfig configToSet = objectMapper.convertValue(params,
-							TaskPushNotificationConfig.class);
-					TaskPushNotificationConfig setResult = a2aServer.setTaskPushNotification(configToSet);
-					response.setResult(setResult);
-					break;
-				case "tasks/pushNotificationConfig/get":
-					TaskIdParams taskIdParamsGetConfig = objectMapper.convertValue(params, TaskIdParams.class);
-					TaskPushNotificationConfig getConfigResult = a2aServer
-						.getTaskPushNotification(taskIdParamsGetConfig.getId());
-					response.setResult(getConfigResult);
-					break;
-				default:
-					log.warn("Unsupported method: {}", method);
-					response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
-							"Method '" + method + "' not supported"));
-					break;
-			}
-		}
-		catch (IllegalArgumentException e) {
-			response.setError(new JSONRPCError(JSONRPCError.INVALID_PARAMS, "Invalid params", e.getMessage()));
-		}
-		catch (Exception e) {
-			response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
-			log.error("Internal error processing method {}.", method, e);
-		}
-		return response;
-	}
-
-	public Flux<JSONRPCResponse> dispatchStream(JSONRPCRequest request) {
-		JSONRPCResponse response = new JSONRPCResponse();
-		response.setId(request.getId());
-		String method = request.getMethod();
-		Object params = request.getParams();
-
-		try {
-			switch (method) {
-				case "message/stream":
-					MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
-					return a2aServer.handleMessageStream(taskSendParams).map(event -> {
-						response.setResult(event);
-						return response;
-					});
-				case "tasks/resubscribe":
-					TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
-					return a2aServer.subscribeToTaskUpdates(taskIdParamsGet.getId()).map(event -> {
-						response.setResult(event);
-						return response;
-					});
-				default:
-					log.warn("Unsupported method: {}", method);
-					response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
-							"Method '" + method + "' not supported"));
-					break;
-			}
-		}
-		catch (IllegalArgumentException e) {
-			response.setError(new JSONRPCError(JSONRPCError.INVALID_REQUEST, "Invalid params", e.getMessage()));
-		}
-		catch (Exception e) {
-			response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
-			log.error("Internal error processing method {}.", method, e);
-		}
-		return Flux.just(response);
-	}
-
-}=======
+import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import reactor.core.publisher.Flux;
 
 /**
- * Interface for dispatching JSON-RPC requests to appropriate handlers. The Dispatcher is
- * responsible for routing incoming JSON-RPC requests to the correct method handlers and
- * managing both synchronous and streaming responses.
+ * Interface for dispatching JSON-RPC requests to appropriate handlers.
+ * The Dispatcher is responsible for routing incoming JSON-RPC requests to the
+ * correct method handlers and managing both synchronous and streaming responses.
  */
 public interface Dispatcher {
 
-	/**
-	 * Dispatches a JSON-RPC request for synchronous processing.
-	 * @param request The JSON-RPC request to be processed
-	 * @return A JSON-RPC response containing the result or error
-	 */
-	JSONRPCResponse dispatch(JSONRPCRequest request);
+    /**
+     * Dispatches a JSON-RPC request for synchronous processing.
+     *
+     * @param request The JSON-RPC request to be processed
+     * @return A JSON-RPC response containing the result or error
+     */
+    JSONRPCResponse dispatch(JSONRPCRequest request);
 
-	/**
+    /**
      * Dispatches a JSON-RPC request for streaming/asynchronous processing.
      * This method is used for operations that return multiple responses over time,
      * such as streaming updates or event subscriptions.
@@ -158,5 +44,4 @@ public interface Dispatcher {
      * @return A Flux of JSON-RPC responses for streaming results
      */
     Flux<JSONRPCResponse> dispatchStream(JSONRPCRequest request);
-
-}>>>>>>>origin/main
+}

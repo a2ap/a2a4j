@@ -27,91 +27,94 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Event queue for A2A responses from agent. Acts as a buffer between the agent's
- * asynchronous execution and the server's response handling (e.g., streaming via SSE).
- * Supports tapping to create child queues that receive the same events. This is the Java
- * equivalent of Python's EventQueue using Reactor's Sinks.Many.
+ * Event queue for A2A responses from agent.
+ * Acts as a buffer between the agent's asynchronous execution and the
+ * server's response handling (e.g., streaming via SSE). Supports tapping
+ * to create child queues that receive the same events.
+ * This is the Java equivalent of Python's EventQueue using Reactor's Sinks.Many.
  */
 public class EventQueue {
 
-	private static final Logger log = LoggerFactory.getLogger(EventQueue.class);
+    private static final Logger log = LoggerFactory.getLogger(EventQueue.class);
 
-	private final Sinks.Many<SendStreamingMessageResponse> sink;
+    private final Sinks.Many<SendStreamingMessageResponse> sink;
+    private final List<EventQueue> children = new CopyOnWriteArrayList<>();
+    private final AtomicBoolean isClosed = new AtomicBoolean(false);
 
-	private final List<EventQueue> children = new CopyOnWriteArrayList<>();
+    public EventQueue() {
+        this.sink = Sinks.many().multicast().onBackpressureBuffer();
+        log.debug("EventQueue initialized.");
+    }
 
-	private final AtomicBoolean isClosed = new AtomicBoolean(false);
+    /**
+     * Enqueues an event to this queue and all its children.
+     *
+     * @param event The event object to enqueue.
+     */
+    public void enqueueEvent(SendStreamingMessageResponse event) {
+        if (isClosed.get()) {
+            log.warn("Queue is closed. Event will not be enqueued.");
+            return;
+        }
 
-	public EventQueue() {
-		this.sink = Sinks.many().multicast().onBackpressureBuffer();
-		log.debug("EventQueue initialized.");
-	}
+        log.debug("Enqueuing event of type: {}", event.getClass().getSimpleName());
 
-	/**
-	 * Enqueues an event to this queue and all its children.
-	 * @param event The event object to enqueue.
-	 */
-	public void enqueueEvent(SendStreamingMessageResponse event) {
-		if (isClosed.get()) {
-			log.warn("Queue is closed. Event will not be enqueued.");
-			return;
-		}
+        Sinks.EmitResult result = sink.tryEmitNext(event);
+        if (result.isFailure()) {
+            log.warn("Failed to enqueue event: {}", result);
+        }
 
-		log.debug("Enqueuing event of type: {}", event.getClass().getSimpleName());
+        // Propagate to children
+        for (EventQueue child : children) {
+            child.enqueueEvent(event);
+        }
+    }
 
-		Sinks.EmitResult result = sink.tryEmitNext(event);
-		if (result.isFailure()) {
-			log.warn("Failed to enqueue event: {}", result);
-		}
+    /**
+     * Returns a Flux that emits events from this queue.
+     *
+     * @return A Flux of events from the queue.
+     */
+    public Flux<SendStreamingMessageResponse> asFlux() {
+        return sink.asFlux();
+    }
 
-		// Propagate to children
-		for (EventQueue child : children) {
-			child.enqueueEvent(event);
-		}
-	}
+    /**
+     * Taps the event queue to create a new child queue that receives all future events.
+     *
+     * @return A new EventQueue instance that will receive all events enqueued
+     * to this parent queue from this point forward.
+     */
+    public EventQueue tap() {
+        log.debug("Tapping EventQueue to create a child queue.");
+        EventQueue childQueue = new EventQueue();
+        children.add(childQueue);
+        return childQueue;
+    }
 
-	/**
-	 * Returns a Flux that emits events from this queue.
-	 * @return A Flux of events from the queue.
-	 */
-	public Flux<SendStreamingMessageResponse> asFlux() {
-		return sink.asFlux();
-	}
+    /**
+     * Closes the queue for future push events.
+     * Once closed, the underlying Flux will complete.
+     * Also closes all child queues.
+     */
+    public void close() {
+        if (isClosed.compareAndSet(false, true)) {
+            log.debug("Closing EventQueue.");
+            sink.tryEmitComplete();
 
-	/**
-	 * Taps the event queue to create a new child queue that receives all future events.
-	 * @return A new EventQueue instance that will receive all events enqueued to this
-	 * parent queue from this point forward.
-	 */
-	public EventQueue tap() {
-		log.debug("Tapping EventQueue to create a child queue.");
-		EventQueue childQueue = new EventQueue();
-		children.add(childQueue);
-		return childQueue;
-	}
+            // Close all child queues
+            for (EventQueue child : children) {
+                child.close();
+            }
+        }
+    }
 
-	/**
-	 * Closes the queue for future push events. Once closed, the underlying Flux will
-	 * complete. Also closes all child queues.
-	 */
-	public void close() {
-		if (isClosed.compareAndSet(false, true)) {
-			log.debug("Closing EventQueue.");
-			sink.tryEmitComplete();
-
-			// Close all child queues
-			for (EventQueue child : children) {
-				child.close();
-			}
-		}
-	}
-
-	/**
-	 * Checks if the queue is closed.
-	 * @return true if the queue is closed, false otherwise.
-	 */
-	public boolean isClosed() {
-		return isClosed.get();
-	}
-
+    /**
+     * Checks if the queue is closed.
+     *
+     * @return true if the queue is closed, false otherwise.
+     */
+    public boolean isClosed() {
+        return isClosed.get();
+    }
 }

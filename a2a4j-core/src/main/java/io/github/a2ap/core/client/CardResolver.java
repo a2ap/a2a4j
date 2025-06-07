@@ -24,12 +24,13 @@ import io.github.a2ap.core.model.AgentCard;
  */
 public interface CardResolver {
 
-	/**
-	 * Resolves the AgentCard for a given agent identifier. The identifier could be a URL,
-	 * a DID, or other forms.
-	 * @param agentIdentifier The identifier of the agent.
-	 * @return AgentCard info.
-	 */
-	AgentCard resolveCard(String agentIdentifier);
+    /**
+     * Resolves the AgentCard for a given agent identifier. The identifier could be a URL,
+     * a DID, or other forms.
+     *
+     * @param agentIdentifier The identifier of the agent.
+     * @return AgentCard info.
+     */
+    AgentCard resolveCard(String agentIdentifier);
 
 }

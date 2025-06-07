@@ -21,8 +21,8 @@ package io.github.a2ap.core.server;
  */
 public class TaskQueueExistsException extends Exception {
 
-	public TaskQueueExistsException(String message) {
-		super(message);
-	}
+    public TaskQueueExistsException(String message) {
+        super(message);
+    }
 
 }

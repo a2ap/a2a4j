@@ -27,11 +27,12 @@ import reactor.core.publisher.Flux;
  */
 public interface TaskHandler {
 
-	/**
-	 * Handles a task based on the provided context.
-	 * @param context The context for the task handling.
-	 * @return A Flux of updated Task TaskUpdate objects.
-	 */
-	Flux<TaskUpdate> handle(RequestContext context);
+    /**
+     * Handles a task based on the provided context.
+     *
+     * @param context The context for the task handling.
+     * @return A Flux of updated Task TaskUpdate objects.
+     */
+    Flux<TaskUpdate> handle(RequestContext context);
 
 }

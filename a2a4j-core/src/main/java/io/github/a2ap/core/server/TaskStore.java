@@ -24,18 +24,20 @@ import io.github.a2ap.core.model.Task;
  */
 public interface TaskStore {
 
-	/**
-	 * Saves a task and its associated message history. Overwrites existing data if the
-	 * task ID exists.
-	 * @param taskContext The task context object to save.
-	 */
-	void save(Task task);
+    /**
+     * Saves a task and its associated message history. Overwrites existing data if the
+     * task ID exists.
+     *
+     * @param task The task context object to save.
+     */
+    void save(Task task);
 
-	/**
-	 * Loads a task and its history by task ID.
-	 * @param taskId The ID of the task to load.
-	 * @return an object containing the Task and its history, or null if not found.
-	 */
-	Task load(String taskId);
+    /**
+     * Loads a task and its history by task ID.
+     *
+     * @param taskId The ID of the task to load.
+     * @return an object containing the Task and its history, or null if not found.
+     */
+    Task load(String taskId);
 
 }

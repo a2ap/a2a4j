@@ -25,11 +25,6 @@ build: ## Build the project
 	@$(LOG_TARGET)
 	mvn -B package --file pom.xml -DskipTests=true
 
-.PHONY: format-fix
-format-fix: ## Format the code
-	@$(LOG_TARGET)
-	mvn spring-javaformat:apply
-
 .PHONY: format-check
 format-check: ## Format Check the code
 	@$(LOG_TARGET)
