@@ -40,12 +40,13 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
 /**
- * Auto-configuration for A2A Server components.
- * 
- * This configuration class automatically sets up all the necessary beans for running
- * an A2A server when the starter is included in a Spring Boot application.
- * 
- * <p>The configuration provides default implementations for all core A2A server components:
+ * Autoconfiguration for A2A Server components.
+ * <p>
+ * This configuration class automatically sets up all the necessary beans for running an
+ * A2A server when the starter is included in a Spring Boot application.
+ *
+ * <p>
+ * The configuration provides default implementations for all core A2A server components:
  * <ul>
  * <li>{@link QueueManager} - Manages event queues for tasks</li>
  * <li>{@link TaskStore} - Stores task data and history</li>
@@ -55,10 +56,11 @@ import reactor.core.publisher.Mono;
  * <li>{@link A2AServer} - Main server implementation</li>
  * <li>{@link AgentCard} - Agent metadata and capabilities</li>
  * </ul>
- * 
- * <p>All beans are created with {@link ConditionalOnMissingBean} annotation,
- * allowing users to override any component by providing their own implementation.
- * 
+ *
+ * <p>
+ * All beans are created with {@link ConditionalOnMissingBean} annotation, allowing users
+ * to override any component by providing their own implementation.
+ *
  * @see A2aServerProperties
  * @see A2AServer
  */
@@ -68,10 +70,10 @@ import reactor.core.publisher.Mono;
 public class A2aServerAutoConfiguration {
 
     /**
-     * Creates a default in-memory queue manager for managing task event queues.
-     * This implementation stores queues in memory and is suitable for development
-     * and single-instance deployments.
-     * 
+     * Creates a default in-memory queue manager for managing task event queues. This
+     * implementation stores queues in memory and is suitable for development and
+     * single-instance deployments.
+     *
      * @return A new InMemoryQueueManager instance
      */
     @Bean
@@ -81,10 +83,10 @@ public class A2aServerAutoConfiguration {
     }
 
     /**
-     * Creates a default in-memory task store for persisting task data.
-     * This implementation stores tasks in memory and is suitable for development
-     * and testing. For production use, consider providing a persistent implementation.
-     * 
+     * Creates a default in-memory task store for persisting task data. This
+     * implementation stores tasks in memory and is suitable for development and testing.
+     * For production use, consider providing a persistent implementation.
+     *
      * @return A new InMemoryTaskStore instance
      */
     @Bean
@@ -94,9 +96,9 @@ public class A2aServerAutoConfiguration {
     }
 
     /**
-     * Creates a default task manager for handling task lifecycle operations.
-     * The task manager uses the provided task store for persistence.
-     * 
+     * Creates a default task manager for handling task lifecycle operations. The task
+     * manager uses the provided task store for persistence.
+     *
      * @param taskStore The task store to use for task persistence
      * @return A new InMemoryTaskManager instance
      */
@@ -105,11 +107,11 @@ public class A2aServerAutoConfiguration {
     public TaskManager taskManager(TaskStore taskStore) {
         return new InMemoryTaskManager(taskStore);
     }
-    
+
     /**
-     * Creates a default Jackson ObjectMapper for JSON serialization/deserialization.
-     * This is used by the dispatcher for converting JSON-RPC parameters.
-     * 
+     * Creates a default Jackson ObjectMapper for JSON serialization/deserialization. This
+     * is used by the dispatcher for converting JSON-RPC parameters.
+     *
      * @return A new ObjectMapper instance with default configuration
      */
     @Bean
@@ -117,12 +119,12 @@ public class A2aServerAutoConfiguration {
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
-    
+
     /**
      * Creates a default dispatcher for routing JSON-RPC requests to appropriate handlers.
      * The dispatcher handles both synchronous and streaming requests.
-     * 
-     * @param a2aServer The A2A server to delegate operations to
+     *
+     * @param a2aServer    The A2A server to delegate operations to
      * @param objectMapper The ObjectMapper for parameter conversion
      * @return A new DefaultDispatcher instance
      */
@@ -131,15 +133,16 @@ public class A2aServerAutoConfiguration {
     public Dispatcher dispatcher(A2AServer a2aServer, ObjectMapper objectMapper) {
         return new DefaultDispatcher(a2aServer, objectMapper);
     }
-    
+
     /**
-     * Creates a default no-op agent executor.
-     * This implementation immediately closes the event queue and returns empty results.
-     * 
-     * <p><strong>Important:</strong> This is a placeholder implementation.
-     * Production applications should provide their own {@link AgentExecutor}
-     * implementation that contains the actual agent logic.
-     * 
+     * Creates a default no-op agent executor. This implementation immediately closes the
+     * event queue and returns empty results.
+     *
+     * <p>
+     * <strong>Important:</strong> This is a placeholder implementation. Production
+     * applications should provide their own {@link AgentExecutor} implementation that
+     * contains the actual agent logic.
+     *
      * @return A no-op AgentExecutor implementation
      */
     @Bean
@@ -160,9 +163,9 @@ public class A2aServerAutoConfiguration {
     }
 
     /**
-     * Creates an agent card based on configuration properties.
-     * The agent card contains metadata about the agent's capabilities and endpoints.
-     * 
+     * Creates an agent card based on configuration properties. The agent card contains
+     * metadata about the agent's capabilities and endpoints.
+     *
      * @param a2aServerProperties The configuration properties for the A2A server
      * @return An AgentCard configured with the provided properties
      */
@@ -181,20 +184,22 @@ public class A2aServerAutoConfiguration {
                         .build())
                 .build();
     }
-    
+
     /**
-     * Creates the main A2A server implementation.
-     * This server orchestrates all the components to provide complete A2A protocol support.
-     * 
-     * @param taskManager The task manager for handling task operations
+     * Creates the main A2A server implementation. This server orchestrates all the
+     * components to provide complete A2A protocol support.
+     *
+     * @param taskManager   The task manager for handling task operations
      * @param agentExecutor The agent executor containing the core logic
-     * @param queueManager The queue manager for event handling
-     * @param agentCard The agent card with server metadata
+     * @param queueManager  The queue manager for event handling
+     * @param agentCard     The agent card with server metadata
      * @return A new DefaultA2AServer instance
      */
     @Bean
     @ConditionalOnMissingBean
-    public A2AServer a2AServer(TaskManager taskManager, AgentExecutor agentExecutor, QueueManager queueManager, AgentCard agentCard) {
+    public A2AServer a2AServer(TaskManager taskManager, AgentExecutor agentExecutor, QueueManager queueManager,
+                               AgentCard agentCard) {
         return new DefaultA2AServer(taskManager, agentExecutor, queueManager, agentCard);
     }
-} 
+
+}

@@ -25,6 +25,7 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentCapabilities {
+
     /**
      * Indicates if the agent supports streaming responses.
      */
@@ -84,9 +85,8 @@ public class AgentCapabilities {
         if (o == null || getClass() != o.getClass())
             return false;
         AgentCapabilities that = (AgentCapabilities) o;
-        return streaming == that.streaming &&
-                pushNotifications == that.pushNotifications &&
-                stateTransitionHistory == that.stateTransitionHistory;
+        return streaming == that.streaming && pushNotifications == that.pushNotifications
+                && stateTransitionHistory == that.stateTransitionHistory;
     }
 
     @Override
@@ -96,16 +96,19 @@ public class AgentCapabilities {
 
     @Override
     public String toString() {
-        return "AgentCapabilities{" +
-                "streaming=" + streaming +
-                ", pushNotifications=" + pushNotifications +
-                ", stateTransitionHistory=" + stateTransitionHistory +
-                '}';
+        return "AgentCapabilities{" + "streaming=" + streaming + ", pushNotifications=" + pushNotifications
+                + ", stateTransitionHistory=" + stateTransitionHistory + '}';
     }
 
+    /**
+     * Builder for {@link AgentCapabilities}
+     */
     public static class AgentCapabilitiesBuilder {
+
         private boolean streaming = false;
+
         private boolean pushNotifications = false;
+
         private boolean stateTransitionHistory = false;
 
         AgentCapabilitiesBuilder() {
@@ -131,9 +134,10 @@ public class AgentCapabilities {
         }
 
         public String toString() {
-            return "AgentCapabilities.AgentCapabilitiesBuilder(streaming=" + this.streaming +
-                    ", pushNotifications=" + this.pushNotifications +
-                    ", stateTransitionHistory=" + this.stateTransitionHistory + ")";
+            return "AgentCapabilities.AgentCapabilitiesBuilder(streaming=" + this.streaming + ", pushNotifications="
+                    + this.pushNotifications + ", stateTransitionHistory=" + this.stateTransitionHistory + ")";
         }
+
     }
+
 }

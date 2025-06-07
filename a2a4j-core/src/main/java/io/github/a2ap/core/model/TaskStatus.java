@@ -38,8 +38,7 @@ public class TaskStatus implements TaskUpdate {
     public static final TaskStatus CANCELLED = TaskStatus.builder().state(TaskState.CANCELED).build();
 
     /**
-     * The state of the task.
-     * Required field.
+     * The state of the task. Required field.
      */
     @JsonProperty("state")
     private TaskState state;
@@ -115,10 +114,8 @@ public class TaskStatus implements TaskUpdate {
         if (o == null || getClass() != o.getClass())
             return false;
         TaskStatus that = (TaskStatus) o;
-        return state == that.state &&
-                Objects.equals(message, that.message) &&
-                Objects.equals(timestamp, that.timestamp) &&
-                Objects.equals(error, that.error);
+        return state == that.state && Objects.equals(message, that.message) && Objects.equals(timestamp, that.timestamp)
+                && Objects.equals(error, that.error);
     }
 
     @Override
@@ -128,18 +125,21 @@ public class TaskStatus implements TaskUpdate {
 
     @Override
     public String toString() {
-        return "TaskStatus{" +
-                "state=" + state +
-                ", message=" + message +
-                ", timestamp='" + timestamp + '\'' +
-                ", error='" + error + '\'' +
-                '}';
+        return "TaskStatus{" + "state=" + state + ", message=" + message + ", timestamp='" + timestamp + '\''
+                + ", error='" + error + '\'' + '}';
     }
 
+    /**
+     * Builder for creating instances of TaskStatus.
+     */
     public static class TaskStatusBuilder {
+
         private TaskState state;
+
         private Message message;
+
         private String timestamp;
+
         private String error;
 
         TaskStatusBuilder() {
@@ -165,16 +165,19 @@ public class TaskStatus implements TaskUpdate {
             return this;
         }
 
+        /**
+         * Builds a TaskStatus instance with the provided values.
+         */
         public TaskStatus build() {
             return new TaskStatus(state, message, timestamp, error);
         }
 
         @Override
         public String toString() {
-            return "TaskStatus.TaskStatusBuilder(state=" + this.state +
-                    ", message=" + this.message +
-                    ", timestamp=" + this.timestamp +
-                    ", error=" + this.error + ")";
+            return "TaskStatus.TaskStatusBuilder(state=" + this.state + ", message=" + this.message + ", timestamp="
+                    + this.timestamp + ", error=" + this.error + ")";
         }
+
     }
+
 }

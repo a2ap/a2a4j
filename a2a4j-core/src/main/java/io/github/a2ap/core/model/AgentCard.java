@@ -28,6 +28,7 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentCard {
+
     /**
      * The unique identifier of the agent.
      */
@@ -88,8 +89,8 @@ public class AgentCard {
     private List<Map<String, List<String>>> security;
 
     /**
-     * Default input modes supported by the agent (e.g., 'text', 'file', 'json').
-     * Defaults to ["text"] if not specified.
+     * Default input modes supported by the agent (e.g., 'text', 'file', 'json'). Defaults
+     * to ["text"] if not specified.
      */
     private List<String> defaultInputModes = List.of("text");
 
@@ -108,11 +109,10 @@ public class AgentCard {
     public AgentCard() {
     }
 
-    public AgentCard(String id, String name, String description, String url, AgentProvider provider,
-            String version, String documentationUrl, AgentCapabilities capabilities,
-            AgentAuthentication authentication, Map<String, SecurityScheme> securitySchemes,
-            List<Map<String, List<String>>> security, List<String> defaultInputModes,
-            List<String> defaultOutputModes, List<AgentSkill> skills) {
+    public AgentCard(String id, String name, String description, String url, AgentProvider provider, String version,
+                     String documentationUrl, AgentCapabilities capabilities, AgentAuthentication authentication,
+                     Map<String, SecurityScheme> securitySchemes, List<Map<String, List<String>>> security,
+                     List<String> defaultInputModes, List<String> defaultOutputModes, List<AgentSkill> skills) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -252,63 +252,66 @@ public class AgentCard {
         if (o == null || getClass() != o.getClass())
             return false;
         AgentCard agentCard = (AgentCard) o;
-        return Objects.equals(id, agentCard.id) &&
-                Objects.equals(name, agentCard.name) &&
-                Objects.equals(description, agentCard.description) &&
-                Objects.equals(url, agentCard.url) &&
-                Objects.equals(provider, agentCard.provider) &&
-                Objects.equals(version, agentCard.version) &&
-                Objects.equals(documentationUrl, agentCard.documentationUrl) &&
-                Objects.equals(capabilities, agentCard.capabilities) &&
-                Objects.equals(authentication, agentCard.authentication) &&
-                Objects.equals(securitySchemes, agentCard.securitySchemes) &&
-                Objects.equals(security, agentCard.security) &&
-                Objects.equals(defaultInputModes, agentCard.defaultInputModes) &&
-                Objects.equals(defaultOutputModes, agentCard.defaultOutputModes) &&
-                Objects.equals(skills, agentCard.skills);
+        return Objects.equals(id, agentCard.id) && Objects.equals(name, agentCard.name)
+                && Objects.equals(description, agentCard.description) && Objects.equals(url, agentCard.url)
+                && Objects.equals(provider, agentCard.provider) && Objects.equals(version, agentCard.version)
+                && Objects.equals(documentationUrl, agentCard.documentationUrl)
+                && Objects.equals(capabilities, agentCard.capabilities)
+                && Objects.equals(authentication, agentCard.authentication)
+                && Objects.equals(securitySchemes, agentCard.securitySchemes)
+                && Objects.equals(security, agentCard.security)
+                && Objects.equals(defaultInputModes, agentCard.defaultInputModes)
+                && Objects.equals(defaultOutputModes, agentCard.defaultOutputModes)
+                && Objects.equals(skills, agentCard.skills);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, url, provider, version, documentationUrl,
-                capabilities, authentication, securitySchemes, security,
-                defaultInputModes, defaultOutputModes, skills);
+        return Objects.hash(id, name, description, url, provider, version, documentationUrl, capabilities,
+                authentication, securitySchemes, security, defaultInputModes, defaultOutputModes, skills);
     }
 
     @Override
     public String toString() {
-        return "AgentCard{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", url='" + url + '\'' +
-                ", provider=" + provider +
-                ", version='" + version + '\'' +
-                ", documentationUrl='" + documentationUrl + '\'' +
-                ", capabilities=" + capabilities +
-                ", authentication=" + authentication +
-                ", securitySchemes=" + securitySchemes +
-                ", security=" + security +
-                ", defaultInputModes=" + defaultInputModes +
-                ", defaultOutputModes=" + defaultOutputModes +
-                ", skills=" + skills +
-                '}';
+        return "AgentCard{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\''
+                + ", url='" + url + '\'' + ", provider=" + provider + ", version='" + version + '\''
+                + ", documentationUrl='" + documentationUrl + '\'' + ", capabilities=" + capabilities
+                + ", authentication=" + authentication + ", securitySchemes=" + securitySchemes + ", security="
+                + security + ", defaultInputModes=" + defaultInputModes + ", defaultOutputModes=" + defaultOutputModes
+                + ", skills=" + skills + '}';
     }
 
+    /**
+     * Builder class for creating instances of {@link AgentCard}.
+     */
     public static class AgentCardBuilder {
+
         private String id;
+
         private String name;
+
         private String description;
+
         private String url;
+
         private AgentProvider provider;
+
         private String version;
+
         private String documentationUrl;
+
         private AgentCapabilities capabilities;
+
         private AgentAuthentication authentication;
+
         private Map<String, SecurityScheme> securitySchemes;
+
         private List<Map<String, List<String>>> security;
+
         private List<String> defaultInputModes = List.of("text");
+
         private List<String> defaultOutputModes = List.of("text");
+
         private List<AgentSkill> skills;
 
         AgentCardBuilder() {
@@ -385,20 +388,21 @@ public class AgentCard {
         }
 
         public AgentCard build() {
-            return new AgentCard(id, name, description, url, provider, version, documentationUrl,
-                    capabilities, authentication, securitySchemes, security,
-                    defaultInputModes, defaultOutputModes, skills);
+            return new AgentCard(id, name, description, url, provider, version, documentationUrl, capabilities,
+                    authentication, securitySchemes, security, defaultInputModes, defaultOutputModes, skills);
         }
 
         @Override
         public String toString() {
-            return "AgentCard.AgentCardBuilder(id=" + this.id + ", name=" + this.name +
-                    ", description=" + this.description + ", url=" + this.url +
-                    ", provider=" + this.provider + ", version=" + this.version +
-                    ", documentationUrl=" + this.documentationUrl + ", capabilities=" + this.capabilities +
-                    ", authentication=" + this.authentication + ", securitySchemes=" + this.securitySchemes +
-                    ", security=" + this.security + ", defaultInputModes=" + this.defaultInputModes +
-                    ", defaultOutputModes=" + this.defaultOutputModes + ", skills=" + this.skills + ")";
+            return "AgentCard.AgentCardBuilder(id=" + this.id + ", name=" + this.name + ", description="
+                    + this.description + ", url=" + this.url + ", provider=" + this.provider + ", version="
+                    + this.version + ", documentationUrl=" + this.documentationUrl + ", capabilities="
+                    + this.capabilities + ", authentication=" + this.authentication + ", securitySchemes="
+                    + this.securitySchemes + ", security=" + this.security + ", defaultInputModes="
+                    + this.defaultInputModes + ", defaultOutputModes=" + this.defaultOutputModes + ", skills="
+                    + this.skills + ")";
         }
+
     }
+
 }

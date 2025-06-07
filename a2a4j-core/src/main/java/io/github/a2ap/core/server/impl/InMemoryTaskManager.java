@@ -30,6 +30,7 @@ import io.github.a2ap.core.model.TaskUpdate;
 import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
 import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
+
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -41,6 +42,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -61,7 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
     public InMemoryTaskManager(TaskStore taskStore) {
         this.taskStore = taskStore;
     }
-    
+
     @Override
     public RequestContext loadOrCreateContext(MessageSendParams params) {
         String taskId = params.getMessage().getTaskId();
@@ -149,15 +151,15 @@ public class InMemoryTaskManager implements TaskManager {
             } else if (taskUpdate instanceof Artifact artifact) {
                 log.info("apply task {} updated with artifact {}", task.getId(), artifact);
                 List<Artifact> artifacts = task.getArtifacts();
-                
+
                 // Initialize artifacts list if it doesn't exist
                 if (artifacts == null) {
                     artifacts = new LinkedList<>();
                     task.setArtifacts(artifacts);
                 }
-                
+
                 String artifactId = artifact.getArtifactId();
-                
+
                 // Find existing artifact with the same ID
                 int existingArtifactIndex = -1;
                 for (int i = 0; i < artifacts.size(); i++) {
@@ -167,7 +169,7 @@ public class InMemoryTaskManager implements TaskManager {
                         break;
                     }
                 }
-                
+
                 // Since we don't have append information from the raw Artifact,
                 // we default to replacing/adding the artifact
                 if (existingArtifactIndex != -1) {
@@ -195,13 +197,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Mono<Task> applyStatusUpdate(Task task, TaskStatusUpdateEvent event) {
         log.info("apply task {} updated with status event {}", task.getId(), event);
-        
+
         TaskStatus taskStatus = event.getStatus();
         if (taskStatus != null) {
             log.info("apply task {} updated with status {}", task.getId(), taskStatus);
             taskStatus.setTimestamp(String.valueOf(Instant.now().toEpochMilli()));
             task.setStatus(taskStatus);
-            
+
             // If the update includes an agent message, add it to history
             if (taskStatus.getMessage() != null && Objects.equals(taskStatus.getMessage().getRole(), "agent")) {
                 List<Message> history = task.getHistory() == null ? new LinkedList<>() : task.getHistory();
@@ -211,32 +213,33 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             log.warn("Received TaskStatusUpdateEvent for task {} but status is null", task.getId());
         }
-        
+
         taskStore.save(task);
         return Mono.just(task);
     }
 
     /**
      * Apply artifact update with append support from TaskArtifactUpdateEvent
-     * @param task The task to update
+     *
+     * @param task  The task to update
      * @param event The TaskArtifactUpdateEvent containing artifact and append information
      * @return Updated task
      */
     public Mono<Task> applyArtifactUpdate(Task task, TaskArtifactUpdateEvent event) {
         log.info("apply task {} updated with artifact event {}", task.getId(), event);
-        
+
         List<Artifact> artifacts = task.getArtifacts();
-        
+
         // Initialize artifacts list if it doesn't exist
         if (artifacts == null) {
             artifacts = new LinkedList<>();
             task.setArtifacts(artifacts);
         }
-        
+
         Artifact newArtifactData = event.getArtifact();
         String artifactId = newArtifactData.getArtifactId();
         boolean appendParts = event.getAppend() != null ? event.getAppend() : false;
-        
+
         // Find existing artifact with the same ID
         Artifact existingArtifact = null;
         int existingArtifactIndex = -1;
@@ -248,7 +251,7 @@ public class InMemoryTaskManager implements TaskManager {
                 break;
             }
         }
-        
+
         if (!appendParts) {
             // This represents the first chunk for this artifact ID.
             if (existingArtifactIndex != -1) {
@@ -271,10 +274,10 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             // We received a chunk to append, but we don't have an existing artifact.
             // we will ignore this chunk
-            log.warn("Received append=true for nonexistent artifact id {} in task {}. Ignoring chunk.", 
+            log.warn("Received append=true for nonexistent artifact id {} in task {}. Ignoring chunk.",
                     artifactId, task.getId());
         }
-        
+
         taskStore.save(task);
         return Mono.just(task);
     }

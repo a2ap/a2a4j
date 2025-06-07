@@ -35,8 +35,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class EventQueue {
 
-   private static final Logger log = LoggerFactory.getLogger(EventQueue.class); 
-    
+    private static final Logger log = LoggerFactory.getLogger(EventQueue.class);
+
     private final Sinks.Many<SendStreamingMessageResponse> sink;
     private final List<EventQueue> children = new CopyOnWriteArrayList<>();
     private final AtomicBoolean isClosed = new AtomicBoolean(false);
@@ -56,7 +56,7 @@ public class EventQueue {
             log.warn("Queue is closed. Event will not be enqueued.");
             return;
         }
-        
+
         log.debug("Enqueuing event of type: {}", event.getClass().getSimpleName());
 
         Sinks.EmitResult result = sink.tryEmitNext(event);
@@ -83,7 +83,7 @@ public class EventQueue {
      * Taps the event queue to create a new child queue that receives all future events.
      *
      * @return A new EventQueue instance that will receive all events enqueued
-     *         to this parent queue from this point forward.
+     * to this parent queue from this point forward.
      */
     public EventQueue tap() {
         log.debug("Tapping EventQueue to create a child queue.");
@@ -117,4 +117,4 @@ public class EventQueue {
     public boolean isClosed() {
         return isClosed.get();
     }
-} 
+}

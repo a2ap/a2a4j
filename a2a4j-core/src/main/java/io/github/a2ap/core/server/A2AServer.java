@@ -32,7 +32,7 @@ public interface A2AServer {
 
     /**
      * Handle send message task.
-     * 
+     *
      * @param params The task params to send
      * @return SendMessageResponse The task or Message
      */
@@ -40,6 +40,7 @@ public interface A2AServer {
 
     /**
      * Handle send task streaming.
+     *
      * @param params The task params to send
      * @return Streaming events
      */
@@ -58,7 +59,7 @@ public interface A2AServer {
      *
      * @param taskId The ID of the task to cancel
      * @return The updated Task object (usually in a cancelled state) or null if not
-     *         found or cancellation failed
+     * found or cancellation failed
      */
     Task cancelTask(String taskId);
 

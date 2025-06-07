@@ -17,6 +17,7 @@
 package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +39,7 @@ public class TaskAndHistory {
 
     /**
      * Constructor with task and history.
-     * 
+     *
      * @param task    the task
      * @param history the message history
      */
@@ -49,7 +50,7 @@ public class TaskAndHistory {
 
     /**
      * Gets the task.
-     * 
+     *
      * @return the task
      */
     public Task getTask() {
@@ -58,7 +59,7 @@ public class TaskAndHistory {
 
     /**
      * Sets the task.
-     * 
+     *
      * @param task the task to set
      */
     public void setTask(Task task) {
@@ -67,7 +68,7 @@ public class TaskAndHistory {
 
     /**
      * Gets the message history.
-     * 
+     *
      * @return the message history
      */
     public List<Message> getHistory() {
@@ -76,7 +77,7 @@ public class TaskAndHistory {
 
     /**
      * Sets the message history.
-     * 
+     *
      * @param history the message history to set
      */
     public void setHistory(List<Message> history) {
@@ -90,8 +91,7 @@ public class TaskAndHistory {
         if (o == null || getClass() != o.getClass())
             return false;
         TaskAndHistory that = (TaskAndHistory) o;
-        return Objects.equals(task, that.task) &&
-                Objects.equals(history, that.history);
+        return Objects.equals(task, that.task) && Objects.equals(history, that.history);
     }
 
     @Override
@@ -101,15 +101,12 @@ public class TaskAndHistory {
 
     @Override
     public String toString() {
-        return "TaskAndHistory{" +
-                "task=" + task +
-                ", history=" + history +
-                '}';
+        return "TaskAndHistory{" + "task=" + task + ", history=" + history + '}';
     }
 
     /**
      * Returns a builder for TaskAndHistory.
-     * 
+     *
      * @return a new builder instance
      */
     public static Builder builder() {
@@ -120,7 +117,9 @@ public class TaskAndHistory {
      * Builder class for TaskAndHistory.
      */
     public static class Builder {
+
         private Task task;
+
         private List<Message> history;
 
         /**
@@ -131,7 +130,7 @@ public class TaskAndHistory {
 
         /**
          * Sets the task.
-         * 
+         *
          * @param task the task
          * @return this builder for chaining
          */
@@ -142,7 +141,7 @@ public class TaskAndHistory {
 
         /**
          * Sets the message history.
-         * 
+         *
          * @param history the message history
          * @return this builder for chaining
          */
@@ -153,11 +152,13 @@ public class TaskAndHistory {
 
         /**
          * Builds a new TaskAndHistory instance.
-         * 
+         *
          * @return the built instance
          */
         public TaskAndHistory build() {
             return new TaskAndHistory(task, history);
         }
+
     }
+
 }

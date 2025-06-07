@@ -17,6 +17,7 @@
 package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -42,10 +43,9 @@ public class RequestContext {
     private MessageSendParams request;
 
     /**
-     * The current state of the task when the handler is invoked or resumed.
-     * Note: This is a snapshot. For the absolute latest state during async
-     * operations,
-     * the handler might need to reload the task via the store.
+     * The current state of the task when the handler is invoked or resumed. Note: This is
+     * a snapshot. For the absolute latest state during async operations, the handler
+     * might need to reload the task via the store.
      */
     private Task task;
 
@@ -57,8 +57,8 @@ public class RequestContext {
     public RequestContext() {
     }
 
-    public RequestContext(String taskId, String contextId, MessageSendParams request,
-            Task task, List<Task> relatedTasks) {
+    public RequestContext(String taskId, String contextId, MessageSendParams request, Task task,
+                          List<Task> relatedTasks) {
         this.taskId = taskId;
         this.contextId = contextId;
         this.request = request;
@@ -117,11 +117,9 @@ public class RequestContext {
         if (o == null || getClass() != o.getClass())
             return false;
         RequestContext that = (RequestContext) o;
-        return Objects.equals(taskId, that.taskId) &&
-                Objects.equals(contextId, that.contextId) &&
-                Objects.equals(request, that.request) &&
-                Objects.equals(task, that.task) &&
-                Objects.equals(relatedTasks, that.relatedTasks);
+        return Objects.equals(taskId, that.taskId) && Objects.equals(contextId, that.contextId)
+                && Objects.equals(request, that.request) && Objects.equals(task, that.task)
+                && Objects.equals(relatedTasks, that.relatedTasks);
     }
 
     @Override
@@ -131,20 +129,23 @@ public class RequestContext {
 
     @Override
     public String toString() {
-        return "RequestContext{" +
-                "taskId='" + taskId + '\'' +
-                ", contextId='" + contextId + '\'' +
-                ", request=" + request +
-                ", task=" + task +
-                ", relatedTasks=" + relatedTasks +
-                '}';
+        return "RequestContext{" + "taskId='" + taskId + '\'' + ", contextId='" + contextId + '\'' + ", request="
+                + request + ", task=" + task + ", relatedTasks=" + relatedTasks + '}';
     }
 
+    /**
+     * Builder for creating instances of RequestContext.
+     */
     public static class RequestContextBuilder {
+
         private String taskId;
+
         private String contextId;
+
         private MessageSendParams request;
+
         private Task task;
+
         private List<Task> relatedTasks;
 
         RequestContextBuilder() {
@@ -175,17 +176,19 @@ public class RequestContext {
             return this;
         }
 
+        /**
+         * Builds the RequestContext instance.
+         */
         public RequestContext build() {
             return new RequestContext(taskId, contextId, request, task, relatedTasks);
         }
 
         @Override
         public String toString() {
-            return "RequestContext.RequestContextBuilder(taskId=" + this.taskId +
-                    ", contextId=" + this.contextId +
-                    ", request=" + this.request +
-                    ", task=" + this.task +
-                    ", relatedTasks=" + this.relatedTasks + ")";
+            return "RequestContext.RequestContextBuilder(taskId=" + this.taskId + ", contextId=" + this.contextId
+                    + ", request=" + this.request + ", task=" + this.task + ", relatedTasks=" + this.relatedTasks + ")";
         }
+
     }
+
 }

@@ -59,8 +59,7 @@ public class SecurityScheme {
     public SecurityScheme() {
     }
 
-    public SecurityScheme(String type, String scheme, String name, String in,
-            String description, String bearerFormat) {
+    public SecurityScheme(String type, String scheme, String name, String in, String description, String bearerFormat) {
         this.type = type;
         this.scheme = scheme;
         this.name = name;
@@ -128,12 +127,9 @@ public class SecurityScheme {
         if (o == null || getClass() != o.getClass())
             return false;
         SecurityScheme that = (SecurityScheme) o;
-        return Objects.equals(type, that.type) &&
-                Objects.equals(scheme, that.scheme) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(in, that.in) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(bearerFormat, that.bearerFormat);
+        return Objects.equals(type, that.type) && Objects.equals(scheme, that.scheme) && Objects.equals(name, that.name)
+                && Objects.equals(in, that.in) && Objects.equals(description, that.description)
+                && Objects.equals(bearerFormat, that.bearerFormat);
     }
 
     @Override
@@ -143,22 +139,26 @@ public class SecurityScheme {
 
     @Override
     public String toString() {
-        return "SecurityScheme{" +
-                "type='" + type + '\'' +
-                ", scheme='" + scheme + '\'' +
-                ", name='" + name + '\'' +
-                ", in='" + in + '\'' +
-                ", description='" + description + '\'' +
-                ", bearerFormat='" + bearerFormat + '\'' +
-                '}';
+        return "SecurityScheme{" + "type='" + type + '\'' + ", scheme='" + scheme + '\'' + ", name='" + name + '\''
+                + ", in='" + in + '\'' + ", description='" + description + '\'' + ", bearerFormat='" + bearerFormat
+                + '\'' + '}';
     }
 
+    /**
+     * Builder for creating instances of SecurityScheme.
+     */
     public static class SecuritySchemeBuilder {
+
         private String type;
+
         private String scheme;
+
         private String name;
+
         private String in;
+
         private String description;
+
         private String bearerFormat;
 
         SecuritySchemeBuilder() {
@@ -200,12 +200,11 @@ public class SecurityScheme {
 
         @Override
         public String toString() {
-            return "SecurityScheme.SecuritySchemeBuilder(type=" + this.type +
-                    ", scheme=" + this.scheme +
-                    ", name=" + this.name +
-                    ", in=" + this.in +
-                    ", description=" + this.description +
-                    ", bearerFormat=" + this.bearerFormat + ")";
+            return "SecurityScheme.SecuritySchemeBuilder(type=" + this.type + ", scheme=" + this.scheme + ", name="
+                    + this.name + ", in=" + this.in + ", description=" + this.description + ", bearerFormat="
+                    + this.bearerFormat + ")";
         }
+
     }
+
 }

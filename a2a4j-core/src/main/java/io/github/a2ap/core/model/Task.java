@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,8 +30,7 @@ import java.util.Objects;
 public class Task implements SendMessageResponse, SendStreamingMessageResponse {
 
     /**
-     * The unique identifier of the task.
-     * Required field.
+     * The unique identifier of the task. Required field.
      */
     @JsonProperty("id")
     private String id;
@@ -54,11 +54,9 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
     private List<Artifact> artifacts;
 
     /**
-     * An optional array of recent messages exchanged within this task,
-     * ordered chronologically (oldest first).
-     * This history is included if requested by the client via the `historyLength`
-     * parameter
-     * in `TaskSendParams` or `TaskQueryParams`.
+     * An optional array of recent messages exchanged within this task, ordered
+     * chronologically (oldest first). This history is included if requested by the client
+     * via the `historyLength` parameter in `TaskSendParams` or `TaskQueryParams`.
      */
     @JsonProperty("history")
     private List<Message> history;
@@ -72,8 +70,8 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
     public Task() {
     }
 
-    public Task(String id, String contextId, TaskStatus status, List<Artifact> artifacts,
-            List<Message> history, Map<String, Object> metadata) {
+    public Task(String id, String contextId, TaskStatus status, List<Artifact> artifacts, List<Message> history,
+                Map<String, Object> metadata) {
         this.id = id;
         this.contextId = contextId;
         this.status = status;
@@ -141,12 +139,9 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
         if (o == null || getClass() != o.getClass())
             return false;
         Task task = (Task) o;
-        return Objects.equals(id, task.id) &&
-                Objects.equals(contextId, task.contextId) &&
-                Objects.equals(status, task.status) &&
-                Objects.equals(artifacts, task.artifacts) &&
-                Objects.equals(history, task.history) &&
-                Objects.equals(metadata, task.metadata);
+        return Objects.equals(id, task.id) && Objects.equals(contextId, task.contextId)
+                && Objects.equals(status, task.status) && Objects.equals(artifacts, task.artifacts)
+                && Objects.equals(history, task.history) && Objects.equals(metadata, task.metadata);
     }
 
     @Override
@@ -156,22 +151,25 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "id='" + id + '\'' +
-                ", contextId='" + contextId + '\'' +
-                ", status=" + status +
-                ", artifacts=" + artifacts +
-                ", history=" + history +
-                ", metadata=" + metadata +
-                '}';
+        return "Task{" + "id='" + id + '\'' + ", contextId='" + contextId + '\'' + ", status=" + status + ", artifacts="
+                + artifacts + ", history=" + history + ", metadata=" + metadata + '}';
     }
 
+    /**
+     * Builder for creating instances of Task.
+     */
     public static class TaskBuilder {
+
         private String id;
+
         private String contextId;
+
         private TaskStatus status;
+
         private List<Artifact> artifacts;
+
         private List<Message> history;
+
         private Map<String, Object> metadata;
 
         TaskBuilder() {
@@ -213,12 +211,11 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
 
         @Override
         public String toString() {
-            return "Task.TaskBuilder(id=" + this.id +
-                    ", contextId=" + this.contextId +
-                    ", status=" + this.status +
-                    ", artifacts=" + this.artifacts +
-                    ", history=" + this.history +
-                    ", metadata=" + this.metadata + ")";
+            return "Task.TaskBuilder(id=" + this.id + ", contextId=" + this.contextId + ", status=" + this.status
+                    + ", artifacts=" + this.artifacts + ", history=" + this.history + ", metadata=" + this.metadata
+                    + ")";
         }
+
     }
+
 }

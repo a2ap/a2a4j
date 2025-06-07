@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,15 +29,13 @@ import java.util.Objects;
 public class DataPart extends Part {
 
     /**
-     * The kind type of the part, always "data" for DataPart.
-     * Required field.
+     * The kind type of the part, always "data" for DataPart. Required field.
      */
     @JsonProperty("kind")
     private final String kind = "data";
 
     /**
-     * The structured data content.
-     * Required field.
+     * The structured data content. Required field.
      */
     @JsonProperty("data")
     private Object data;
@@ -50,7 +49,7 @@ public class DataPart extends Part {
 
     /**
      * Constructor with data.
-     * 
+     *
      * @param data the structured data content
      */
     public DataPart(Object data) {
@@ -60,7 +59,7 @@ public class DataPart extends Part {
 
     /**
      * Constructor with data and metadata.
-     * 
+     *
      * @param data     the structured data content
      * @param metadata the metadata
      */
@@ -71,7 +70,7 @@ public class DataPart extends Part {
 
     /**
      * Gets the kind.
-     * 
+     *
      * @return the kind, always "data"
      */
     @Override
@@ -81,7 +80,7 @@ public class DataPart extends Part {
 
     /**
      * Gets the structured data content.
-     * 
+     *
      * @return the structured data content
      */
     public Object getData() {
@@ -90,7 +89,7 @@ public class DataPart extends Part {
 
     /**
      * Sets the structured data content.
-     * 
+     *
      * @param data the structured data content to set
      */
     public void setData(Object data) {
@@ -106,8 +105,7 @@ public class DataPart extends Part {
         if (!super.equals(o))
             return false;
         DataPart dataPart = (DataPart) o;
-        return Objects.equals(kind, dataPart.kind) &&
-                Objects.equals(data, dataPart.data);
+        return Objects.equals(kind, dataPart.kind) && Objects.equals(data, dataPart.data);
     }
 
     @Override
@@ -117,16 +115,12 @@ public class DataPart extends Part {
 
     @Override
     public String toString() {
-        return "DataPart{" +
-                "kind='" + kind + '\'' +
-                ", data=" + data +
-                ", metadata=" + getMetadata() +
-                '}';
+        return "DataPart{" + "kind='" + kind + '\'' + ", data=" + data + ", metadata=" + getMetadata() + '}';
     }
 
     /**
      * Returns a builder for DataPart.
-     * 
+     *
      * @return a new builder instance
      */
     public static Builder builder() {
@@ -137,7 +131,9 @@ public class DataPart extends Part {
      * Builder class for DataPart.
      */
     public static class Builder {
+
         private Object data;
+
         private Map<String, Object> metadata;
 
         /**
@@ -148,7 +144,7 @@ public class DataPart extends Part {
 
         /**
          * Sets the structured data content.
-         * 
+         *
          * @param data the structured data content
          * @return this builder for chaining
          */
@@ -159,7 +155,7 @@ public class DataPart extends Part {
 
         /**
          * Sets the metadata.
-         * 
+         *
          * @param metadata the metadata
          * @return this builder for chaining
          */
@@ -170,11 +166,13 @@ public class DataPart extends Part {
 
         /**
          * Builds a new DataPart instance.
-         * 
+         *
          * @return the built instance
          */
         public DataPart build() {
             return new DataPart(data, metadata);
         }
+
     }
+
 }

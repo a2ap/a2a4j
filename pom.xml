@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.a2ap</groupId>
-    <artifactId>a2a4j-parent</artifactId>
+    <artifactId>a2a4j</artifactId>
     <version>${revision}</version>
 
     <packaging>pom</packaging>
@@ -72,9 +72,6 @@
 
         <!-- Spring Boot Version -->
         <spring-boot.version>3.4.5</spring-boot.version>
-
-        <!-- CheckStyle Plugin -->
-        <disable.checks>true</disable.checks>
 
         <!-- Unit Test Config -->
         <surefireArgLine>-Xms512m -Xmx1024m</surefireArgLine>
@@ -137,11 +134,10 @@
                 <version>${spring-javaformat-maven-plugin.version}</version>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>validate</goal>
-                        </goals>
                         <phase>validate</phase>
-                        <inherited>true</inherited>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -171,14 +167,11 @@
                         <inherited>true</inherited>
                         <configuration>
                             <consoleOutput>true</consoleOutput>
-                            <skip>${disable.checks}</skip>
                             <configLocation>tools/src/checkstyle/checkstyle.xml</configLocation>
-                            <headerLocation>tools/src/checkstyle/checkstyle-header.txt</headerLocation>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <propertyExpansion>checkstyle.build.directory=${project.build.directory}
-								checkstyle.suppressions.file=${project.basedir}/tools/src/checkstyle/checkstyle-suppressions.xml
-								checkstyle.additional.suppressions.file=${project.basedir}/tools/src/checkstyle/checkstyle-suppressions.xml
-								checkstyle.header.file=${project.basedir}/tools/src/checkstyle/checkstyle-header.txt</propertyExpansion>
+                                checkstyle.suppressions.file=${project.basedir}/tools/src/checkstyle/checkstyle-suppressions.xml
+                                checkstyle.additional.suppressions.file=${project.basedir}/tools/src/checkstyle/checkstyle-suppressions.xml</propertyExpansion>
                             <failsOnError>${maven-checkstyle-plugin.failsOnError}</failsOnError>
                             <violationSeverity>warning</violationSeverity>
                             <failOnViolation>${maven-checkstyle-plugin.failOnViolation}</failOnViolation>

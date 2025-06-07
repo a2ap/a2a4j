@@ -18,13 +18,14 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * Represents a message exchanged between agents.
- * A message can contain multiple parts of different types (text, file, data).
+ * Represents a message exchanged between agents. A message can contain multiple parts of
+ * different types (text, file, data).
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Message implements SendMessageResponse, SendStreamingMessageResponse {
@@ -48,16 +49,14 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
     private String contextId;
 
     /**
-     * The role of the message sender (e.g., "user", "assistant").
-     * Required field.
+     * The role of the message sender (e.g., "user", "assistant"). Required field.
      */
     @JsonProperty("role")
     private String role;
 
     /**
-     * The parts that make up the message content.
-     * Each part can be a TextPart, FilePart, or DataPart.
-     * Required field.
+     * The parts that make up the message content. Each part can be a TextPart, FilePart,
+     * or DataPart. Required field.
      */
     @JsonProperty("parts")
     private List<Part> parts;
@@ -77,8 +76,8 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
     public Message() {
     }
 
-    public Message(String messageId, String taskId, String contextId, String role,
-            List<Part> parts, Map<String, Object> metadata, String kind) {
+    public Message(String messageId, String taskId, String contextId, String role, List<Part> parts,
+                   Map<String, Object> metadata, String kind) {
         this.messageId = messageId;
         this.taskId = taskId;
         this.contextId = contextId;
@@ -155,13 +154,10 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
         if (o == null || getClass() != o.getClass())
             return false;
         Message message = (Message) o;
-        return Objects.equals(messageId, message.messageId) &&
-                Objects.equals(taskId, message.taskId) &&
-                Objects.equals(contextId, message.contextId) &&
-                Objects.equals(role, message.role) &&
-                Objects.equals(parts, message.parts) &&
-                Objects.equals(metadata, message.metadata) &&
-                Objects.equals(kind, message.kind);
+        return Objects.equals(messageId, message.messageId) && Objects.equals(taskId, message.taskId)
+                && Objects.equals(contextId, message.contextId) && Objects.equals(role, message.role)
+                && Objects.equals(parts, message.parts) && Objects.equals(metadata, message.metadata)
+                && Objects.equals(kind, message.kind);
     }
 
     @Override
@@ -171,24 +167,28 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
 
     @Override
     public String toString() {
-        return "Message{" +
-                "messageId='" + messageId + '\'' +
-                ", taskId='" + taskId + '\'' +
-                ", contextId='" + contextId + '\'' +
-                ", role='" + role + '\'' +
-                ", parts=" + parts +
-                ", metadata=" + metadata +
-                ", kind='" + kind + '\'' +
-                '}';
+        return "Message{" + "messageId='" + messageId + '\'' + ", taskId='" + taskId + '\'' + ", contextId='"
+                + contextId + '\'' + ", role='" + role + '\'' + ", parts=" + parts + ", metadata=" + metadata
+                + ", kind='" + kind + '\'' + '}';
     }
 
+    /**
+     * Builder class for Message.
+     */
     public static class MessageBuilder {
+
         private String messageId;
+
         private String taskId;
+
         private String contextId;
+
         private String role;
+
         private List<Part> parts;
+
         private Map<String, Object> metadata;
+
         private String kind;
 
         MessageBuilder() {
@@ -235,13 +235,11 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
 
         @Override
         public String toString() {
-            return "Message.MessageBuilder(messageId=" + this.messageId +
-                    ", taskId=" + this.taskId +
-                    ", contextId=" + this.contextId +
-                    ", role=" + this.role +
-                    ", parts=" + this.parts +
-                    ", metadata=" + this.metadata +
-                    ", kind=" + this.kind + ")";
+            return "Message.MessageBuilder(messageId=" + this.messageId + ", taskId=" + this.taskId + ", contextId="
+                    + this.contextId + ", role=" + this.role + ", parts=" + this.parts + ", metadata=" + this.metadata
+                    + ", kind=" + this.kind + ")";
         }
+
     }
+
 }

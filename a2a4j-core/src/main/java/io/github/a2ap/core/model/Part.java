@@ -25,21 +25,17 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Base class for different types of parts that can be included in messages or
- * artifacts.
+ * Base class for different types of parts that can be included in messages or artifacts.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = TextPart.class, name = "text"),
+@JsonSubTypes({@JsonSubTypes.Type(value = TextPart.class, name = "text"),
         @JsonSubTypes.Type(value = FilePart.class, name = "file"),
-        @JsonSubTypes.Type(value = DataPart.class, name = "data")
-})
+        @JsonSubTypes.Type(value = DataPart.class, name = "data")})
 public abstract class Part {
 
     /**
-     * The kind type of the part.
-     * Required field.
+     * The kind type of the part. Required field.
      */
     @JsonProperty("kind")
     private String kind;
@@ -81,8 +77,7 @@ public abstract class Part {
         if (o == null || getClass() != o.getClass())
             return false;
         Part part = (Part) o;
-        return Objects.equals(kind, part.kind) &&
-                Objects.equals(metadata, part.metadata);
+        return Objects.equals(kind, part.kind) && Objects.equals(metadata, part.metadata);
     }
 
     @Override
@@ -92,9 +87,7 @@ public abstract class Part {
 
     @Override
     public String toString() {
-        return "Part{" +
-                "kind='" + kind + '\'' +
-                ", metadata=" + metadata +
-                '}';
+        return "Part{" + "kind='" + kind + '\'' + ", metadata=" + metadata + '}';
     }
+
 }

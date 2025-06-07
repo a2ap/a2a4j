@@ -30,32 +30,32 @@ public class A2AError extends RuntimeException {
      * Invalid parameters error code
      */
     public static final int INVALID_PARAMS = -32602;
-    
+
     /**
      * Method not found error code
      */
     public static final int METHOD_NOT_FOUND = -32601;
-    
+
     /**
      * Task not found error code
      */
     public static final int TASK_NOT_FOUND = 1001;
-    
+
     /**
      * Task already cancelled error code
      */
     public static final int TASK_CANCELLED = 1002;
-    
+
     /**
      * Agent execution error code
      */
     public static final int AGENT_EXECUTION_ERROR = 1003;
-    
+
     /**
      * Authentication error code
      */
     public static final int AUTHENTICATION_ERROR = 1004;
-    
+
     /**
      * Authorization error code
      */
@@ -76,7 +76,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Constructor with message
-     * 
+     *
      * @param message The error message
      */
     public A2AError(String message) {
@@ -85,7 +85,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Constructor with message and cause
-     * 
+     *
      * @param message The error message
      * @param cause   The cause
      */
@@ -95,7 +95,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Constructor with all properties
-     * 
+     *
      * @param message The error message
      * @param code    The error code
      * @param data    Additional data
@@ -110,7 +110,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Constructor with all properties and cause
-     * 
+     *
      * @param message The error message
      * @param cause   The cause
      * @param code    The error code
@@ -126,7 +126,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Gets the error code
-     * 
+     *
      * @return The error code
      */
     public int getCode() {
@@ -135,7 +135,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Sets the error code
-     * 
+     *
      * @param code The error code to set
      */
     public void setCode(int code) {
@@ -144,7 +144,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Gets the additional data
-     * 
+     *
      * @return The additional data
      */
     public Object getData() {
@@ -153,7 +153,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Sets the additional data
-     * 
+     *
      * @param data The additional data to set
      */
     public void setData(Object data) {
@@ -162,7 +162,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Gets the task ID
-     * 
+     *
      * @return The task ID
      */
     public String getTaskId() {
@@ -171,7 +171,7 @@ public class A2AError extends RuntimeException {
 
     /**
      * Sets the task ID
-     * 
+     *
      * @param taskId The task ID to set
      */
     public void setTaskId(String taskId) {
@@ -185,10 +185,10 @@ public class A2AError extends RuntimeException {
         if (o == null || getClass() != o.getClass())
             return false;
         A2AError a2AError = (A2AError) o;
-        return code == a2AError.code &&
-                Objects.equals(data, a2AError.data) &&
-                Objects.equals(taskId, a2AError.taskId) &&
-                Objects.equals(getMessage(), a2AError.getMessage());
+        return code == a2AError.code
+				&& Objects.equals(data, a2AError.data)
+                && Objects.equals(taskId, a2AError.taskId)
+				&& Objects.equals(getMessage(), a2AError.getMessage());
     }
 
     @Override
@@ -198,17 +198,17 @@ public class A2AError extends RuntimeException {
 
     @Override
     public String toString() {
-        return "A2AError{" +
-                "code=" + code +
-                ", data=" + data +
-                ", taskId='" + taskId + '\'' +
-                ", message='" + getMessage() + '\'' +
-                '}';
+        return "A2AError{"
+                + "code=" + code
+                + ", data=" + data
+                + ", taskId='" + taskId + '\''
+                + ", message='" + getMessage() + '\''
+                + '}';
     }
 
     /**
      * Returns a builder for A2AError
-     * 
+     *
      * @return A new builder instance
      */
     public static Builder builder() {
@@ -233,7 +233,7 @@ public class A2AError extends RuntimeException {
 
         /**
          * Sets the error message
-         * 
+         *
          * @param message The error message
          * @return This builder for chaining
          */
@@ -244,7 +244,7 @@ public class A2AError extends RuntimeException {
 
         /**
          * Sets the error code
-         * 
+         *
          * @param code The error code
          * @return This builder for chaining
          */
@@ -255,7 +255,7 @@ public class A2AError extends RuntimeException {
 
         /**
          * Sets the additional data
-         * 
+         *
          * @param data The additional data
          * @return This builder for chaining
          */
@@ -266,7 +266,7 @@ public class A2AError extends RuntimeException {
 
         /**
          * Sets the task ID
-         * 
+         *
          * @param taskId The task ID
          * @return This builder for chaining
          */
@@ -277,7 +277,7 @@ public class A2AError extends RuntimeException {
 
         /**
          * Sets the cause
-         * 
+         *
          * @param cause The cause
          * @return This builder for chaining
          */
@@ -288,7 +288,7 @@ public class A2AError extends RuntimeException {
 
         /**
          * Builds a new A2AError instance
-         * 
+         *
          * @return The built instance
          */
         public A2AError build() {

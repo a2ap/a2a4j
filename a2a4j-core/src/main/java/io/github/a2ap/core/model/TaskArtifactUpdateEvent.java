@@ -17,6 +17,7 @@
 package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -56,8 +57,8 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
     private Boolean isFinal;
 
     /**
-     * Indicates if this artifact appends to a previous one. Omitted if artifact is
-     * a complete artifact
+     * Indicates if this artifact appends to a previous one. Omitted if artifact is a
+     * complete artifact
      */
     @JsonProperty("append")
     private Boolean append;
@@ -83,7 +84,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Constructor with all properties
-     * 
+     *
      * @param taskId    The task ID
      * @param contextId The context ID
      * @param kind      The kind
@@ -93,9 +94,8 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
      * @param lastChunk Whether this is the last chunk
      * @param metadata  Additional metadata
      */
-    public TaskArtifactUpdateEvent(String taskId, String contextId, String kind,
-            Artifact artifact, Boolean isFinal, Boolean append,
-            Boolean lastChunk, Map<String, Object> metadata) {
+    public TaskArtifactUpdateEvent(String taskId, String contextId, String kind, Artifact artifact, Boolean isFinal,
+                                   Boolean append, Boolean lastChunk, Map<String, Object> metadata) {
         this.taskId = taskId;
         this.contextId = contextId;
         this.kind = kind != null ? kind : "artifact-update";
@@ -108,7 +108,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the task ID
-     * 
+     *
      * @return The task ID
      */
     public String getTaskId() {
@@ -117,7 +117,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the task ID
-     * 
+     *
      * @param taskId The task ID to set
      */
     public void setTaskId(String taskId) {
@@ -126,7 +126,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the context ID
-     * 
+     *
      * @return The context ID
      */
     public String getContextId() {
@@ -135,7 +135,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the context ID
-     * 
+     *
      * @param contextId The context ID to set
      */
     public void setContextId(String contextId) {
@@ -144,7 +144,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the kind
-     * 
+     *
      * @return The kind
      */
     public String getKind() {
@@ -153,7 +153,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the kind
-     * 
+     *
      * @param kind The kind to set
      */
     public void setKind(String kind) {
@@ -162,7 +162,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the artifact
-     * 
+     *
      * @return The artifact
      */
     public Artifact getArtifact() {
@@ -171,7 +171,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the artifact
-     * 
+     *
      * @param artifact The artifact to set
      */
     public void setArtifact(Artifact artifact) {
@@ -180,7 +180,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets whether this is the final update
-     * 
+     *
      * @return Whether this is the final update
      */
     public Boolean getIsFinal() {
@@ -189,7 +189,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets whether this is the final update
-     * 
+     *
      * @param isFinal Whether this is the final update
      */
     public void setIsFinal(Boolean isFinal) {
@@ -198,7 +198,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets whether this appends to a previous artifact
-     * 
+     *
      * @return Whether this appends to a previous artifact
      */
     public Boolean getAppend() {
@@ -207,7 +207,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets whether this appends to a previous artifact
-     * 
+     *
      * @param append Whether this appends to a previous artifact
      */
     public void setAppend(Boolean append) {
@@ -216,7 +216,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets whether this is the last chunk
-     * 
+     *
      * @return Whether this is the last chunk
      */
     public Boolean getLastChunk() {
@@ -225,7 +225,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets whether this is the last chunk
-     * 
+     *
      * @param lastChunk Whether this is the last chunk
      */
     public void setLastChunk(Boolean lastChunk) {
@@ -234,7 +234,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the metadata
-     * 
+     *
      * @return The metadata
      */
     public Map<String, Object> getMetadata() {
@@ -243,7 +243,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the metadata
-     * 
+     *
      * @param metadata The metadata to set
      */
     public void setMetadata(Map<String, Object> metadata) {
@@ -257,14 +257,10 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
         if (o == null || getClass() != o.getClass())
             return false;
         TaskArtifactUpdateEvent that = (TaskArtifactUpdateEvent) o;
-        return Objects.equals(taskId, that.taskId) &&
-                Objects.equals(contextId, that.contextId) &&
-                Objects.equals(kind, that.kind) &&
-                Objects.equals(artifact, that.artifact) &&
-                Objects.equals(isFinal, that.isFinal) &&
-                Objects.equals(append, that.append) &&
-                Objects.equals(lastChunk, that.lastChunk) &&
-                Objects.equals(metadata, that.metadata);
+        return Objects.equals(taskId, that.taskId) && Objects.equals(contextId, that.contextId)
+                && Objects.equals(kind, that.kind) && Objects.equals(artifact, that.artifact)
+                && Objects.equals(isFinal, that.isFinal) && Objects.equals(append, that.append)
+                && Objects.equals(lastChunk, that.lastChunk) && Objects.equals(metadata, that.metadata);
     }
 
     @Override
@@ -274,21 +270,14 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
     @Override
     public String toString() {
-        return "TaskArtifactUpdateEvent{" +
-                "taskId='" + taskId + '\'' +
-                ", contextId='" + contextId + '\'' +
-                ", kind='" + kind + '\'' +
-                ", artifact=" + artifact +
-                ", isFinal=" + isFinal +
-                ", append=" + append +
-                ", lastChunk=" + lastChunk +
-                ", metadata=" + metadata +
-                '}';
+        return "TaskArtifactUpdateEvent{" + "taskId='" + taskId + '\'' + ", contextId='" + contextId + '\'' + ", kind='"
+                + kind + '\'' + ", artifact=" + artifact + ", isFinal=" + isFinal + ", append=" + append
+                + ", lastChunk=" + lastChunk + ", metadata=" + metadata + '}';
     }
 
     /**
      * Returns a builder for TaskArtifactUpdateEvent
-     * 
+     *
      * @return A new builder instance
      */
     public static Builder builder() {
@@ -299,13 +288,21 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
      * Builder class for TaskArtifactUpdateEvent
      */
     public static class Builder {
+
         private String taskId;
+
         private String contextId;
+
         private String kind = "artifact-update";
+
         private Artifact artifact;
+
         private Boolean isFinal;
+
         private Boolean append;
+
         private Boolean lastChunk;
+
         private Map<String, Object> metadata;
 
         /**
@@ -316,7 +313,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the task ID
-         * 
+         *
          * @param taskId The task ID
          * @return This builder for chaining
          */
@@ -327,7 +324,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the context ID
-         * 
+         *
          * @param contextId The context ID
          * @return This builder for chaining
          */
@@ -338,7 +335,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the kind
-         * 
+         *
          * @param kind The kind
          * @return This builder for chaining
          */
@@ -349,7 +346,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the artifact
-         * 
+         *
          * @param artifact The artifact
          * @return This builder for chaining
          */
@@ -360,7 +357,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets whether this is the final update
-         * 
+         *
          * @param isFinal Whether this is the final update
          * @return This builder for chaining
          */
@@ -371,7 +368,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets whether this appends to a previous artifact
-         * 
+         *
          * @param append Whether this appends to a previous artifact
          * @return This builder for chaining
          */
@@ -382,7 +379,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets whether this is the last chunk
-         * 
+         *
          * @param lastChunk Whether this is the last chunk
          * @return This builder for chaining
          */
@@ -393,7 +390,7 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the metadata
-         * 
+         *
          * @param metadata The metadata
          * @return This builder for chaining
          */
@@ -404,11 +401,13 @@ public class TaskArtifactUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Builds a new TaskArtifactUpdateEvent instance
-         * 
+         *
          * @return The built instance
          */
         public TaskArtifactUpdateEvent build() {
             return new TaskArtifactUpdateEvent(taskId, contextId, kind, artifact, isFinal, append, lastChunk, metadata);
         }
+
     }
+
 }

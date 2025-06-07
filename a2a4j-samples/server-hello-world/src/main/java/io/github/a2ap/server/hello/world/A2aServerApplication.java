@@ -23,8 +23,9 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
  * Main Spring Boot application class for the A2A "Hello World" server sample.
- * 
- * <p>This sample demonstrates a complete A2A (Agent2Agent) protocol server implementation
+ *
+ * <p>
+ * This sample demonstrates a complete A2A (Agent2Agent) protocol server implementation
  * using the A2A4J Spring Boot Starter. The application provides:
  * <ul>
  * <li>Agent Card discovery endpoint at {@code /.well-known/agent.json}</li>
@@ -32,32 +33,34 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  * <li>A demo agent executor that simulates realistic task processing</li>
  * <li>CORS configuration for cross-origin requests</li>
  * </ul>
- * 
- * <p>The server can be accessed at {@code http://localhost:8089} by default.
- * 
+ *
+ * <p>
+ * The server can be accessed at {@code http://localhost:8089} by default.
+ *
  * @see io.github.a2ap.server.hello.world.agent.DemoAgentExecutor
  * @see io.github.a2ap.server.hello.world.controller.A2aServerController
  */
 @SpringBootApplication
 public class A2aServerApplication implements WebFluxConfigurer {
-    
+
     /**
      * Main entry point for the A2A server application.
-     * 
+     *
      * @param args command line arguments
      */
     public static void main(String[] args) {
         SpringApplication.run(A2aServerApplication.class, args);
     }
-    
+
     /**
      * Configures CORS (Cross-Origin Resource Sharing) settings for the WebFlux server.
-     * This allows the A2A server to accept requests from any origin, which is useful
-     * for development and testing scenarios.
-     * 
-     * <p><strong>Note:</strong> In production environments, you should restrict
+     * This allows the A2A server to accept requests from any origin, which is useful for
+     * development and testing scenarios.
+     *
+     * <p>
+     * <strong>Note:</strong> In production environments, you should restrict
      * {@code allowedOrigins} to specific domains for security reasons.
-     * 
+     *
      * @param registry the CORS registry to configure
      */
     @Override
@@ -67,4 +70,5 @@ public class A2aServerApplication implements WebFluxConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*");
     }
+
 }

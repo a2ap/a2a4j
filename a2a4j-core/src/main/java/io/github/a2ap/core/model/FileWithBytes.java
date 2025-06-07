@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 /**
@@ -41,7 +42,7 @@ public class FileWithBytes extends FileContent {
 
     /**
      * Constructor with bytes.
-     * 
+     *
      * @param bytes the base64-encoded content
      */
     public FileWithBytes(String bytes) {
@@ -51,7 +52,7 @@ public class FileWithBytes extends FileContent {
 
     /**
      * Constructor with name, MIME type, and bytes.
-     * 
+     *
      * @param name     the file name
      * @param mimeType the MIME type
      * @param bytes    the base64-encoded content
@@ -63,7 +64,7 @@ public class FileWithBytes extends FileContent {
 
     /**
      * Gets the base64-encoded content.
-     * 
+     *
      * @return the base64-encoded content
      */
     public String getBytes() {
@@ -72,7 +73,7 @@ public class FileWithBytes extends FileContent {
 
     /**
      * Sets the base64-encoded content.
-     * 
+     *
      * @param bytes the base64-encoded content to set
      */
     public void setBytes(String bytes) {
@@ -98,16 +99,13 @@ public class FileWithBytes extends FileContent {
 
     @Override
     public String toString() {
-        return "FileWithBytes{" +
-                "bytes='" + (bytes != null ? "[BASE64]" : "null") + '\'' +
-                ", name='" + getName() + '\'' +
-                ", mimeType='" + getMimeType() + '\'' +
-                '}';
+        return "FileWithBytes{" + "bytes='" + (bytes != null ? "[BASE64]" : "null") + '\'' + ", name='" + getName()
+                + '\'' + ", mimeType='" + getMimeType() + '\'' + '}';
     }
 
     /**
      * Returns a builder for FileWithBytes.
-     * 
+     *
      * @return a new builder instance
      */
     public static Builder builder() {
@@ -118,8 +116,11 @@ public class FileWithBytes extends FileContent {
      * Builder class for FileWithBytes.
      */
     public static class Builder {
+
         private String name;
+
         private String mimeType;
+
         private String bytes;
 
         /**
@@ -130,7 +131,7 @@ public class FileWithBytes extends FileContent {
 
         /**
          * Sets the file name.
-         * 
+         *
          * @param name the file name
          * @return this builder for chaining
          */
@@ -141,7 +142,7 @@ public class FileWithBytes extends FileContent {
 
         /**
          * Sets the MIME type.
-         * 
+         *
          * @param mimeType the MIME type
          * @return this builder for chaining
          */
@@ -152,7 +153,7 @@ public class FileWithBytes extends FileContent {
 
         /**
          * Sets the base64-encoded content.
-         * 
+         *
          * @param bytes the base64-encoded content
          * @return this builder for chaining
          */
@@ -163,11 +164,13 @@ public class FileWithBytes extends FileContent {
 
         /**
          * Builds a new FileWithBytes instance.
-         * 
+         *
          * @return the built instance
          */
         public FileWithBytes build() {
             return new FileWithBytes(name, mimeType, bytes);
         }
+
     }
+
 }

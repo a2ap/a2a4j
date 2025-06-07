@@ -17,6 +17,7 @@
 package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -69,7 +70,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Constructor with all properties
-     * 
+     *
      * @param taskId    The task ID
      * @param contextId The context ID
      * @param kind      The kind
@@ -77,8 +78,8 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
      * @param isFinal   Whether this is the final update
      * @param metadata  Additional metadata
      */
-    public TaskStatusUpdateEvent(String taskId, String contextId, String kind,
-            TaskStatus status, Boolean isFinal, Map<String, Object> metadata) {
+    public TaskStatusUpdateEvent(String taskId, String contextId, String kind, TaskStatus status, Boolean isFinal,
+                                 Map<String, Object> metadata) {
         this.taskId = taskId;
         this.contextId = contextId;
         this.kind = kind != null ? kind : "status-update";
@@ -89,7 +90,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the task ID
-     * 
+     *
      * @return The task ID
      */
     public String getTaskId() {
@@ -98,7 +99,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the task ID
-     * 
+     *
      * @param taskId The task ID to set
      */
     public void setTaskId(String taskId) {
@@ -107,7 +108,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the context ID
-     * 
+     *
      * @return The context ID
      */
     public String getContextId() {
@@ -116,7 +117,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the context ID
-     * 
+     *
      * @param contextId The context ID to set
      */
     public void setContextId(String contextId) {
@@ -125,7 +126,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the kind
-     * 
+     *
      * @return The kind
      */
     public String getKind() {
@@ -134,7 +135,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the kind
-     * 
+     *
      * @param kind The kind to set
      */
     public void setKind(String kind) {
@@ -143,7 +144,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the task status
-     * 
+     *
      * @return The task status
      */
     public TaskStatus getStatus() {
@@ -152,7 +153,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the task status
-     * 
+     *
      * @param status The task status to set
      */
     public void setStatus(TaskStatus status) {
@@ -161,7 +162,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets whether this is the final update
-     * 
+     *
      * @return Whether this is the final update
      */
     public Boolean getIsFinal() {
@@ -170,7 +171,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets whether this is the final update
-     * 
+     *
      * @param isFinal Whether this is the final update
      */
     public void setIsFinal(Boolean isFinal) {
@@ -179,7 +180,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Gets the metadata
-     * 
+     *
      * @return The metadata
      */
     public Map<String, Object> getMetadata() {
@@ -188,7 +189,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     /**
      * Sets the metadata
-     * 
+     *
      * @param metadata The metadata to set
      */
     public void setMetadata(Map<String, Object> metadata) {
@@ -202,12 +203,9 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
         if (o == null || getClass() != o.getClass())
             return false;
         TaskStatusUpdateEvent that = (TaskStatusUpdateEvent) o;
-        return Objects.equals(taskId, that.taskId) &&
-                Objects.equals(contextId, that.contextId) &&
-                Objects.equals(kind, that.kind) &&
-                Objects.equals(status, that.status) &&
-                Objects.equals(isFinal, that.isFinal) &&
-                Objects.equals(metadata, that.metadata);
+        return Objects.equals(taskId, that.taskId) && Objects.equals(contextId, that.contextId)
+                && Objects.equals(kind, that.kind) && Objects.equals(status, that.status)
+                && Objects.equals(isFinal, that.isFinal) && Objects.equals(metadata, that.metadata);
     }
 
     @Override
@@ -217,19 +215,13 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
     @Override
     public String toString() {
-        return "TaskStatusUpdateEvent{" +
-                "taskId='" + taskId + '\'' +
-                ", contextId='" + contextId + '\'' +
-                ", kind='" + kind + '\'' +
-                ", status=" + status +
-                ", isFinal=" + isFinal +
-                ", metadata=" + metadata +
-                '}';
+        return "TaskStatusUpdateEvent{" + "taskId='" + taskId + '\'' + ", contextId='" + contextId + '\'' + ", kind='"
+                + kind + '\'' + ", status=" + status + ", isFinal=" + isFinal + ", metadata=" + metadata + '}';
     }
 
     /**
      * Returns a builder for TaskStatusUpdateEvent
-     * 
+     *
      * @return A new builder instance
      */
     public static Builder builder() {
@@ -240,11 +232,17 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
      * Builder class for TaskStatusUpdateEvent
      */
     public static class Builder {
+
         private String taskId;
+
         private String contextId;
+
         private String kind = "status-update";
+
         private TaskStatus status;
+
         private Boolean isFinal;
+
         private Map<String, Object> metadata;
 
         /**
@@ -255,7 +253,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the task ID
-         * 
+         *
          * @param taskId The task ID
          * @return This builder for chaining
          */
@@ -266,7 +264,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the context ID
-         * 
+         *
          * @param contextId The context ID
          * @return This builder for chaining
          */
@@ -277,7 +275,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the kind
-         * 
+         *
          * @param kind The kind
          * @return This builder for chaining
          */
@@ -288,7 +286,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the task status
-         * 
+         *
          * @param status The task status
          * @return This builder for chaining
          */
@@ -299,7 +297,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets whether this is the final update
-         * 
+         *
          * @param isFinal Whether this is the final update
          * @return This builder for chaining
          */
@@ -310,7 +308,7 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Sets the metadata
-         * 
+         *
          * @param metadata The metadata
          * @return This builder for chaining
          */
@@ -321,11 +319,13 @@ public class TaskStatusUpdateEvent implements SendStreamingMessageResponse {
 
         /**
          * Builds a new TaskStatusUpdateEvent instance
-         * 
+         *
          * @return The built instance
          */
         public TaskStatusUpdateEvent build() {
             return new TaskStatusUpdateEvent(taskId, contextId, kind, status, isFinal, metadata);
         }
+
     }
+
 }

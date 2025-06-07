@@ -24,19 +24,19 @@ import java.util.Objects;
 /**
  * Represents a JSON-RPC request.
  */
+
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JSONRPCRequest {
 
     /**
-     * The JSON-RPC version, always "2.0".
-     * Required field.
+     * The JSON-RPC version, always "2.0". Required field.
      */
     @JsonProperty("jsonrpc")
     private final String jsonrpc = "2.0";
 
     /**
-     * The method to be invoked.
-     * Required field.
+     * The method to be invoked. Required field.
      */
     @JsonProperty("method")
     private String method;
@@ -48,8 +48,7 @@ public class JSONRPCRequest {
     private Object params;
 
     /**
-     * The request identifier.
-     * Required field.
+     * The request identifier. Required field.
      */
     @JsonProperty("id")
     private String id;
@@ -102,10 +101,8 @@ public class JSONRPCRequest {
         if (o == null || getClass() != o.getClass())
             return false;
         JSONRPCRequest that = (JSONRPCRequest) o;
-        return Objects.equals(jsonrpc, that.jsonrpc) &&
-                Objects.equals(method, that.method) &&
-                Objects.equals(params, that.params) &&
-                Objects.equals(id, that.id);
+        return Objects.equals(jsonrpc, that.jsonrpc) && Objects.equals(method, that.method)
+                && Objects.equals(params, that.params) && Objects.equals(id, that.id);
     }
 
     @Override
@@ -115,17 +112,19 @@ public class JSONRPCRequest {
 
     @Override
     public String toString() {
-        return "JSONRPCRequest{" +
-                "jsonrpc='" + jsonrpc + '\'' +
-                ", method='" + method + '\'' +
-                ", params=" + params +
-                ", id='" + id + '\'' +
-                '}';
+        return "JSONRPCRequest{" + "jsonrpc='" + jsonrpc + '\'' + ", method='" + method + '\'' + ", params=" + params
+                + ", id='" + id + '\'' + '}';
     }
 
+    /**
+     * Builder class for JSONRPCRequest.
+     */
     public static class JSONRPCRequestBuilder {
+
         private String method;
+
         private Object params;
+
         private String id;
 
         JSONRPCRequestBuilder() {
@@ -152,9 +151,10 @@ public class JSONRPCRequest {
 
         @Override
         public String toString() {
-            return "JSONRPCRequest.JSONRPCRequestBuilder(method=" + this.method +
-                    ", params=" + this.params +
-                    ", id=" + this.id + ")";
+            return "JSONRPCRequest.JSONRPCRequestBuilder(method=" + this.method + ", params=" + this.params + ", id="
+                    + this.id + ")";
         }
+
     }
+
 }

@@ -30,16 +30,14 @@ import java.util.Objects;
 public class AgentSkill {
 
     /**
-     * The unique identifier of the skill.
-     * Required field.
+     * The unique identifier of the skill. Required field.
      */
     @NotNull
     @JsonProperty("id")
     private String id;
 
     /**
-     * The name of the skill.
-     * Required field.
+     * The name of the skill. Required field.
      */
     @NotNull
     @JsonProperty("name")
@@ -78,8 +76,8 @@ public class AgentSkill {
     public AgentSkill() {
     }
 
-    public AgentSkill(String id, String name, String description, List<String> tags,
-            List<String> examples, List<String> inputModes, List<String> outputModes) {
+    public AgentSkill(String id, String name, String description, List<String> tags, List<String> examples,
+                      List<String> inputModes, List<String> outputModes) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -156,13 +154,10 @@ public class AgentSkill {
         if (o == null || getClass() != o.getClass())
             return false;
         AgentSkill that = (AgentSkill) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(tags, that.tags) &&
-                Objects.equals(examples, that.examples) &&
-                Objects.equals(inputModes, that.inputModes) &&
-                Objects.equals(outputModes, that.outputModes);
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description) && Objects.equals(tags, that.tags)
+                && Objects.equals(examples, that.examples) && Objects.equals(inputModes, that.inputModes)
+                && Objects.equals(outputModes, that.outputModes);
     }
 
     @Override
@@ -172,24 +167,28 @@ public class AgentSkill {
 
     @Override
     public String toString() {
-        return "AgentSkill{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", tags=" + tags +
-                ", examples=" + examples +
-                ", inputModes=" + inputModes +
-                ", outputModes=" + outputModes +
-                '}';
+        return "AgentSkill{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\''
+                + ", tags=" + tags + ", examples=" + examples + ", inputModes=" + inputModes + ", outputModes="
+                + outputModes + '}';
     }
 
+    /**
+     * Builder for {@link AgentSkill}
+     */
     public static class AgentSkillBuilder {
+
         private String id;
+
         private String name;
+
         private String description;
+
         private List<String> tags;
+
         private List<String> examples;
+
         private List<String> inputModes;
+
         private List<String> outputModes;
 
         AgentSkillBuilder() {
@@ -236,13 +235,11 @@ public class AgentSkill {
 
         @Override
         public String toString() {
-            return "AgentSkill.AgentSkillBuilder(id=" + this.id +
-                    ", name=" + this.name +
-                    ", description=" + this.description +
-                    ", tags=" + this.tags +
-                    ", examples=" + this.examples +
-                    ", inputModes=" + this.inputModes +
-                    ", outputModes=" + this.outputModes + ")";
+            return "AgentSkill.AgentSkillBuilder(id=" + this.id + ", name=" + this.name + ", description="
+                    + this.description + ", tags=" + this.tags + ", examples=" + this.examples + ", inputModes="
+                    + this.inputModes + ", outputModes=" + this.outputModes + ")";
         }
+
     }
+
 }

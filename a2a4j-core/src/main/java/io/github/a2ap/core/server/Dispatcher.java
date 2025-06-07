@@ -22,14 +22,14 @@ import reactor.core.publisher.Flux;
 
 /**
  * Interface for dispatching JSON-RPC requests to appropriate handlers.
- * The Dispatcher is responsible for routing incoming JSON-RPC requests to the 
+ * The Dispatcher is responsible for routing incoming JSON-RPC requests to the
  * correct method handlers and managing both synchronous and streaming responses.
  */
 public interface Dispatcher {
 
     /**
      * Dispatches a JSON-RPC request for synchronous processing.
-     * 
+     *
      * @param request The JSON-RPC request to be processed
      * @return A JSON-RPC response containing the result or error
      */
@@ -39,9 +39,9 @@ public interface Dispatcher {
      * Dispatches a JSON-RPC request for streaming/asynchronous processing.
      * This method is used for operations that return multiple responses over time,
      * such as streaming updates or event subscriptions.
-     * 
+     *
      * @param request The JSON-RPC request to be processed
      * @return A Flux of JSON-RPC responses for streaming results
      */
     Flux<JSONRPCResponse> dispatchStream(JSONRPCRequest request);
-} 
+}

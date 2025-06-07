@@ -57,3 +57,6 @@ application-mysql.yml
 application-pg.yml
 /package.json
 /yarn.lock
+
+# Maven ignore
+.flattened-pom.xml

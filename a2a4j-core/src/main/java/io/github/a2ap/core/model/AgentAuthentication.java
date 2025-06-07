@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -28,8 +29,7 @@ import java.util.Objects;
 public class AgentAuthentication {
 
     /**
-     * The authentication schemes supported by the agent.
-     * Required field.
+     * The authentication schemes supported by the agent. Required field.
      */
     @JsonProperty("schemes")
     private List<String> schemes;
@@ -75,8 +75,7 @@ public class AgentAuthentication {
         if (o == null || getClass() != o.getClass())
             return false;
         AgentAuthentication that = (AgentAuthentication) o;
-        return Objects.equals(schemes, that.schemes) &&
-                Objects.equals(credentials, that.credentials);
+        return Objects.equals(schemes, that.schemes) && Objects.equals(credentials, that.credentials);
     }
 
     @Override
@@ -86,14 +85,16 @@ public class AgentAuthentication {
 
     @Override
     public String toString() {
-        return "AgentAuthentication{" +
-                "schemes=" + schemes +
-                ", credentials='" + credentials + '\'' +
-                '}';
+        return "AgentAuthentication{" + "schemes=" + schemes + ", credentials='" + credentials + '\'' + '}';
     }
 
+    /**
+     * Builder class for AgentAuthentication.
+     */
     public static class AgentAuthenticationBuilder {
+
         private List<String> schemes;
+
         private String credentials;
 
         AgentAuthenticationBuilder() {
@@ -115,8 +116,10 @@ public class AgentAuthentication {
 
         @Override
         public String toString() {
-            return "AgentAuthentication.AgentAuthenticationBuilder(schemes=" + this.schemes +
-                    ", credentials=" + this.credentials + ")";
+            return "AgentAuthentication.AgentAuthenticationBuilder(schemes=" + this.schemes + ", credentials="
+                    + this.credentials + ")";
         }
+
     }
+
 }
