@@ -18,6 +18,8 @@ package io.github.a2ap.core.server.impl;
 
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.server.TaskStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,6 +48,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InMemoryTaskStore implements TaskStore {
 
+    private static final Logger log = LoggerFactory.getLogger(InMemoryTaskStore.class);
+
     private final Map<String, Task> store = new ConcurrentHashMap<>();
 
     @Override
@@ -55,6 +59,14 @@ public class InMemoryTaskStore implements TaskStore {
 
     @Override
     public Task load(String taskId) {
+
+        log.debug("Get task status, Loading task with ID {}", taskId);
+
+        if (taskId == null) {
+            log.warn("task Id is null.");
+            return null;
+        }
+
         return store.get(taskId);
     }
 }

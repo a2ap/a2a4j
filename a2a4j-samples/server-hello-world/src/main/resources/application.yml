@@ -5,6 +5,12 @@ spring:
   application:
     name: a2a-server
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 logging:
   level:
     io.github.a2ap: DEBUG

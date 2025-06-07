@@ -21,8 +21,6 @@ import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.Dispatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -57,8 +55,6 @@ import reactor.core.publisher.Flux;
  */
 @RestController
 public class A2aServerController {
-
-    private static final Logger log = LoggerFactory.getLogger(A2aServerController.class);
 
     private final A2AServer a2aServer;
 

@@ -26,11 +26,15 @@
 
     <artifactId>a2a4j-server-spring-boot-starter</artifactId>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>Agent2Agent (A2A) Protocol For Java Spring Boot Starter Server</name>
+    <description>A2A4J Spring Boot Starter Server</description>
+    <url>https://github.com/a2ap/a2a4j</url>
+
+    <scm>
+        <connection>git://github.com/a2ap/a2a4j.git</connection>
+        <developerConnection>git@github.com:a2ap/a2a4j.git</developerConnection>
+        <url>https://github.com/a2ap/a2a4j</url>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -52,4 +56,5 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
 </project>

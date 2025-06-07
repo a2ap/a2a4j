@@ -115,16 +115,103 @@ curl -X POST http://localhost:8089/a2a/server \
 **预期响应示例：**
 ```json
 {
-  "jsonrpc": "2.0",
-  "result": {
-    "taskId": "task-abc123",
-    "contextId": "ctx-456789",
-    "status": {
-      "state": "CREATED",
-      "timestamp": "1703123456789"
-    }
-  },
-  "id": "test-1"
+	"jsonrpc": "2.0",
+	"result": {
+		"id": "5c694c92-3860-4a4b-9a21-ab7362e84b0b",
+		"contextId": "15334c48-6c91-4536-9cab-43d9f66bcf00",
+		"status": {
+			"state": "completed",
+			"message": {
+				"role": "agent",
+				"parts": [{
+					"type": "text",
+					"kind": "text",
+					"text": "Task completed successfully! I have generated a detailed response and example code for you."
+				}]
+			},
+			"timestamp": "1749283570371"
+		},
+		"artifacts": [{
+			"artifactId": "text-response",
+			"name": "AI Assistant Response",
+			"description": "AI generated text reply",
+			"parts": [{
+				"type": "text",
+				"kind": "text",
+				"text": "Here's my analysis of your question:\n\n"
+			}, {
+				"type": "text",
+				"kind": "text",
+				"text": "Based on the information provided, I suggest the following approach:\n"
+			}, {
+				"type": "text",
+				"kind": "text",
+				"text": "\n\nIf you have any questions, please feel free to ask!"
+			}],
+			"metadata": {
+				"contentType": "text/plain",
+				"chunkIndex": 1749283568621,
+				"encoding": "utf-8"
+			}
+		}, {
+			"artifactId": "code-example",
+			"name": "Example Code",
+			"description": "Example Java code generated based on requirements",
+			"parts": [{
+				"type": "text",
+				"kind": "text",
+				"text": "// Example code\npublic class ExampleService {\n\n    public String processRequest(String input) {\n        if (input == null || input.trim().isEmpty()) {\n            return \"Input cannot be empty\";\n        }\n\n        // Process input\n        String processed = input.trim().toLowerCase();\n        return \"Processed result: \" + processed;\n    }\n}\n"
+			}],
+			"metadata": {
+				"contentType": "text/x-java-source",
+				"language": "java",
+				"filename": "ExampleService.java"
+			}
+		}, {
+			"artifactId": "task-summary",
+			"name": "Task Summary",
+			"description": "Summary report of this task execution",
+			"parts": [{
+				"type": "text",
+				"kind": "text",
+				"text": "## Task Execution Summary\n\n? User request analysis completed\n? Text response generated\n? Example code provided\n? Task executed successfully\n\nTotal execution time: ~3 seconds\nGenerated content: Text response + Code example"
+			}],
+			"metadata": {
+				"reportType": "summ  mary",
+				"contentType": "text/markdown"
+			}
+		}],
+		"history": [{
+			"role": "agent",
+			"parts": [{
+				"type": "text",
+				"kind": "text",
+				"text": "Starting to process user request..."
+			}]
+		}, {
+			"role": "agent",
+			"parts": [{
+				"type": "text",
+				"kind": "text",
+				"text": "Analyzing user input..."
+			}]
+		}, {
+			"role": "agent",
+			"parts": [{
+				"type": "text",
+				"kind": "text",
+				"text": "Generating response..."
+			}]
+		}, {
+			"role": "agent",
+			"parts": [{
+				"type": "text",
+				"kind": "text",
+				"text": "Task completed successfully! I have generated a detailed response and example code for you."
+			}]
+		}]
+	},
+	"id": "test-1"
 }
 ```
 
@@ -156,21 +243,34 @@ curl -X POST http://localhost:8089/a2a/server \
 ```
 
 **预期流式响应：**
-```
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","status":{"state":"WORKING","message":"Starting to process user request..."}},"id":"stream-1"}
 
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","status":{"state":"WORKING","message":"Analyzing user input..."}},"id":"stream-1"}
+```text
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"status-update","status":{"state":"working","message":{"role":"agent","parts":[{"type":"text","kind":"text","text":"Starting to process user request..."}]},"timestamp":"1749283741336"},"final":false,"metadata":null},"id":"stream-1"}
 
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","artifact":{"artifactId":"text-response","name":"AI Assistant Response","parts":[{"type":"text","text":"Here's my analysis of your question:\n\n"}]}},"id":"stream-1"}
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"status-update","status":{"state":"working","message":{"role":"agent","parts":[{"type":"text","kind":"text","text":"Analyzing user input..."}]},"timestamp":"1749283741340"},"final":false,"metadata":null},"id":"stream-1"}
 
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","artifact":{"artifactId":"code-example","name":"Example Code","parts":[{"type":"text","text":"// Example code\npublic class ExampleService {\n..."}]}},"id":"stream-1"}
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"status-update","status":{"state":"working","message":{"role":"agent","parts":[{"type":"text","kind":"text","text":"Generating response..."}]},"timestamp":"1749283741340"},"final":false,"metadata":null},"id":"stream-1"}
 
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","status":{"state":"COMPLETED","message":"Task completed successfully!"}},"id":"stream-1"}
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"artifact-update","artifact":{"artifactId":"text-response","name":"AI Assistant Response","description":"AI generated text reply","parts":[{"type":"text","kind":"text","text":"Here's my analysis of your question:\n\n"}],"metadata":{"contentType":"text/plain","chunkIndex":1749283739591,"encoding":"utf-8"}},"final":false,"append":false,"lastChunk":false,"metadata":{"artifactType":"text"}},"id":"stream-1"}
+
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"artifact-update","artifact":{"artifactId":"text-response","name":"AI Assistant Response","description":"AI generated text reply","parts":[{"type":"text","kind":"text","text":"Based on the information provided, I suggest the following approach:\n"}],"metadata":{"contentType":"text/plain","chunkIndex":1749283739893,"encoding":"utf-8"}},"final":false,"append":true,"lastChunk":false,"metadata":{"artifactType":"text"}},"id":"stream-1"}
+
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"artifact-update","artifact":{"artifactId":"code-example","name":"Example Code","description":"Example Java code generated based on requirements","parts":[{"type":"text","kind":"text","text":"// Example code\npublic class ExampleService {\n\n    public String processRequest(String input) {\n        if (input == null || input.trim().isEmpty()) {\n            return \"Input cannot be empty\";\n        }\n\n        // Process input\n        String processed = input.trim().toLowerCase();\n        return \"Processed result: \" + processed;\n    }\n}\n"}],"metadata":{"contentType":"text/x-java-source","language":"java","filename":"ExampleService.java"}},"final":false,"append":false,"lastChunk":true,"metadata":{"artifactType":"code"}},"id":"stream-1"}
+
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"artifact-update","artifact":{"artifactId":"text-response","name":"AI Assistant Response","description":"AI generated text reply","parts":[{"type":"text","kind":"text","text":"\n\nIf you have any questions, please feel free to ask!"}],"metadata":{"contentType":"text/plain","chunkIndex":1749283740812,"encoding":"utf-8"}},"final":false,"append":true,"lastChunk":true,"metadata":{"artifactType":"text"}},"id":"stream-1"}
+
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"artifact-update","artifact":{"artifactId":"task-summary","name":"Task Summary","description":"Summary report of this task execution","parts":[{"type":"text","kind":"text","text":"## Task Execution Summary\n\n? User request analysis completed\n? Text response generated\n? Exampl  le code provided\n? Task executed successfully\n\nTotal execution time: ~3 seconds\nGenerated content: Text response + Code example"}],"metadata":{"reportType":"summary","contentType":"text/markdown"}},"final"::false,"append":false,"lastChunk":true,"metadata":{"artifactType":"summary"}},"id":"stream-1"}
+
+event:task-update
+data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"status-update","status":{"state":"completed","message":{"role":"agent","parts":[{"type":"text","kind":"text","text":"Task completed successfully! I have generated a detailed response and example code for you."}]},"timestamp":"1749283741347"},"final":true,"metadata":{"artifactsGenerated":4,"executionTime":"3000ms","success":true}},"id":"stream-1"}
 ```
 
 ### 4. 任务状态查询
@@ -339,7 +439,7 @@ logging:
 
 ### 性能监控
 
-添加 Spring Boot Actuator 端点：
+添加 Spring Boot Actuator 端点（需要在配置文件中开启，默认开始 health 断点）：
 
 ```bash
 # 查看应用信息
