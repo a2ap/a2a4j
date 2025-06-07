@@ -244,7 +244,7 @@ curl -X POST http://localhost:8089/a2a/server \
 
 **预期流式响应：**
 
-```json
+```text
 event:task-update
 data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"status-update","status":{"state":"working","message":{"role":"agent","parts":[{"type":"text","kind":"text","text":"Starting to process user request..."}]},"timestamp":"1749283741336"},"final":false,"metadata":null},"id":"stream-1"}
 
