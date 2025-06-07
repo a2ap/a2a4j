@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.core.model;
-
 /**
- * object Message | Task | TaskStatusUpdateEvent | TaskArtifactUpdateEvent
+ * Autoconfiguration for A2A Server components.
  */
-public interface SendStreamingMessageResponse {
 
-}
+package io.github.a2ap.server.spring.auto.configuration;

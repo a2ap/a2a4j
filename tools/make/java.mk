@@ -25,17 +25,7 @@ build: ## Build the project
 	@$(LOG_TARGET)
 	mvn -B package --file pom.xml -DskipTests=true
 
-.PHONY: format-fix
-format-fix: ## Format the code
-	@$(LOG_TARGET)
-	mvn spring-javaformat:apply
-
 .PHONY: format-check
 format-check: ## Format Check the code
 	@$(LOG_TARGET)
-	mvn spring-javaformat:validate
-
-.PHONY: checkstyle-check
-checkstyle-check: ## Checkstyle Check the code and output to target/checkstyle-report.xml
-	@$(LOG_TARGET)
-	mvn clean compile -Dcheckstyle.skip=false -Dcheckstyle.output.file=checkstyle-report.xml checkstyle:checkstyle
+	mvn clean compile --file pom.xml

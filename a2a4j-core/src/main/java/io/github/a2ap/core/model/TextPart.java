@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 /**
@@ -27,15 +28,13 @@ import java.util.Objects;
 public class TextPart extends Part {
 
     /**
-     * The kind type of the part, always "text" for TextPart.
-     * Required field.
+     * The kind type of the part, always "text" for TextPart. Required field.
      */
     @JsonProperty("kind")
     private final String kind = "text";
 
     /**
-     * The text content.
-     * Required field.
+     * The text content. Required field.
      */
     @JsonProperty("text")
     private String text;
@@ -49,7 +48,7 @@ public class TextPart extends Part {
 
     /**
      * Constructor with text
-     * 
+     *
      * @param text The text content
      */
     public TextPart(String text) {
@@ -59,7 +58,7 @@ public class TextPart extends Part {
 
     /**
      * Gets the kind
-     * 
+     *
      * @return The kind, always "text"
      */
     public String getKind() {
@@ -68,7 +67,7 @@ public class TextPart extends Part {
 
     /**
      * Gets the text content
-     * 
+     *
      * @return The text content
      */
     public String getText() {
@@ -77,7 +76,7 @@ public class TextPart extends Part {
 
     /**
      * Sets the text content
-     * 
+     *
      * @param text The text content to set
      */
     public void setText(String text) {
@@ -91,8 +90,7 @@ public class TextPart extends Part {
         if (o == null || getClass() != o.getClass())
             return false;
         TextPart textPart = (TextPart) o;
-        return Objects.equals(kind, textPart.kind) &&
-                Objects.equals(text, textPart.text);
+        return Objects.equals(kind, textPart.kind) && Objects.equals(text, textPart.text);
     }
 
     @Override
@@ -102,15 +100,12 @@ public class TextPart extends Part {
 
     @Override
     public String toString() {
-        return "TextPart{" +
-                "kind='" + kind + '\'' +
-                ", text='" + text + '\'' +
-                '}';
+        return "TextPart{" + "kind='" + kind + '\'' + ", text='" + text + '\'' + '}';
     }
 
     /**
      * Returns a builder for TextPart
-     * 
+     *
      * @return A new builder instance
      */
     public static Builder builder() {
@@ -121,6 +116,7 @@ public class TextPart extends Part {
      * Builder class for TextPart
      */
     public static class Builder {
+
         private String text;
 
         /**
@@ -131,7 +127,7 @@ public class TextPart extends Part {
 
         /**
          * Sets the text content
-         * 
+         *
          * @param text The text content
          * @return This builder for chaining
          */
@@ -142,11 +138,13 @@ public class TextPart extends Part {
 
         /**
          * Builds a new TextPart instance
-         * 
+         *
          * @return The built instance
          */
         public TextPart build() {
             return new TextPart(text);
         }
+
     }
+
 }

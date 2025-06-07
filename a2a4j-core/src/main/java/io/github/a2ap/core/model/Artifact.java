@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,8 +48,7 @@ public class Artifact implements TaskUpdate {
     private String description;
 
     /**
-     * The parts that make up the artifact content.
-     * Required field.
+     * The parts that make up the artifact content. Required field.
      */
     @JsonProperty("parts")
     private List<Part> parts;
@@ -63,7 +63,7 @@ public class Artifact implements TaskUpdate {
     }
 
     public Artifact(String artifactId, String name, String description, List<Part> parts,
-            Map<String, Object> metadata) {
+                    Map<String, Object> metadata) {
         this.artifactId = artifactId;
         this.name = name;
         this.description = description;
@@ -122,11 +122,9 @@ public class Artifact implements TaskUpdate {
         if (o == null || getClass() != o.getClass())
             return false;
         Artifact artifact = (Artifact) o;
-        return Objects.equals(artifactId, artifact.artifactId) &&
-                Objects.equals(name, artifact.name) &&
-                Objects.equals(description, artifact.description) &&
-                Objects.equals(parts, artifact.parts) &&
-                Objects.equals(metadata, artifact.metadata);
+        return Objects.equals(artifactId, artifact.artifactId) && Objects.equals(name, artifact.name)
+                && Objects.equals(description, artifact.description) && Objects.equals(parts, artifact.parts)
+                && Objects.equals(metadata, artifact.metadata);
     }
 
     @Override
@@ -136,20 +134,23 @@ public class Artifact implements TaskUpdate {
 
     @Override
     public String toString() {
-        return "Artifact{" +
-                "artifactId='" + artifactId + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", parts=" + parts +
-                ", metadata=" + metadata +
-                '}';
+        return "Artifact{" + "artifactId='" + artifactId + '\'' + ", name='" + name + '\'' + ", description='"
+                + description + '\'' + ", parts=" + parts + ", metadata=" + metadata + '}';
     }
 
+    /**
+     * Builder for creating instances of {@link Artifact}.
+     */
     public static class ArtifactBuilder {
+
         private String artifactId;
+
         private String name;
+
         private String description;
+
         private List<Part> parts;
+
         private Map<String, Object> metadata;
 
         ArtifactBuilder() {
@@ -186,11 +187,10 @@ public class Artifact implements TaskUpdate {
 
         @Override
         public String toString() {
-            return "Artifact.ArtifactBuilder(artifactId=" + this.artifactId +
-                    ", name=" + this.name +
-                    ", description=" + this.description +
-                    ", parts=" + this.parts +
-                    ", metadata=" + this.metadata + ")";
+            return "Artifact.ArtifactBuilder(artifactId=" + this.artifactId + ", name=" + this.name + ", description="
+                    + this.description + ", parts=" + this.parts + ", metadata=" + this.metadata + ")";
         }
+
     }
+
 }

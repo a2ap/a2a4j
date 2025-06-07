@@ -26,6 +26,7 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentProvider {
+
     /**
      * The name of the organization providing the agent.
      */
@@ -72,8 +73,7 @@ public class AgentProvider {
         if (o == null || getClass() != o.getClass())
             return false;
         AgentProvider that = (AgentProvider) o;
-        return Objects.equals(organization, that.organization) &&
-                Objects.equals(url, that.url);
+        return Objects.equals(organization, that.organization) && Objects.equals(url, that.url);
     }
 
     @Override
@@ -83,14 +83,16 @@ public class AgentProvider {
 
     @Override
     public String toString() {
-        return "AgentProvider{" +
-                "organization='" + organization + '\'' +
-                ", url='" + url + '\'' +
-                '}';
+        return "AgentProvider{" + "organization='" + organization + '\'' + ", url='" + url + '\'' + '}';
     }
 
+    /**
+     * Builder for creating instances of {@link AgentProvider}.
+     */
     public static class AgentProviderBuilder {
+
         private String organization;
+
         private String url;
 
         AgentProviderBuilder() {
@@ -112,8 +114,9 @@ public class AgentProvider {
 
         @Override
         public String toString() {
-            return "AgentProvider.AgentProviderBuilder(organization=" + this.organization +
-                    ", url=" + this.url + ")";
+            return "AgentProvider.AgentProviderBuilder(organization=" + this.organization + ", url=" + this.url + ")";
         }
+
     }
+
 }

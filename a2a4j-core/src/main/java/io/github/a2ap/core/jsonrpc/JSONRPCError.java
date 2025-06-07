@@ -24,19 +24,19 @@ import java.util.Objects;
 /**
  * Represents a JSON-RPC error.
  */
+
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JSONRPCError {
 
     /**
-     * The error code.
-     * Required field.
+     * The error code. Required field.
      */
     @JsonProperty("code")
     private int code;
 
     /**
-     * The error message.
-     * Required field.
+     * The error message. Required field.
      */
     @JsonProperty("message")
     private String message;
@@ -49,14 +49,20 @@ public class JSONRPCError {
 
     // Standard JSON-RPC error codes
     public static final int PARSE_ERROR = -32700;
+
     public static final int INVALID_REQUEST = -32600;
+
     public static final int METHOD_NOT_FOUND = -32601;
+
     public static final int INVALID_PARAMS = -32602;
+
     public static final int INTERNAL_ERROR = -32603;
 
     // A2A specific error codes
     public static final int TASK_NOT_FOUND = -32000;
+
     public static final int AUTHENTICATION_FAILED = -32001;
+
     public static final int PUSH_NOTIFICATION_NOT_SUPPORTED = -32002;
 
     public JSONRPCError() {
@@ -103,9 +109,7 @@ public class JSONRPCError {
         if (o == null || getClass() != o.getClass())
             return false;
         JSONRPCError that = (JSONRPCError) o;
-        return code == that.code &&
-                Objects.equals(message, that.message) &&
-                Objects.equals(data, that.data);
+        return code == that.code && Objects.equals(message, that.message) && Objects.equals(data, that.data);
     }
 
     @Override
@@ -115,16 +119,18 @@ public class JSONRPCError {
 
     @Override
     public String toString() {
-        return "JSONRPCError{" +
-                "code=" + code +
-                ", message='" + message + '\'' +
-                ", data=" + data +
-                '}';
+        return "JSONRPCError{" + "code=" + code + ", message='" + message + '\'' + ", data=" + data + '}';
     }
 
+    /**
+     * Builder for creating instances of JSONRPCError.
+     */
     public static class JSONRPCErrorBuilder {
+
         private int code;
+
         private String message;
+
         private Object data;
 
         JSONRPCErrorBuilder() {
@@ -145,15 +151,19 @@ public class JSONRPCError {
             return this;
         }
 
+        /**
+         * Builds a new JSONRPCError instance with the provided parameters.
+         */
         public JSONRPCError build() {
             return new JSONRPCError(code, message, data);
         }
 
         @Override
         public String toString() {
-            return "JSONRPCError.JSONRPCErrorBuilder(code=" + this.code +
-                    ", message=" + this.message +
-                    ", data=" + this.data + ")";
+            return "JSONRPCError.JSONRPCErrorBuilder(code=" + this.code + ", message=" + this.message + ", data="
+                    + this.data + ")";
         }
+
     }
+
 }

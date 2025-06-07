@@ -35,7 +35,7 @@ import reactor.core.publisher.Flux;
  * Default implementation of the Dispatcher interface.
  * This implementation routes JSON-RPC requests to the appropriate A2A server methods
  * and handles both synchronous and streaming operations.
- * 
+ * <p>
  * Supported methods include:
  * - message/send: Send a message and create a task
  * - message/stream: Send a message and subscribe to streaming updates
@@ -46,16 +46,16 @@ import reactor.core.publisher.Flux;
  * - tasks/resubscribe: Resubscribe to task updates
  */
 public class DefaultDispatcher implements Dispatcher {
-    
+
     private static final Logger log = LoggerFactory.getLogger(DefaultDispatcher.class);
 
     private final A2AServer a2aServer;
     private final ObjectMapper objectMapper;
-    
+
     /**
      * Constructs a new DefaultDispatcher.
-     * 
-     * @param a2aServer The A2A server instance to delegate operations to
+     *
+     * @param a2aServer    The A2A server instance to delegate operations to
      * @param objectMapper The Jackson ObjectMapper for parameter conversion
      */
     public DefaultDispatcher(A2AServer a2aServer, ObjectMapper objectMapper) {
@@ -65,7 +65,7 @@ public class DefaultDispatcher implements Dispatcher {
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * This implementation supports the following methods:
      * - message/send
      * - tasks/get
@@ -79,41 +79,41 @@ public class DefaultDispatcher implements Dispatcher {
         response.setId(request.getId());
         String method = request.getMethod();
         Object params = request.getParams();
-        
+
         try {
             switch (method) {
-                case "message/send":
+                case "message/send" -> {
                     MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
                     SendMessageResponse messageResponse = a2aServer.handleMessage(taskSendParams);
                     response.setResult(messageResponse);
-                    break;
-                case "tasks/get":
+                }
+                case "tasks/get" -> {
                     TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
                     Task task = a2aServer.getTask(taskIdParamsGet.getId());
                     response.setResult(task);
-                    break;
-                case "tasks/cancel":
+                }
+                case "tasks/cancel" -> {
                     TaskIdParams taskIdParamsCancel = objectMapper.convertValue(params, TaskIdParams.class);
                     Task cancelledTask = a2aServer.cancelTask(taskIdParamsCancel.getId());
                     response.setResult(cancelledTask);
-                    break;
-                case "tasks/pushNotificationConfig/set":
+                }
+                case "tasks/pushNotificationConfig/set" -> {
                     TaskPushNotificationConfig configToSet = objectMapper.convertValue(params,
                             TaskPushNotificationConfig.class);
                     TaskPushNotificationConfig setResult = a2aServer.setTaskPushNotification(configToSet);
                     response.setResult(setResult);
-                    break;
-                case "tasks/pushNotificationConfig/get":
+                }
+                case "tasks/pushNotificationConfig/get" -> {
                     TaskIdParams taskIdParamsGetConfig = objectMapper.convertValue(params, TaskIdParams.class);
                     TaskPushNotificationConfig getConfigResult = a2aServer
                             .getTaskPushNotification(taskIdParamsGetConfig.getId());
                     response.setResult(getConfigResult);
-                    break;
-                default:
+                }
+                default -> {
                     log.warn("Unsupported method: {}", method);
                     response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
                             "Method '" + method + "' not supported"));
-                    break;
+                }
             }
         } catch (IllegalArgumentException e) {
             response.setError(new JSONRPCError(JSONRPCError.INVALID_PARAMS, "Invalid params", e.getMessage()));
@@ -126,7 +126,7 @@ public class DefaultDispatcher implements Dispatcher {
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * This implementation supports the following streaming methods:
      * - message/stream
      * - tasks/resubscribe
@@ -137,27 +137,29 @@ public class DefaultDispatcher implements Dispatcher {
         response.setId(request.getId());
         String method = request.getMethod();
         Object params = request.getParams();
-        
+
         try {
             switch (method) {
-                case "message/stream":
+                case "message/stream" -> {
                     MessageSendParams taskSendParams = objectMapper.convertValue(params, MessageSendParams.class);
                     return a2aServer.handleMessageStream(taskSendParams).map(event -> {
                         response.setResult(event);
                         return response;
                     });
-                case "tasks/resubscribe":
+                }
+                case "tasks/resubscribe" -> {
                     TaskIdParams taskIdParamsGet = objectMapper.convertValue(params, TaskIdParams.class);
                     return a2aServer.subscribeToTaskUpdates(taskIdParamsGet.getId())
                             .map(event -> {
                                 response.setResult(event);
                                 return response;
                             });
-                default:
+                }
+                default -> {
                     log.warn("Unsupported method: {}", method);
                     response.setError(new JSONRPCError(JSONRPCError.METHOD_NOT_FOUND, "Method not found",
                             "Method '" + method + "' not supported"));
-                    break;
+                }
             }
         } catch (IllegalArgumentException e) {
             response.setError(new JSONRPCError(JSONRPCError.INVALID_REQUEST, "Invalid params", e.getMessage()));
@@ -167,4 +169,4 @@ public class DefaultDispatcher implements Dispatcher {
         }
         return Flux.just(response);
     }
-} 
+}

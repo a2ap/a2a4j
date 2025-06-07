@@ -22,6 +22,7 @@ import java.util.Objects;
  * Parameters for querying tasks.
  */
 public class TaskQueryParams {
+
     /**
      * The ID of the task.
      */
@@ -31,6 +32,7 @@ public class TaskQueryParams {
      * The session ID associated with the task.
      */
     private String sessionId;
+
     // Add other query parameters as needed based on A2A protocol
 
     /**
@@ -41,7 +43,7 @@ public class TaskQueryParams {
 
     /**
      * Constructor with taskId
-     * 
+     *
      * @param taskId The task ID
      */
     public TaskQueryParams(String taskId) {
@@ -50,7 +52,7 @@ public class TaskQueryParams {
 
     /**
      * Constructor with all fields
-     * 
+     *
      * @param taskId    The task ID
      * @param sessionId The session ID
      */
@@ -61,7 +63,7 @@ public class TaskQueryParams {
 
     /**
      * Gets the task ID
-     * 
+     *
      * @return The task ID
      */
     public String getTaskId() {
@@ -70,7 +72,7 @@ public class TaskQueryParams {
 
     /**
      * Sets the task ID
-     * 
+     *
      * @param taskId The task ID to set
      */
     public void setTaskId(String taskId) {
@@ -79,7 +81,7 @@ public class TaskQueryParams {
 
     /**
      * Gets the session ID
-     * 
+     *
      * @return The session ID
      */
     public String getSessionId() {
@@ -88,7 +90,7 @@ public class TaskQueryParams {
 
     /**
      * Sets the session ID
-     * 
+     *
      * @param sessionId The session ID to set
      */
     public void setSessionId(String sessionId) {
@@ -102,8 +104,7 @@ public class TaskQueryParams {
         if (o == null || getClass() != o.getClass())
             return false;
         TaskQueryParams that = (TaskQueryParams) o;
-        return Objects.equals(taskId, that.taskId) &&
-                Objects.equals(sessionId, that.sessionId);
+        return Objects.equals(taskId, that.taskId) && Objects.equals(sessionId, that.sessionId);
     }
 
     @Override
@@ -113,15 +114,12 @@ public class TaskQueryParams {
 
     @Override
     public String toString() {
-        return "TaskQueryParams{" +
-                "taskId='" + taskId + '\'' +
-                ", sessionId='" + sessionId + '\'' +
-                '}';
+        return "TaskQueryParams{" + "taskId='" + taskId + '\'' + ", sessionId='" + sessionId + '\'' + '}';
     }
 
     /**
      * Returns a builder for TaskQueryParams
-     * 
+     *
      * @return A new builder instance
      */
     public static Builder builder() {
@@ -132,7 +130,9 @@ public class TaskQueryParams {
      * Builder class for TaskQueryParams
      */
     public static class Builder {
+
         private String taskId;
+
         private String sessionId;
 
         /**
@@ -143,7 +143,7 @@ public class TaskQueryParams {
 
         /**
          * Sets the task ID
-         * 
+         *
          * @param taskId The task ID
          * @return This builder for chaining
          */
@@ -154,7 +154,7 @@ public class TaskQueryParams {
 
         /**
          * Sets the session ID
-         * 
+         *
          * @param sessionId The session ID
          * @return This builder for chaining
          */
@@ -165,11 +165,13 @@ public class TaskQueryParams {
 
         /**
          * Builds a new TaskQueryParams instance
-         * 
+         *
          * @return The built instance
          */
         public TaskQueryParams build() {
             return new TaskQueryParams(taskId, sessionId);
         }
+
     }
+
 }

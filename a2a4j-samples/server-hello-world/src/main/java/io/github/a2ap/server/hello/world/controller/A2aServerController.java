@@ -34,34 +34,40 @@ import reactor.core.publisher.Flux;
 
 /**
  * Spring Boot REST Controller that implements the A2A protocol endpoints.
- * 
- * <p>This controller provides the standard A2A protocol endpoints required for
- * agent discovery and communication:
+ *
+ * <p>
+ * This controller provides the standard A2A protocol endpoints required for agent
+ * discovery and communication:
  * <ul>
- * <li><strong>Agent Discovery:</strong> {@code GET /.well-known/agent.json} - Returns the agent card</li>
- * <li><strong>Synchronous Communication:</strong> {@code POST /a2a/server} - JSON-RPC requests with immediate response</li>
- * <li><strong>Streaming Communication:</strong> {@code POST /a2a/server} with Accept: text/event-stream - Server-Sent Events</li>
+ * <li><strong>Agent Discovery:</strong> {@code GET /.well-known/agent.json} - Returns the
+ * agent card</li>
+ * <li><strong>Synchronous Communication:</strong> {@code POST /a2a/server} - JSON-RPC
+ * requests with immediate response</li>
+ * <li><strong>Streaming Communication:</strong> {@code POST /a2a/server} with Accept:
+ * text/event-stream - Server-Sent Events</li>
  * </ul>
- * 
- * <p>The controller delegates JSON-RPC request processing to the {@link Dispatcher},
- * which routes requests to appropriate handlers based on the method name.
- * 
+ *
+ * <p>
+ * The controller delegates JSON-RPC request processing to the {@link Dispatcher}, which
+ * routes requests to appropriate handlers based on the method name.
+ *
  * @see io.github.a2ap.core.server.Dispatcher
  * @see io.github.a2ap.core.jsonrpc.JSONRPCRequest
  * @see io.github.a2ap.core.model.AgentCard
  */
 @RestController
 public class A2aServerController {
-    
+
     private static final Logger log = LoggerFactory.getLogger(A2aServerController.class);
 
     private final A2AServer a2aServer;
+
     private final Dispatcher a2aDispatch;
-    
+
     /**
      * Constructs a new A2A server controller.
-     * 
-     * @param a2aServer the A2A server instance for accessing agent card
+     *
+     * @param a2aServer   the A2A server instance for accessing agent card
      * @param a2aDispatch the dispatcher for handling JSON-RPC requests
      */
     public A2aServerController(A2AServer a2aServer, Dispatcher a2aDispatch) {
@@ -71,16 +77,17 @@ public class A2aServerController {
 
     /**
      * Returns the agent card for agent discovery.
-     * 
-     * <p>This endpoint is required by the A2A protocol for agent discovery.
-     * Clients can call this endpoint to learn about the agent's capabilities,
-     * supported methods, and metadata.
-     * 
-     * <p><strong>Example request:</strong>
-     * <pre>GET /.well-known/agent.json</pre>
-     * 
-     * <p><strong>Example response:</strong>
-     * <pre>
+     *
+     * <p>
+     * This endpoint is required by the A2A protocol for agent discovery. Clients can call
+     * this endpoint to learn about the agent's capabilities, supported methods, and
+     * metadata.
+     *
+     * <p>
+     * <strong>Example request:</strong> <pre>GET /.well-known/agent.json</pre>
+     *
+     * <p>
+     * <strong>Example response:</strong> <pre>
      * {
      *   "name": "A2A Java Server",
      *   "description": "A sample A2A agent implemented in Java",
@@ -93,7 +100,7 @@ public class A2aServerController {
      *   }
      * }
      * </pre>
-     * 
+     *
      * @return ResponseEntity containing the agent card
      */
     @GetMapping(".well-known/agent.json")
@@ -104,20 +111,21 @@ public class A2aServerController {
 
     /**
      * Handles synchronous A2A JSON-RPC requests.
-     * 
-     * <p>This endpoint processes JSON-RPC 2.0 requests and returns immediate responses.
-     * It supports all standard A2A methods such as:
+     *
+     * <p>
+     * This endpoint processes JSON-RPC 2.0 requests and returns immediate responses. It
+     * supports all standard A2A methods such as:
      * <ul>
      * <li>{@code message/send} - Send a message and create a task</li>
      * <li>{@code tasks/get} - Get task status</li>
      * <li>{@code tasks/cancel} - Cancel a task</li>
      * </ul>
-     * 
-     * <p><strong>Example request:</strong>
-     * <pre>
+     *
+     * <p>
+     * <strong>Example request:</strong> <pre>
      * POST /a2a/server
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "jsonrpc": "2.0",
      *   "method": "message/send",
@@ -127,7 +135,7 @@ public class A2aServerController {
      *       "parts": [
      *         {
      *           "type": "text",
-     *           "kind": "text", 
+     *           "kind": "text",
      *           "text": "Hello, A2A!"
      *         }
      *       ]
@@ -136,7 +144,7 @@ public class A2aServerController {
      *   "id": "1"
      * }
      * </pre>
-     * 
+     *
      * @param request the JSON-RPC request
      * @return ResponseEntity containing the JSON-RPC response
      */
@@ -147,24 +155,27 @@ public class A2aServerController {
 
     /**
      * Handles streaming A2A JSON-RPC requests using Server-Sent Events.
-     * 
-     * <p>This endpoint processes JSON-RPC 2.0 requests and returns a stream of events
-     * as the task progresses. Clients receive real-time updates about task status,
-     * artifacts generated, and completion status.
-     * 
-     * <p>The stream typically includes:
+     *
+     * <p>
+     * This endpoint processes JSON-RPC 2.0 requests and returns a stream of events as the
+     * task progresses. Clients receive real-time updates about task status, artifacts
+     * generated, and completion status.
+     *
+     * <p>
+     * The stream typically includes:
      * <ul>
-     * <li><strong>Status Updates:</strong> Task state changes (WORKING, COMPLETED, etc.)</li>
+     * <li><strong>Status Updates:</strong> Task state changes (WORKING, COMPLETED,
+     * etc.)</li>
      * <li><strong>Artifact Updates:</strong> Generated content (text, code, files)</li>
      * <li><strong>Progress Updates:</strong> Task progress information</li>
      * </ul>
-     * 
-     * <p><strong>Example request:</strong>
-     * <pre>
+     *
+     * <p>
+     * <strong>Example request:</strong> <pre>
      * POST /a2a/server
      * Content-Type: application/json
      * Accept: text/event-stream
-     * 
+     *
      * {
      *   "jsonrpc": "2.0",
      *   "method": "message/stream",
@@ -183,25 +194,26 @@ public class A2aServerController {
      *   "id": "1"
      * }
      * </pre>
-     * 
-     * <p><strong>Example response stream:</strong>
-     * <pre>
+     *
+     * <p>
+     * <strong>Example response stream:</strong> <pre>
      * event: task-update
      * data: {"jsonrpc":"2.0","result":{"taskId":"abc123","status":"WORKING"},"id":"1"}
-     * 
+     *
      * event: task-update
      * data: {"jsonrpc":"2.0","result":{"taskId":"abc123","artifact":{"type":"text","content":"Hello!"}},"id":"1"}
-     * 
+     *
      * event: task-update
      * data: {"jsonrpc":"2.0","result":{"taskId":"abc123","status":"COMPLETED"},"id":"1"}
      * </pre>
-     * 
+     *
      * @param request the JSON-RPC request
      * @return Flux of ServerSentEvent containing JSON-RPC responses
      */
     @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
-        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder()
-                            .data(event).event("task-update").build());
+        return a2aDispatch.dispatchStream(request)
+                .map(event -> ServerSentEvent.<JSONRPCResponse>builder().data(event).event("task-update").build());
     }
+
 }

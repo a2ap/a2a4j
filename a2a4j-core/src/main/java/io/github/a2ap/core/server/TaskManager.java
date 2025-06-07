@@ -16,15 +16,16 @@
 
 package io.github.a2ap.core.server;
 
-import io.github.a2ap.core.model.Task;
-import io.github.a2ap.core.model.RequestContext;
-import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.MessageSendParams;
+import io.github.a2ap.core.model.RequestContext;
+import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
+import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.model.TaskUpdate;
-import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
-import java.util.List;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * Interface for managing tasks in the A2A system.
@@ -34,7 +35,7 @@ public interface TaskManager {
 
     /**
      * Load or create a new task.
-     * 
+     *
      * @param params The task param to create
      * @return The created task with a generated ID
      */
@@ -42,7 +43,7 @@ public interface TaskManager {
 
     /**
      * Gets a task by its ID.
-     * 
+     *
      * @param taskId The ID of the task
      * @return The task with the specified ID, or null if not found
      */
@@ -50,7 +51,8 @@ public interface TaskManager {
 
     /**
      * apply take update for task
-     * @param taskContext TaskContext
+     *
+     * @param task TaskContext
      * @param taskUpdates taskUpdate TaskStatus or Artifact update
      * @return mono of task
      */
@@ -58,23 +60,26 @@ public interface TaskManager {
 
     /**
      * apply task update for task
-     * @param taskContext TaskContext
-     * @param update tash update TaskStatus or Artifact update
+     *
+     * @param task TaskContext
+     * @param update      tash update TaskStatus or Artifact update
      * @return mono of task
      */
     Mono<Task> applyTaskUpdate(Task task, TaskUpdate update);
 
     /**
      * Apply status update with append support from TaskStatusUpdateEvent
-     * @param task The task to update
+     *
+     * @param task  The task to update
      * @param event The TaskStatusUpdateEvent containing status information
      * @return Updated task
      */
     Mono<Task> applyStatusUpdate(Task task, TaskStatusUpdateEvent event);
-    
+
     /**
      * Apply artifact update with append support from TaskArtifactUpdateEvent
-     * @param task The task to update
+     *
+     * @param task  The task to update
      * @param event The TaskArtifactUpdateEvent containing artifact and append information
      * @return Updated task
      */
@@ -82,14 +87,16 @@ public interface TaskManager {
 
     /**
      * register task notification config
+     *
      * @param config notification config
      */
     void registerTaskNotification(TaskPushNotificationConfig config);
 
     /**
      * get task notification config
+     *
      * @param taskId task id
-     * @return notification config 
+     * @return notification config
      */
     TaskPushNotificationConfig getTaskNotification(String taskId);
 }

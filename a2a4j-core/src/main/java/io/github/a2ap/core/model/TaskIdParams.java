@@ -17,6 +17,7 @@
 package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -24,6 +25,7 @@ import java.util.Objects;
  * Parameters for task ID related operations.
  */
 public class TaskIdParams {
+
     /**
      * The ID of the task.
      */
@@ -44,7 +46,7 @@ public class TaskIdParams {
 
     /**
      * Constructor with id
-     * 
+     *
      * @param id The task ID
      */
     public TaskIdParams(String id) {
@@ -53,7 +55,7 @@ public class TaskIdParams {
 
     /**
      * Constructor with all fields
-     * 
+     *
      * @param id       The task ID
      * @param metadata The metadata
      */
@@ -64,7 +66,7 @@ public class TaskIdParams {
 
     /**
      * Gets the task ID
-     * 
+     *
      * @return The task ID
      */
     public String getId() {
@@ -73,7 +75,7 @@ public class TaskIdParams {
 
     /**
      * Sets the task ID
-     * 
+     *
      * @param id The task ID to set
      */
     public void setId(String id) {
@@ -82,7 +84,7 @@ public class TaskIdParams {
 
     /**
      * Gets the metadata
-     * 
+     *
      * @return The metadata
      */
     public Map<String, Object> getMetadata() {
@@ -91,7 +93,7 @@ public class TaskIdParams {
 
     /**
      * Sets the metadata
-     * 
+     *
      * @param metadata The metadata to set
      */
     public void setMetadata(Map<String, Object> metadata) {
@@ -105,8 +107,7 @@ public class TaskIdParams {
         if (o == null || getClass() != o.getClass())
             return false;
         TaskIdParams that = (TaskIdParams) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(metadata, that.metadata);
+        return Objects.equals(id, that.id) && Objects.equals(metadata, that.metadata);
     }
 
     @Override
@@ -116,15 +117,12 @@ public class TaskIdParams {
 
     @Override
     public String toString() {
-        return "TaskIdParams{" +
-                "id='" + id + '\'' +
-                ", metadata=" + metadata +
-                '}';
+        return "TaskIdParams{" + "id='" + id + '\'' + ", metadata=" + metadata + '}';
     }
 
     /**
      * Returns a builder for TaskIdParams
-     * 
+     *
      * @return A new builder instance
      */
     public static Builder builder() {
@@ -135,7 +133,9 @@ public class TaskIdParams {
      * Builder class for TaskIdParams
      */
     public static class Builder {
+
         private String id;
+
         private Map<String, Object> metadata;
 
         /**
@@ -146,7 +146,7 @@ public class TaskIdParams {
 
         /**
          * Sets the task ID
-         * 
+         *
          * @param id The task ID
          * @return This builder for chaining
          */
@@ -157,7 +157,7 @@ public class TaskIdParams {
 
         /**
          * Sets the metadata
-         * 
+         *
          * @param metadata The metadata
          * @return This builder for chaining
          */
@@ -168,11 +168,13 @@ public class TaskIdParams {
 
         /**
          * Builds a new TaskIdParams instance
-         * 
+         *
          * @return The built instance
          */
         public TaskIdParams build() {
             return new TaskIdParams(id, metadata);
         }
+
     }
+
 }

@@ -24,8 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
- * An implementation of {@link CardResolver} that fetches AgentCard from a URL
- * via HTTP.
+ * An implementation of {@link CardResolver} that fetches AgentCard from a URL via HTTP.
  */
 @Component
 public class HttpCardResolver implements CardResolver {
@@ -38,15 +37,16 @@ public class HttpCardResolver implements CardResolver {
         WebClient client = WebClient.create(agentIdentifier);
         try {
             AgentCard responseCard = client.get()
-                    .uri("/.well-known/agent.json")
-                    .retrieve()
-                    .bodyToMono(AgentCard.class)
-                    .block();
-            log.info("Retrieve agent card {} successfully. Info: {}", agentIdentifier, responseCard);
+                .uri("/.well-known/agent.json")
+                .retrieve()
+                .bodyToMono(AgentCard.class)
+                .block();
+            log.info("Retrieve agent card {} successfully, Info: {}.", agentIdentifier, responseCard);
             return responseCard;
         } catch (Exception e) {
             log.error("Error sending task to {}: {}", agentIdentifier, e.getMessage(), e);
             return null;
         }
     }
+
 }

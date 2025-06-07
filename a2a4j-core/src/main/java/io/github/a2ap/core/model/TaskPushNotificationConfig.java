@@ -29,8 +29,7 @@ import java.util.Objects;
 public class TaskPushNotificationConfig extends PushNotificationConfig {
 
     /**
-     * The task ID to receive push notifications for.
-     * Required field.
+     * The task ID to receive push notifications for. Required field.
      */
     @JsonProperty("task_id")
     private String taskId;
@@ -71,20 +70,23 @@ public class TaskPushNotificationConfig extends PushNotificationConfig {
 
     @Override
     public String toString() {
-        return "TaskPushNotificationConfig{" +
-                "taskId='" + taskId + '\'' +
-                ", url='" + getUrl() + '\'' +
-                ", authToken='" + getAuthToken() + '\'' +
-                '}';
+        return "TaskPushNotificationConfig{" + "taskId='" + taskId + '\'' + ", url='" + getUrl() + '\''
+                + ", authToken='" + getAuthToken() + '\'' + '}';
     }
 
     public static TaskPushNotificationConfigBuilder taskPushBuilder() {
         return new TaskPushNotificationConfigBuilder();
     }
 
+    /**
+     * Builder for creating instances of TaskPushNotificationConfig.
+     */
     public static class TaskPushNotificationConfigBuilder {
+
         private String url;
+
         private String authToken;
+
         private String taskId;
 
         TaskPushNotificationConfigBuilder() {
@@ -105,15 +107,19 @@ public class TaskPushNotificationConfig extends PushNotificationConfig {
             return this;
         }
 
+        /**
+         * Builds the TaskPushNotificationConfig instance.
+         */
         public TaskPushNotificationConfig build() {
             return new TaskPushNotificationConfig(url, authToken, taskId);
         }
 
         @Override
         public String toString() {
-            return "TaskPushNotificationConfig.TaskPushNotificationConfigBuilder(url=" + this.url +
-                    ", authToken=" + this.authToken +
-                    ", taskId=" + this.taskId + ")";
+            return "TaskPushNotificationConfig.TaskPushNotificationConfigBuilder(url=" + this.url + ", authToken="
+                    + this.authToken + ", taskId=" + this.taskId + ")";
         }
+
     }
+
 }

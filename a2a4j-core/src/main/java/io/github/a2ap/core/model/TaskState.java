@@ -22,15 +22,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Enumeration of possible states for a task.
  */
 public enum TaskState {
-    SUBMITTED("submitted"),
-    WORKING("working"),
-    INPUT_REQUIRED("input-required"),
-    COMPLETED("completed"),
-    FAILED("failed"),
-    CANCELED("canceled"),
-    REJECTED("rejected"),
-    AUTH_REQUIRED("auth-required"),
-    UNKNOWN("unknown");
+
+    SUBMITTED("submitted"), WORKING("working"), INPUT_REQUIRED("input-required"), COMPLETED("completed"),
+    FAILED("failed"), CANCELED("canceled"), REJECTED("rejected"), AUTH_REQUIRED("auth-required"), UNKNOWN("unknown");
 
     private final String value;
 
@@ -51,4 +45,5 @@ public enum TaskState {
         }
         throw new IllegalArgumentException("Unknown TaskState value: " + value);
     }
+
 }

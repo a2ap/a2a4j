@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 /**
@@ -41,7 +42,7 @@ public class FileWithUri extends FileContent {
 
     /**
      * Constructor with URI.
-     * 
+     *
      * @param uri the file URI
      */
     public FileWithUri(String uri) {
@@ -51,7 +52,7 @@ public class FileWithUri extends FileContent {
 
     /**
      * Constructor with name, MIME type, and URI.
-     * 
+     *
      * @param name     the file name
      * @param mimeType the MIME type
      * @param uri      the file URI
@@ -63,7 +64,7 @@ public class FileWithUri extends FileContent {
 
     /**
      * Gets the URI of the file.
-     * 
+     *
      * @return the URI
      */
     public String getUri() {
@@ -72,7 +73,7 @@ public class FileWithUri extends FileContent {
 
     /**
      * Sets the URI of the file.
-     * 
+     *
      * @param uri the URI to set
      */
     public void setUri(String uri) {
@@ -98,16 +99,13 @@ public class FileWithUri extends FileContent {
 
     @Override
     public String toString() {
-        return "FileWithUri{" +
-                "uri='" + uri + '\'' +
-                ", name='" + getName() + '\'' +
-                ", mimeType='" + getMimeType() + '\'' +
-                '}';
+        return "FileWithUri{" + "uri='" + uri + '\'' + ", name='" + getName() + '\'' + ", mimeType='" + getMimeType()
+                + '\'' + '}';
     }
 
     /**
      * Returns a builder for FileWithUri.
-     * 
+     *
      * @return a new builder instance
      */
     public static Builder builder() {
@@ -118,8 +116,11 @@ public class FileWithUri extends FileContent {
      * Builder class for FileWithUri.
      */
     public static class Builder {
+
         private String name;
+
         private String mimeType;
+
         private String uri;
 
         /**
@@ -130,7 +131,7 @@ public class FileWithUri extends FileContent {
 
         /**
          * Sets the file name.
-         * 
+         *
          * @param name the file name
          * @return this builder for chaining
          */
@@ -141,7 +142,7 @@ public class FileWithUri extends FileContent {
 
         /**
          * Sets the MIME type.
-         * 
+         *
          * @param mimeType the MIME type
          * @return this builder for chaining
          */
@@ -152,7 +153,7 @@ public class FileWithUri extends FileContent {
 
         /**
          * Sets the URI.
-         * 
+         *
          * @param uri the URI
          * @return this builder for chaining
          */
@@ -163,11 +164,13 @@ public class FileWithUri extends FileContent {
 
         /**
          * Builds a new FileWithUri instance.
-         * 
+         *
          * @return the built instance
          */
         public FileWithUri build() {
             return new FileWithUri(name, mimeType, uri);
         }
+
     }
+
 }

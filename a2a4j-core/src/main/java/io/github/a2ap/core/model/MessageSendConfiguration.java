@@ -19,6 +19,9 @@ package io.github.a2ap.core.model;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Configuration for sending messages in the A2A4J framework.
+ */
 public class MessageSendConfiguration {
 
     /**
@@ -41,11 +44,14 @@ public class MessageSendConfiguration {
      */
     private Boolean blocking;
 
+    /**
+     * Default constructor for serialization frameworks.
+     */
     public MessageSendConfiguration() {
     }
 
     public MessageSendConfiguration(List<String> acceptedOutputModes, Integer historyLength,
-            PushNotificationConfig pushNotificationConfig, Boolean blocking) {
+                                    PushNotificationConfig pushNotificationConfig, Boolean blocking) {
         this.acceptedOutputModes = acceptedOutputModes;
         this.historyLength = historyLength;
         this.pushNotificationConfig = pushNotificationConfig;
@@ -95,10 +101,10 @@ public class MessageSendConfiguration {
         if (o == null || getClass() != o.getClass())
             return false;
         MessageSendConfiguration that = (MessageSendConfiguration) o;
-        return Objects.equals(acceptedOutputModes, that.acceptedOutputModes) &&
-                Objects.equals(historyLength, that.historyLength) &&
-                Objects.equals(pushNotificationConfig, that.pushNotificationConfig) &&
-                Objects.equals(blocking, that.blocking);
+        return Objects.equals(acceptedOutputModes, that.acceptedOutputModes)
+                && Objects.equals(historyLength, that.historyLength)
+                && Objects.equals(pushNotificationConfig, that.pushNotificationConfig)
+                && Objects.equals(blocking, that.blocking);
     }
 
     @Override
@@ -108,18 +114,21 @@ public class MessageSendConfiguration {
 
     @Override
     public String toString() {
-        return "MessageSendConfiguration{" +
-                "acceptedOutputModes=" + acceptedOutputModes +
-                ", historyLength=" + historyLength +
-                ", pushNotificationConfig=" + pushNotificationConfig +
-                ", blocking=" + blocking +
-                '}';
+        return "MessageSendConfiguration{" + "acceptedOutputModes=" + acceptedOutputModes + ", historyLength="
+                + historyLength + ", pushNotificationConfig=" + pushNotificationConfig + ", blocking=" + blocking + '}';
     }
 
+    /**
+     * Builder class for MessageSendConfiguration.
+     */
     public static class MessageSendConfigurationBuilder {
+
         private List<String> acceptedOutputModes;
+
         private Integer historyLength;
+
         private PushNotificationConfig pushNotificationConfig;
+
         private Boolean blocking;
 
         MessageSendConfigurationBuilder() {
@@ -151,11 +160,11 @@ public class MessageSendConfiguration {
 
         @Override
         public String toString() {
-            return "MessageSendConfiguration.MessageSendConfigurationBuilder(" +
-                    "acceptedOutputModes=" + this.acceptedOutputModes +
-                    ", historyLength=" + this.historyLength +
-                    ", pushNotificationConfig=" + this.pushNotificationConfig +
-                    ", blocking=" + this.blocking + ")";
+            return "MessageSendConfiguration.MessageSendConfigurationBuilder(" + "acceptedOutputModes="
+                    + this.acceptedOutputModes + ", historyLength=" + this.historyLength + ", pushNotificationConfig="
+                    + this.pushNotificationConfig + ", blocking=" + this.blocking + ")";
         }
+
     }
+
 }

@@ -28,8 +28,7 @@ import java.util.Objects;
 public class PushNotificationConfig {
 
     /**
-     * The URL to send push notifications to.
-     * Required field.
+     * The URL to send push notifications to. Required field.
      */
     @JsonProperty("url")
     private String url;
@@ -75,8 +74,7 @@ public class PushNotificationConfig {
         if (o == null || getClass() != o.getClass())
             return false;
         PushNotificationConfig that = (PushNotificationConfig) o;
-        return Objects.equals(url, that.url) &&
-                Objects.equals(authToken, that.authToken);
+        return Objects.equals(url, that.url) && Objects.equals(authToken, that.authToken);
     }
 
     @Override
@@ -86,14 +84,16 @@ public class PushNotificationConfig {
 
     @Override
     public String toString() {
-        return "PushNotificationConfig{" +
-                "url='" + url + '\'' +
-                ", authToken='" + authToken + '\'' +
-                '}';
+        return "PushNotificationConfig{" + "url='" + url + '\'' + ", authToken='" + authToken + '\'' + '}';
     }
 
+    /**
+     * Builder class for PushNotificationConfig.
+     */
     public static class PushNotificationConfigBuilder {
+
         private String url;
+
         private String authToken;
 
         PushNotificationConfigBuilder() {
@@ -115,8 +115,10 @@ public class PushNotificationConfig {
 
         @Override
         public String toString() {
-            return "PushNotificationConfig.PushNotificationConfigBuilder(url=" + this.url +
-                    ", authToken=" + this.authToken + ")";
+            return "PushNotificationConfig.PushNotificationConfigBuilder(url=" + this.url + ", authToken="
+                    + this.authToken + ")";
         }
+
     }
+
 }

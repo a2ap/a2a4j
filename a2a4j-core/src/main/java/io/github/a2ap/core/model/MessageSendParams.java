@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Parameters for sending a message.
+ */
 public class MessageSendParams {
 
     /**
@@ -85,9 +88,8 @@ public class MessageSendParams {
         if (o == null || getClass() != o.getClass())
             return false;
         MessageSendParams that = (MessageSendParams) o;
-        return Objects.equals(message, that.message) &&
-                Objects.equals(configuration, that.configuration) &&
-                Objects.equals(metadata, that.metadata);
+        return Objects.equals(message, that.message) && Objects.equals(configuration, that.configuration)
+                && Objects.equals(metadata, that.metadata);
     }
 
     @Override
@@ -97,16 +99,19 @@ public class MessageSendParams {
 
     @Override
     public String toString() {
-        return "MessageSendParams{" +
-                "message=" + message +
-                ", configuration=" + configuration +
-                ", metadata=" + metadata +
-                '}';
+        return "MessageSendParams{" + "message=" + message + ", configuration=" + configuration + ", metadata="
+                + metadata + '}';
     }
 
+    /**
+     * Builder for creating instances of {@link MessageSendParams}.
+     */
     public static class MessageSendParamsBuilder {
+
         private Message message;
+
         private MessageSendConfiguration configuration;
+
         private Map<String, Object> metadata;
 
         MessageSendParamsBuilder() {
@@ -133,9 +138,10 @@ public class MessageSendParams {
 
         @Override
         public String toString() {
-            return "MessageSendParams.MessageSendParamsBuilder(message=" + this.message +
-                    ", configuration=" + this.configuration +
-                    ", metadata=" + this.metadata + ")";
+            return "MessageSendParams.MessageSendParamsBuilder(message=" + this.message + ", configuration="
+                    + this.configuration + ", metadata=" + this.metadata + ")";
         }
+
     }
+
 }

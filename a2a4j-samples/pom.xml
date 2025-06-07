@@ -15,20 +15,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>io.github.a2ap</groupId>
-		<artifactId>a2a4j-parent</artifactId>
-		<version>${revision}</version>
-	</parent>
+    <parent>
+        <groupId>io.github.a2ap</groupId>
+        <artifactId>a2a4j</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-	<artifactId>a2a4j-samples</artifactId>
-	<version>${revision}</version>
+    <artifactId>a2a4j-samples</artifactId>
     <packaging>pom</packaging>
     <url>https://github.com/a2ap/a2a4j</url>
+
     <modules>
         <module>server-hello-world</module>
     </modules>
@@ -39,13 +39,13 @@
         <url>https://github.com/a2ap/a2a4j</url>
     </scm>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -18,6 +18,7 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 /**
@@ -46,7 +47,7 @@ public abstract class FileContent {
 
     /**
      * Constructor with name and MIME type.
-     * 
+     *
      * @param name     the file name
      * @param mimeType the MIME type
      */
@@ -57,7 +58,7 @@ public abstract class FileContent {
 
     /**
      * Gets the file name.
-     * 
+     *
      * @return the file name
      */
     public String getName() {
@@ -66,7 +67,7 @@ public abstract class FileContent {
 
     /**
      * Sets the file name.
-     * 
+     *
      * @param name the file name to set
      */
     public void setName(String name) {
@@ -75,7 +76,7 @@ public abstract class FileContent {
 
     /**
      * Gets the MIME type.
-     * 
+     *
      * @return the MIME type
      */
     public String getMimeType() {
@@ -84,7 +85,7 @@ public abstract class FileContent {
 
     /**
      * Sets the MIME type.
-     * 
+     *
      * @param mimeType the MIME type to set
      */
     public void setMimeType(String mimeType) {
@@ -98,8 +99,7 @@ public abstract class FileContent {
         if (o == null || getClass() != o.getClass())
             return false;
         FileContent that = (FileContent) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(mimeType, that.mimeType);
+        return Objects.equals(name, that.name) && Objects.equals(mimeType, that.mimeType);
     }
 
     @Override
@@ -109,9 +109,7 @@ public abstract class FileContent {
 
     @Override
     public String toString() {
-        return "FileContent{" +
-                "name='" + name + '\'' +
-                ", mimeType='" + mimeType + '\'' +
-                '}';
+        return "FileContent{" + "name='" + name + '\'' + ", mimeType='" + mimeType + '\'' + '}';
     }
+
 }
