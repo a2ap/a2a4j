@@ -16,6 +16,7 @@
 
 package io.github.a2ap.core.client.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.github.a2ap.core.client.A2AClient;
 import io.github.a2ap.core.client.CardResolver;
 import io.github.a2ap.core.model.AgentCard;
@@ -25,15 +26,19 @@ import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskQueryParams;
 import io.github.a2ap.core.model.MessageSendParams;
+import io.github.a2ap.core.util.JsonUtil;
+import io.netty.buffer.Unpooled;
+import io.netty.util.internal.StringUtil;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Objects;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 /**
  * Implementation of the A2AClient interface.
@@ -84,35 +89,39 @@ public class A2AClientImpl implements A2AClient {
      * @return The created Task object received from the agent.
      */
     @Override
-    public Task sendTask(MessageSendParams taskSendParams) {
-        log.info("Sending task to {} with params: {}", this.baseUrl, taskSendParams);
-        WebClient client = WebClient.create(this.baseUrl);
+    public Task sendMessage(MessageSendParams taskSendParams) {
+        log.info("Sending message to {} with params: {}", this.baseUrl, taskSendParams);
+        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
         try {
             Task responseTask = client.post()
-                    .uri("/tasks/send")
-                    .bodyValue(taskSendParams)
-                    .retrieve()
-                    .bodyToMono(Task.class)
+                    .uri("/message/send")
+                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(taskSendParams).getBytes(StandardCharsets.UTF_8))))
+                    .responseContent()
+                    .aggregate()
+                    .asString()
+                    .map(data -> JsonUtil.fromJson(data, Task.class))
                     .block();
-            log.info("Task sent successfully. Received task: {}", responseTask);
+            log.info("Message sent successfully. Received task: {}", responseTask);
             return responseTask;
         } catch (Exception e) {
-            log.error("Error sending task to {}: {}", this.baseUrl, e.getMessage(), e);
+            log.error("Error sending message to {}: {}", this.baseUrl, e.getMessage(), e);
             return null; 
         }
     }
 
     @Override
-    public Flux<SendStreamingMessageResponse> sendTaskSubscribe(MessageSendParams params) {
-        log.info("Subscribing to task updates for {} from {}", params, this.baseUrl);
-        WebClient client = WebClient.create(this.baseUrl);
-        return client.get()
-                .uri("/tasks/sendSubscribe")
-                .accept(MediaType.TEXT_EVENT_STREAM)
-                .retrieve()
-                .bodyToFlux(SendStreamingMessageResponse.class)
-                .doOnError(e -> log.error("Error receiving task updates for {}: {}", params, e.getMessage(), e))
-                .doOnComplete(() -> log.info("Task updates stream completed for {}.", params));
+    public Flux<SendStreamingMessageResponse> sendMessageStream(MessageSendParams params) {
+        log.info("Send stream message for {} from {}", params, this.baseUrl);
+        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
+        return client.post()
+                .uri("/message/stream")
+                .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(params).getBytes(StandardCharsets.UTF_8))))
+                .responseContent()
+                .asString()
+                .map(this::parseServerSentEvent)
+                .filter(Objects::nonNull)
+                .doOnError(e -> log.error("Error receiving streaming updates for {}: {}", params, e.getMessage(), e))
+                .doOnComplete(() -> log.info("Message updates stream completed for {}.", params));
     }
 
     /**
@@ -124,13 +133,16 @@ public class A2AClientImpl implements A2AClient {
     @Override
     public Task getTask(TaskQueryParams queryParams) {
         log.info("Getting task {} from {}", queryParams, this.baseUrl);
-        WebClient client = WebClient.create(this.baseUrl);
+        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
         try {
-            Task task = client.get()
-                    .uri("/tasks/" + queryParams.getTaskId())
-                    .retrieve()
-                    .bodyToMono(Task.class)
-                    .block(); // Using block() for simplicity
+            Task task = client.post()
+                    .uri("/tasks/get")
+                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(queryParams).getBytes(StandardCharsets.UTF_8))))
+                    .responseContent()
+                    .aggregate()
+                    .asString()
+                    .map(data -> JsonUtil.fromJson(data, Task.class))
+                    .block();
             log.info("Successfully retrieved task {}: {}", queryParams, task);
             return task;
         } catch (Exception e) {
@@ -142,17 +154,18 @@ public class A2AClientImpl implements A2AClient {
     @Override
     public Task cancelTask(TaskIdParams params) {
         log.info("Cancelling task {} on {}", params, this.baseUrl);
-        WebClient client = WebClient.create(this.baseUrl);
+        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
         try {
-            // Assuming the cancel endpoint returns a boolean or a response indicating
-            // success
-            client.post()
-                    .uri("/tasks/" + params.getId() + "/cancel")
-                    .retrieve()
-                    .toBodilessEntity() // Use toBodilessEntity() if no response body is expected
-                    .block(); // Using block() for simplicity
+            Task task = client.post()
+                    .uri("/tasks/cancel")
+                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(params).getBytes(StandardCharsets.UTF_8))))
+                    .responseContent()
+                    .aggregate()
+                    .asString()
+                    .map(data -> JsonUtil.fromJson(data, Task.class))
+                    .block();
             log.info("Task {} cancelled successfully.", params);
-            return null;
+            return task;
         } catch (Exception e) {
             log.error("Error cancelling task {} on {}: {}", params, this.baseUrl, e.getMessage(), e);
             return null;
@@ -160,10 +173,9 @@ public class A2AClientImpl implements A2AClient {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public TaskPushNotificationConfig setTaskPushNotification(TaskPushNotificationConfig params) {
         log.info("Setting push notification config for task {} on {}", params.getTaskId(), this.baseUrl);
-        WebClient client = WebClient.create(this.baseUrl);
+        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
         try {
             // 构建JSON-RPC请求
             Map<String, Object> jsonRpcRequest = Map.of(
@@ -173,17 +185,21 @@ public class A2AClientImpl implements A2AClient {
                 "id", UUID.randomUUID().toString()
             );
             
-            Map<String, Object> response = client.post()
+            String responseData = client.post()
                     .uri("/a2a/server")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(jsonRpcRequest)
-                    .retrieve()
-                    .bodyToMono(Map.class)
+                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
+                    .responseContent()
+                    .aggregate()
+                    .asString()
                     .block();
             
-            if (response != null && response.containsKey("result")) {
-                ObjectMapper mapper = new ObjectMapper();
-                return mapper.convertValue(response.get("result"), TaskPushNotificationConfig.class);
+            if (responseData != null) {
+                TypeReference<HashMap<String, String>> typeRef = new TypeReference<>() {
+                };
+                Map<String, String> response = JsonUtil.fromJson(responseData, typeRef);
+                if (response != null && response.containsKey("result")) {
+                    return JsonUtil.fromJson(response.get("result"), TaskPushNotificationConfig.class);
+                }
             }
             return null;
         } catch (Exception e) {
@@ -193,10 +209,9 @@ public class A2AClientImpl implements A2AClient {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public TaskPushNotificationConfig getTaskPushNotification(TaskIdParams params) {
         log.info("Getting push notification config for task {} from {}", params.getId(), this.baseUrl);
-        WebClient client = WebClient.create(this.baseUrl);
+        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
         try {
             // 构建JSON-RPC请求
             Map<String, Object> jsonRpcRequest = Map.of(
@@ -206,17 +221,21 @@ public class A2AClientImpl implements A2AClient {
                 "id", UUID.randomUUID().toString()
             );
             
-            Map<String, Object> response = client.post()
+            String responseData = client.post()
                     .uri("/a2a/server")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(jsonRpcRequest)
-                    .retrieve()
-                    .bodyToMono(Map.class)
+                    .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
+                    .responseContent()
+                    .aggregate()
+                    .asString()
                     .block();
             
-            if (response != null && response.containsKey("result")) {
-                ObjectMapper mapper = new ObjectMapper();
-                return mapper.convertValue(response.get("result"), TaskPushNotificationConfig.class);
+            if (responseData != null) {
+                TypeReference<HashMap<String, String>> typeRef = new TypeReference<>() {
+                };
+                Map<String, String> response = JsonUtil.fromJson(responseData, typeRef);
+                if (response != null && response.containsKey("result")) {
+                    return JsonUtil.fromJson(response.get("result"), TaskPushNotificationConfig.class);
+                }
             }
             return null;
         } catch (Exception e) {
@@ -228,7 +247,7 @@ public class A2AClientImpl implements A2AClient {
     @Override
     public Flux<SendStreamingMessageResponse> resubscribeTask(TaskQueryParams params) {
         log.info("Resubscribing to task updates for {} from {}", params.getTaskId(), this.baseUrl);
-        WebClient client = WebClient.create(this.baseUrl);
+        HttpClient client = HttpClient.create().baseUrl(this.baseUrl);
         
         // 构建JSON-RPC请求
         Map<String, Object> jsonRpcRequest = Map.of(
@@ -240,11 +259,9 @@ public class A2AClientImpl implements A2AClient {
         
         return client.post()
                 .uri("/a2a/server")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.TEXT_EVENT_STREAM)
-                .bodyValue(jsonRpcRequest)
-                .retrieve()
-                .bodyToFlux(String.class)
+                .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
+                .responseContent()
+                .asString()
                 .map(this::parseServerSentEvent)
                 .filter(Objects::nonNull)
                 .doOnError(e -> log.error("Error resubscribing to task updates for {}: {}", params.getTaskId(), e.getMessage(), e))
@@ -261,7 +278,7 @@ public class A2AClientImpl implements A2AClient {
             return false;
         }
         
-        // 检查代理能力
+        // check agent supports
         return switch (capability.toLowerCase()) {
             case "streaming" -> agentCard.getCapabilities().isStreaming();
             case "pushnotifications" -> agentCard.getCapabilities().isPushNotifications();
@@ -269,17 +286,19 @@ public class A2AClientImpl implements A2AClient {
         };
     }
     
-    @SuppressWarnings("unchecked")
     private SendStreamingMessageResponse parseServerSentEvent(String eventData) {
+        if (StringUtil.isNullOrEmpty(eventData)) {
+            return null;
+        }
         try {
-            // 解析SSE数据中的JSON-RPC响应
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> jsonRpcResponse = mapper.readValue(eventData, Map.class);
+            // parse sse data from response
+            TypeReference<Map<String, String>> typeRef = new TypeReference<>() {
+            };
+            Map<String, String> jsonRpcResponse = JsonUtil.fromJson(eventData, typeRef);
             
-            if (jsonRpcResponse.containsKey("result")) {
-                Object result = jsonRpcResponse.get("result");
-                // 根据结果类型创建相应的事件
-                return mapper.convertValue(result, SendStreamingMessageResponse.class);
+            if (jsonRpcResponse != null && jsonRpcResponse.containsKey("result")) {
+                String result = jsonRpcResponse.get("result");
+                return JsonUtil.fromJson(result, SendStreamingMessageResponse.class);
             }
             return null;
         } catch (Exception e) {

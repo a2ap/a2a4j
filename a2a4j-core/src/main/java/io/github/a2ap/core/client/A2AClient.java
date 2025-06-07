@@ -49,7 +49,7 @@ public interface A2AClient {
      * @param params The parameters for the tasks/send method.
      * @return created Task object or null.
      */
-    Task sendTask(MessageSendParams params);
+    Task sendMessage(MessageSendParams params);
 
     /**
      * Sends a task request and subscribes to streaming updates.
@@ -57,7 +57,7 @@ public interface A2AClient {
      * @param params The parameters for the tasks/sendSubscribe method.
      * @return A Flux of task update events.
      */
-    Flux<SendStreamingMessageResponse> sendTaskSubscribe(MessageSendParams params);
+    Flux<SendStreamingMessageResponse> sendMessageStream(MessageSendParams params);
 
     /**
      * Retrieves the current state of a task.
