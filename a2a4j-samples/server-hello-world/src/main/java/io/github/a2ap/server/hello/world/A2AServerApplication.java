@@ -40,8 +40,9 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  * @see io.github.a2ap.server.hello.world.agent.DemoAgentExecutor
  * @see io.github.a2ap.server.hello.world.controller.A2aServerController
  */
+
 @SpringBootApplication
-public class A2aServerApplication implements WebFluxConfigurer {
+public class A2AServerApplication implements WebFluxConfigurer {
 
     /**
      * Main entry point for the A2A server application.
@@ -49,7 +50,7 @@ public class A2aServerApplication implements WebFluxConfigurer {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        SpringApplication.run(A2aServerApplication.class, args);
+        SpringApplication.run(A2AServerApplication.class, args);
     }
 
     /**
