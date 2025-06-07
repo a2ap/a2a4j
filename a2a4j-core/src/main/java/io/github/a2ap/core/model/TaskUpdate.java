@@ -17,7 +17,18 @@
 package io.github.a2ap.core.model;
 
 /**
- * The task handle update entity
+ * Marker interface for task update entities in the A2A protocol.
+ * 
+ * This interface serves as a common type for all task update events that can be
+ * applied to modify the state of a task during its lifecycle. Implementations
+ * of this interface represent different types of updates that can occur:
+ * 
+ * - Status updates (via TaskStatusUpdateEvent)
+ * - Artifact updates (via TaskArtifactUpdateEvent)
+ * - Other custom update types as needed
+ * 
+ * The interface enables type-safe handling of various update events in the
+ * task management system while maintaining flexibility for future extensions.
  */
 public interface TaskUpdate {
 

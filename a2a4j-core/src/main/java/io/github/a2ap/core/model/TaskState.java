@@ -19,12 +19,65 @@ package io.github.a2ap.core.model;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Enumeration of possible states for a task.
+ * Enumeration of possible states for a task in the A2A protocol lifecycle.
+ * 
+ * This enum defines all valid states that a task can be in during its execution,
+ * from initial submission through completion or termination. The states follow
+ * a logical progression and help clients understand the current status of their
+ * requests.
+ * 
+ * State transitions typically follow this pattern:
+ * SUBMITTED → WORKING → (INPUT_REQUIRED ↔ WORKING) → COMPLETED/FAILED/CANCELED
+ * 
+ * Special states like REJECTED, AUTH_REQUIRED, and UNKNOWN handle exceptional
+ * cases in the task lifecycle.
  */
 public enum TaskState {
 
-    SUBMITTED("submitted"), WORKING("working"), INPUT_REQUIRED("input-required"), COMPLETED("completed"),
-    FAILED("failed"), CANCELED("canceled"), REJECTED("rejected"), AUTH_REQUIRED("auth-required"), UNKNOWN("unknown");
+    /**
+     * Task has been submitted but not yet started processing.
+     */
+    SUBMITTED("submitted"), 
+    
+    /**
+     * Task is currently being processed by the agent.
+     */
+    WORKING("working"), 
+    
+    /**
+     * Task execution is paused, waiting for additional input from the client.
+     */
+    INPUT_REQUIRED("input-required"), 
+    
+    /**
+     * Task has been successfully completed.
+     */
+    COMPLETED("completed"),
+    
+    /**
+     * Task execution failed due to an error.
+     */
+    FAILED("failed"), 
+    
+    /**
+     * Task was canceled by client request or system intervention.
+     */
+    CANCELED("canceled"), 
+    
+    /**
+     * Task was rejected by the agent (e.g., invalid parameters, unsupported operation).
+     */
+    REJECTED("rejected"), 
+    
+    /**
+     * Task requires authentication before it can proceed.
+     */
+    AUTH_REQUIRED("auth-required"), 
+    
+    /**
+     * Task state is unknown or could not be determined.
+     */
+    UNKNOWN("unknown");
 
     private final String value;
 

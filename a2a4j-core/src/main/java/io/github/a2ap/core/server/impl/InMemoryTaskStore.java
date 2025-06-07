@@ -23,8 +23,26 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * In-memory implementation of the TaskStore interface.
- * Stores Task and History data in a ConcurrentHashMap.
+ * In-memory implementation of the TaskStore interface for development and testing purposes.
+ * 
+ * This implementation stores task data and their associated message history in a
+ * thread-safe ConcurrentHashMap. It provides fast access to task information but
+ * does not persist data beyond the application lifecycle.
+ * 
+ * Key characteristics:
+ * - Thread-safe operations using ConcurrentHashMap
+ * - No persistence - data is lost when the application stops
+ * - Suitable for development, testing, and single-instance deployments
+ * - Fast in-memory access with O(1) lookup performance
+ * 
+ * Limitations:
+ * - Data is not persisted across application restarts
+ * - Memory usage grows with the number of stored tasks
+ * - Not suitable for distributed deployments
+ * - No built-in cleanup or expiration mechanisms
+ * 
+ * For production deployments requiring persistence, consider implementing
+ * TaskStore with a database or distributed cache backend.
  */
 public class InMemoryTaskStore implements TaskStore {
 

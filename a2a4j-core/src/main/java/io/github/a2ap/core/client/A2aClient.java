@@ -29,7 +29,7 @@ import reactor.core.publisher.Flux;
  * Interface defining the core functionality of an A2A client.
  * The A2A client is responsible for interacting with an A2A server.
  */
-public interface A2AClient {
+public interface A2aClient {
 
     /**
      * Get the AgentCard info current in client
