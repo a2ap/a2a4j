@@ -24,8 +24,23 @@ import org.slf4j.LoggerFactory;
 import reactor.netty.http.client.HttpClient;
 
 /**
- * An implementation of {@link CardResolver} that fetches AgentCard from a URL
- * via HTTP.
+ * HTTP-based implementation of {@link CardResolver} for discovering agent capabilities.
+ * 
+ * This implementation follows the A2A protocol standard for agent discovery by fetching
+ * AgentCard information from a well-known HTTP endpoint. It assumes the agent identifier
+ * is a base URL and attempts to retrieve the agent card from the standard location.
+ * 
+ * Discovery process:
+ * 1. Treats the agent identifier as a base URL
+ * 2. Appends the well-known path "/.well-known/agent.json"
+ * 3. Performs an HTTP GET request to retrieve the agent card
+ * 4. Deserializes the JSON response into an AgentCard object
+ * 
+ * The implementation uses Reactor Netty's HttpClient for non-blocking HTTP operations
+ * and includes proper error handling and logging for troubleshooting discovery issues.
+ * 
+ * This resolver is suitable for agents that expose their capabilities through standard
+ * HTTP endpoints following the A2A protocol conventions.
  */
 public class HttpCardResolver implements CardResolver {
 

@@ -22,7 +22,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 /**
- * Represents a JSON-RPC response.
+ * Represents a JSON-RPC 2.0 response object as defined in the JSON-RPC specification.
+ * 
+ * This class encapsulates the response structure for JSON-RPC method invocations,
+ * containing either a successful result or an error object. The response always
+ * includes the JSON-RPC version ("2.0") and the request identifier for correlation.
+ * 
+ * Key characteristics:
+ * - The result and error fields are mutually exclusive - only one can be present
+ * - For successful method invocations, the result field contains the return value
+ * - For failed method invocations, the error field contains detailed error information
+ * - The id field matches the corresponding request identifier for proper correlation
+ * 
+ * In the A2A protocol context, successful results can be various types:
+ * - Message objects for immediate responses
+ * - Task objects for asynchronous operations
+ * - TaskStatusUpdateEvent objects for status changes
+ * - TaskArtifactUpdateEvent objects for artifact updates
+ * 
+ * This class enforces the mutual exclusivity of result and error fields through
+ * its setter methods to maintain JSON-RPC specification compliance.
  */
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")

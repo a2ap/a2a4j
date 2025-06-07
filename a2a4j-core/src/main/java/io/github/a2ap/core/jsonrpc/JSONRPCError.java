@@ -22,7 +22,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 /**
- * Represents a JSON-RPC error.
+ * Represents a JSON-RPC 2.0 error object as defined in the JSON-RPC specification.
+ * 
+ * This class encapsulates error information returned in JSON-RPC responses when
+ * a request cannot be processed successfully. It includes both standard JSON-RPC
+ * error codes and A2A protocol-specific error codes.
+ * 
+ * Standard JSON-RPC error codes (as per specification):
+ * - PARSE_ERROR (-32700): Invalid JSON was received
+ * - INVALID_REQUEST (-32600): The JSON sent is not a valid Request object
+ * - METHOD_NOT_FOUND (-32601): The method does not exist or is not available
+ * - INVALID_PARAMS (-32602): Invalid method parameter(s)
+ * - INTERNAL_ERROR (-32603): Internal JSON-RPC error
+ * 
+ * A2A protocol-specific error codes:
+ * - TASK_NOT_FOUND (-32000): Requested task does not exist
+ * - AUTHENTICATION_FAILED (-32001): Authentication credentials are invalid
+ * - PUSH_NOTIFICATION_NOT_SUPPORTED (-32002): Push notifications are not supported
+ * 
+ * The error object may include additional data to provide more context about
+ * the specific error condition.
  */
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")

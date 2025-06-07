@@ -22,7 +22,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 /**
- * Represents a JSON-RPC request.
+ * Represents a JSON-RPC 2.0 request object as defined in the JSON-RPC specification.
+ * 
+ * This class encapsulates the structure for JSON-RPC method invocation requests,
+ * containing the method name, parameters, and request identifier. All requests
+ * in the A2A protocol follow the JSON-RPC 2.0 standard for consistent communication.
+ * 
+ * Key components:
+ * - jsonrpc: Always "2.0" to indicate JSON-RPC version compliance
+ * - method: The name of the method to be invoked on the remote agent
+ * - params: Optional parameters for the method (can be object, array, or primitive)
+ * - id: Unique identifier for correlating requests with responses
+ * 
+ * Common A2A protocol methods include:
+ * - "tasks/send": Send a message and create a task
+ * - "tasks/sendSubscribe": Send a message with streaming updates
+ * - "tasks/get": Retrieve task information
+ * - "tasks/cancel": Cancel an ongoing task
+ * - "tasks/pushNotification/set": Configure push notifications
+ * - "tasks/pushNotification/get": Retrieve push notification settings
+ * - "tasks/resubscribe": Resubscribe to task updates
+ * 
+ * The class includes a builder pattern for convenient request construction.
  */
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")

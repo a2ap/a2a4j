@@ -25,7 +25,22 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Base class for different types of parts that can be included in messages or artifacts.
+ * Abstract base class for different types of content parts in the A2A protocol.
+ * 
+ * Parts represent discrete pieces of content that can be included in messages or artifacts.
+ * This class provides a common structure and polymorphic behavior for handling various
+ * content types in a type-safe manner.
+ * 
+ * Supported part types:
+ * - TextPart: Plain text content
+ * - FilePart: File-based content with metadata
+ * - DataPart: Structured data content
+ * 
+ * The class uses Jackson's polymorphic serialization to maintain type information
+ * during JSON serialization/deserialization, enabling proper reconstruction of
+ * specific part types from generic Part references.
+ * 
+ * Each part can optionally include metadata for additional context or processing hints.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")

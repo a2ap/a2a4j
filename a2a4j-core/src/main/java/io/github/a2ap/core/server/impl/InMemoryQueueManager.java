@@ -25,8 +25,30 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * In-memory implementation of QueueManager.
- * This is the Java equivalent of Python's InMemoryQueueManager.
+ * In-memory implementation of QueueManager for managing task event queues.
+ * 
+ * This implementation manages EventQueue instances for tasks using a thread-safe
+ * ConcurrentHashMap. It provides the core functionality for creating, accessing,
+ * and managing event queues that facilitate streaming communication between
+ * agents and clients in the A2A protocol.
+ * 
+ * Key features:
+ * - Thread-safe queue management using ConcurrentHashMap
+ * - Support for queue creation and retrieval by task ID
+ * - Queue tapping functionality for creating child queues
+ * - Automatic cleanup when queues are removed
+ * - Comprehensive logging for debugging and monitoring
+ * 
+ * Queue lifecycle:
+ * 1. create() - Creates a new EventQueue for a task (idempotent)
+ * 2. get() - Retrieves an existing queue without creating
+ * 3. tap() - Creates a child queue that receives the same events
+ * 4. remove() - Removes and closes the queue, cleaning up resources
+ * 
+ * This implementation is suitable for single-instance deployments and provides
+ * the foundation for streaming task updates and real-time communication in
+ * the A2A protocol. For distributed deployments, consider implementing
+ * QueueManager with a distributed messaging system.
  */
 public class InMemoryQueueManager implements QueueManager {
 

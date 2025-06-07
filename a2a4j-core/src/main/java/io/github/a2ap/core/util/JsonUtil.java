@@ -30,7 +30,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * json util implement by jackson
+ * Utility class for JSON serialization and deserialization operations using Jackson.
+ * 
+ * This class provides a centralized, thread-safe JSON processing facility with pre-configured
+ * ObjectMapper settings optimized for the A2A protocol. It handles common JSON operations
+ * including object serialization, deserialization with type safety, and JSON validation.
+ * 
+ * Key features:
+ * - Ignores unknown properties during deserialization for backward compatibility
+ * - Supports Java 8 time types through JavaTimeModule
+ * - Provides null-safe operations with proper error handling
+ * - Includes JSON string validation utilities
+ * 
+ * All methods are static and thread-safe, making this class suitable for concurrent usage
+ * across the A2A framework.
  */
 public final class JsonUtil {
 

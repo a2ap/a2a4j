@@ -22,7 +22,26 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * task context
+ * Represents the execution context for a request being processed by an agent.
+ * 
+ * This class encapsulates all the contextual information needed for an agent to
+ * process a request, including the original request parameters, current task state,
+ * and any related tasks. It serves as a comprehensive data container that is passed
+ * to agent executors and other processing components.
+ * 
+ * Key components:
+ * - taskId: Unique identifier for the primary task being processed
+ * - contextId: Optional session or conversation identifier for grouping related tasks
+ * - request: Original message send parameters that initiated the task
+ * - task: Current snapshot of the task state (may need reloading for latest state)
+ * - relatedTasks: Additional tasks that are part of the same processing context
+ * 
+ * The context provides a snapshot view of the task state at the time of handler
+ * invocation. For operations requiring the absolute latest state, components should
+ * reload the task from the persistent store.
+ * 
+ * This design enables stateful request processing while maintaining clear separation
+ * between request parameters, execution state, and related task information.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RequestContext {
