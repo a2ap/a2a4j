@@ -174,7 +174,7 @@ curl -X POST http://localhost:8089/a2a/server \
 			"parts": [{
 				"type": "text",
 				"kind": "text",
-				"text": "## Task Execution Summary\n\n? User request analysis commpleted\n? Text response generated\n? Example code provided\n? Task executed successfully\n\nTotal execution time: ~3 seconds\nGenerated content: Text response + Code example"
+				"text": "## Task Execution Summary\n\n? User request analysis completed\n? Text response generated\n? Example code provided\n? Task executed successfully\n\nTotal execution time: ~3 seconds\nGenerated content: Text response + Code example"
 			}],
 			"metadata": {
 				"reportType": "summ  mary",
