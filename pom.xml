@@ -15,8 +15,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.a2ap</groupId>
@@ -26,8 +25,7 @@
     <packaging>pom</packaging>
 
     <name>Agent2Agent (A2A) Protocol For Java</name>
-    <description>An open protocol enabling communication and interoperability between opaque agentic applications.
-    </description>
+    <description>An open protocol enabling communication and interoperability between opaque agentic applications.</description>
     <url>https://github.com/a2ap/a2a4j</url>
 
     <licenses>
@@ -171,11 +169,9 @@
                             <consoleOutput>true</consoleOutput>
                             <configLocation>tools/src/checkstyle/checkstyle.xml</configLocation>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                            <propertyExpansion>
-                                checkstyle.build.directory=${project.build.directory}
+                            <propertyExpansion>checkstyle.build.directory=${project.build.directory}
                                 checkstyle.suppressions.file=${project.basedir}/tools/src/checkstyle/checkstyle-suppressions.xml
-                                checkstyle.additional.suppressions.file=${project.basedir}/tools/src/checkstyle/checkstyle-suppressions.xml
-                            </propertyExpansion>
+                                checkstyle.additional.suppressions.file=${project.basedir}/tools/src/checkstyle/checkstyle-suppressions.xml</propertyExpansion>
                             <failsOnError>${maven-checkstyle-plugin.failsOnError}</failsOnError>
                             <violationSeverity>warning</violationSeverity>
                             <failOnViolation>${maven-checkstyle-plugin.failOnViolation}</failOnViolation>
