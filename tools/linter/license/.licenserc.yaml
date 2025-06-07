@@ -84,5 +84,7 @@ header:
     - '**/*.keep'
     - 'tools/linter/codespell/.codespell.ignorewords'
     - 'tools/linter/codespell/.codespell.skip'
+    - 'tools/src/checkstyle/checkstyle.xml'
+    - 'tools/src/checkstyle/checkstyle-suppressions.xml'
 
   comment: never
