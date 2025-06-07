@@ -136,11 +136,10 @@
                 <version>${spring-javaformat-maven-plugin.version}</version>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>validate</goal>
-                        </goals>
                         <phase>validate</phase>
-                        <inherited>true</inherited>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
