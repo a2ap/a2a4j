@@ -41,7 +41,41 @@ import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 /**
- * Implementation of the A2AClient interface.
+ * Default implementation of the A2aClient interface providing comprehensive A2A protocol client functionality.
+ * 
+ * This implementation offers a complete HTTP-based client for interacting with A2A protocol-compliant
+ * agents. It handles all aspects of the client-side A2A communication including agent discovery,
+ * task management, streaming operations, and push notification configuration.
+ * 
+ * Key features:
+ * - JSON-RPC 2.0 based communication over HTTP
+ * - Automatic agent card resolution and caching
+ * - Support for both synchronous and streaming message operations
+ * - Comprehensive task lifecycle management (send, get, cancel, resubscribe)
+ * - Push notification configuration management
+ * - Built-in capability detection and validation
+ * - Robust error handling and logging
+ * 
+ * Communication protocol:
+ * - Uses Reactor Netty HttpClient for non-blocking HTTP operations
+ * - All requests follow JSON-RPC 2.0 specification
+ * - Streaming responses are handled via Server-Sent Events (SSE)
+ * - Automatic request ID generation for proper correlation
+ * 
+ * Supported A2A methods:
+ * - "message/send": Send messages and create tasks
+ * - "message/stream": Send messages with streaming updates
+ * - "tasks/get": Retrieve task information
+ * - "tasks/cancel": Cancel ongoing tasks
+ * - "tasks/pushNotificationConfig/set": Configure push notifications
+ * - "tasks/pushNotificationConfig/get": Retrieve push notification settings
+ * - "tasks/resubscribe": Resubscribe to task updates
+ * 
+ * The client maintains agent card information for efficient communication and provides
+ * capability checking to ensure operations are supported by the target agent.
+ * 
+ * Thread safety: This implementation is thread-safe and can be used concurrently
+ * across multiple threads.
  */
 public class DefaultA2aClient implements A2aClient {
 
