@@ -41,7 +41,7 @@ public class HttpCardResolver implements CardResolver {
                 .retrieve()
                 .bodyToMono(AgentCard.class)
                 .block();
-            log.info("Retrieve agent card {} successfully. Info: {}", agentIdentifier, responseCard);
+            log.info("Retrieve agent card {} successfully, Info: {}.", agentIdentifier, responseCard);
             return responseCard;
         } catch (Exception e) {
             log.error("Error sending task to {}: {}", agentIdentifier, e.getMessage(), e);
