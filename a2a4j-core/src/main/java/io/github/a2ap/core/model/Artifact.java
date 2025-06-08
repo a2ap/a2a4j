@@ -92,8 +92,8 @@ public class Artifact implements TaskUpdate {
         this.metadata = metadata;
     }
 
-    public static ArtifactBuilder builder() {
-        return new ArtifactBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getArtifactId() {
@@ -162,7 +162,7 @@ public class Artifact implements TaskUpdate {
     /**
      * Builder for creating instances of {@link Artifact}.
      */
-    public static class ArtifactBuilder {
+    public static class Builder {
 
         private String artifactId;
 
@@ -174,30 +174,30 @@ public class Artifact implements TaskUpdate {
 
         private Map<String, Object> metadata;
 
-        ArtifactBuilder() {
+        Builder() {
         }
 
-        public ArtifactBuilder artifactId(String artifactId) {
+        public Builder artifactId(String artifactId) {
             this.artifactId = artifactId;
             return this;
         }
 
-        public ArtifactBuilder name(String name) {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public ArtifactBuilder description(String description) {
+        public Builder description(String description) {
             this.description = description;
             return this;
         }
 
-        public ArtifactBuilder parts(List<Part> parts) {
+        public Builder parts(List<Part> parts) {
             this.parts = parts;
             return this;
         }
 
-        public ArtifactBuilder metadata(Map<String, Object> metadata) {
+        public Builder metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
             return this;
         }

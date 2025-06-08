@@ -50,8 +50,8 @@ public class AgentCapabilities {
         this.stateTransitionHistory = stateTransitionHistory;
     }
 
-    public static AgentCapabilitiesBuilder builder() {
-        return new AgentCapabilitiesBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public boolean isStreaming() {
@@ -103,7 +103,7 @@ public class AgentCapabilities {
     /**
      * Builder for {@link AgentCapabilities}
      */
-    public static class AgentCapabilitiesBuilder {
+    public static class Builder {
 
         private boolean streaming = false;
 
@@ -111,20 +111,20 @@ public class AgentCapabilities {
 
         private boolean stateTransitionHistory = false;
 
-        AgentCapabilitiesBuilder() {
+        Builder() {
         }
 
-        public AgentCapabilitiesBuilder streaming(boolean streaming) {
+        public Builder streaming(boolean streaming) {
             this.streaming = streaming;
             return this;
         }
 
-        public AgentCapabilitiesBuilder pushNotifications(boolean pushNotifications) {
+        public Builder pushNotifications(boolean pushNotifications) {
             this.pushNotifications = pushNotifications;
             return this;
         }
 
-        public AgentCapabilitiesBuilder stateTransitionHistory(boolean stateTransitionHistory) {
+        public Builder stateTransitionHistory(boolean stateTransitionHistory) {
             this.stateTransitionHistory = stateTransitionHistory;
             return this;
         }

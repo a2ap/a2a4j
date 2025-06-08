@@ -68,8 +68,8 @@ public class SecurityScheme {
         this.bearerFormat = bearerFormat;
     }
 
-    public static SecuritySchemeBuilder builder() {
-        return new SecuritySchemeBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getType() {
@@ -147,7 +147,7 @@ public class SecurityScheme {
     /**
      * Builder for creating instances of SecurityScheme.
      */
-    public static class SecuritySchemeBuilder {
+    public static class Builder {
 
         private String type;
 
@@ -161,35 +161,35 @@ public class SecurityScheme {
 
         private String bearerFormat;
 
-        SecuritySchemeBuilder() {
+        Builder() {
         }
 
-        public SecuritySchemeBuilder type(String type) {
+        public Builder type(String type) {
             this.type = type;
             return this;
         }
 
-        public SecuritySchemeBuilder scheme(String scheme) {
+        public Builder scheme(String scheme) {
             this.scheme = scheme;
             return this;
         }
 
-        public SecuritySchemeBuilder name(String name) {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public SecuritySchemeBuilder in(String in) {
+        public Builder in(String in) {
             this.in = in;
             return this;
         }
 
-        public SecuritySchemeBuilder description(String description) {
+        public Builder description(String description) {
             this.description = description;
             return this;
         }
 
-        public SecuritySchemeBuilder bearerFormat(String bearerFormat) {
+        public Builder bearerFormat(String bearerFormat) {
             this.bearerFormat = bearerFormat;
             return this;
         }

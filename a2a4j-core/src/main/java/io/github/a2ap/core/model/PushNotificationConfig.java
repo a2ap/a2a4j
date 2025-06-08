@@ -47,8 +47,8 @@ public class PushNotificationConfig {
         this.authToken = authToken;
     }
 
-    public static PushNotificationConfigBuilder builder() {
-        return new PushNotificationConfigBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getUrl() {
@@ -90,21 +90,21 @@ public class PushNotificationConfig {
     /**
      * Builder class for PushNotificationConfig.
      */
-    public static class PushNotificationConfigBuilder {
+    public static class Builder {
 
         private String url;
 
         private String authToken;
 
-        PushNotificationConfigBuilder() {
+        Builder() {
         }
 
-        public PushNotificationConfigBuilder url(String url) {
+        public Builder url(String url) {
             this.url = url;
             return this;
         }
 
-        public PushNotificationConfigBuilder authToken(String authToken) {
+        public Builder authToken(String authToken) {
             this.authToken = authToken;
             return this;
         }
