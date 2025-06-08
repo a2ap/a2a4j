@@ -30,6 +30,7 @@ A2A4J 是 Agent2Agent (A2A) 协议的全面 Java 实现，为独立 AI 智能体
 
 ```
 a2a4j/
+├── a2a4j-bom/                     # 依赖管理
 ├── a2a4j-core/                    # 核心 A2A 协议实现
 ├── a2a4j-spring-boot-starter/     # Spring Boot 自动配置
 │   ├── a2a4j-server-spring-boot-starter/   # 服务器端启动器

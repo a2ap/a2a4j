@@ -30,6 +30,7 @@ A2A4J is a comprehensive Java implementation of the Agent2Agent (A2A) Protocol, 
 
 ```
 a2a4j/
+├── a2a4j-bom/                     # A2A4J dependency management
 ├── a2a4j-core/                    # Core A2A protocol implementation
 ├── a2a4j-spring-boot-starter/     # Spring Boot auto-configuration
 │   ├── a2a4j-server-spring-boot-starter/   # Server-side starter
