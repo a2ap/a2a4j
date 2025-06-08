@@ -71,8 +71,8 @@ public class TaskStatus implements TaskUpdate {
         this.error = error;
     }
 
-    public static TaskStatusBuilder builder() {
-        return new TaskStatusBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public TaskState getState() {
@@ -132,7 +132,7 @@ public class TaskStatus implements TaskUpdate {
     /**
      * Builder for creating instances of TaskStatus.
      */
-    public static class TaskStatusBuilder {
+    public static class Builder {
 
         private TaskState state;
 
@@ -142,25 +142,25 @@ public class TaskStatus implements TaskUpdate {
 
         private String error;
 
-        TaskStatusBuilder() {
+        Builder() {
         }
 
-        public TaskStatusBuilder state(TaskState state) {
+        public Builder state(TaskState state) {
             this.state = state;
             return this;
         }
 
-        public TaskStatusBuilder message(Message message) {
+        public Builder message(Message message) {
             this.message = message;
             return this;
         }
 
-        public TaskStatusBuilder timestamp(String timestamp) {
+        public Builder timestamp(String timestamp) {
             this.timestamp = timestamp;
             return this;
         }
 
-        public TaskStatusBuilder error(String error) {
+        public Builder error(String error) {
             this.error = error;
             return this;
         }

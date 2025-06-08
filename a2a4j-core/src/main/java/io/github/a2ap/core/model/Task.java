@@ -80,8 +80,8 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
         this.metadata = metadata;
     }
 
-    public static TaskBuilder builder() {
-        return new TaskBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getId() {
@@ -158,7 +158,7 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
     /**
      * Builder for creating instances of Task.
      */
-    public static class TaskBuilder {
+    public static class Builder {
 
         private String id;
 
@@ -172,35 +172,35 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
 
         private Map<String, Object> metadata;
 
-        TaskBuilder() {
+        Builder() {
         }
 
-        public TaskBuilder id(String id) {
+        public Builder id(String id) {
             this.id = id;
             return this;
         }
 
-        public TaskBuilder contextId(String contextId) {
+        public Builder contextId(String contextId) {
             this.contextId = contextId;
             return this;
         }
 
-        public TaskBuilder status(TaskStatus status) {
+        public Builder status(TaskStatus status) {
             this.status = status;
             return this;
         }
 
-        public TaskBuilder artifacts(List<Artifact> artifacts) {
+        public Builder artifacts(List<Artifact> artifacts) {
             this.artifacts = artifacts;
             return this;
         }
 
-        public TaskBuilder history(List<Message> history) {
+        public Builder history(List<Message> history) {
             this.history = history;
             return this;
         }
 
-        public TaskBuilder metadata(Map<String, Object> metadata) {
+        public Builder metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
             return this;
         }

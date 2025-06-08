@@ -87,8 +87,8 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
         this.kind = kind;
     }
 
-    public static MessageBuilder builder() {
-        return new MessageBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getMessageId() {
@@ -175,7 +175,7 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
     /**
      * Builder class for Message.
      */
-    public static class MessageBuilder {
+    public static class Builder {
 
         private String messageId;
 
@@ -191,40 +191,40 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
 
         private String kind;
 
-        MessageBuilder() {
+        Builder() {
         }
 
-        public MessageBuilder messageId(String messageId) {
+        public Builder messageId(String messageId) {
             this.messageId = messageId;
             return this;
         }
 
-        public MessageBuilder taskId(String taskId) {
+        public Builder taskId(String taskId) {
             this.taskId = taskId;
             return this;
         }
 
-        public MessageBuilder contextId(String contextId) {
+        public Builder contextId(String contextId) {
             this.contextId = contextId;
             return this;
         }
 
-        public MessageBuilder role(String role) {
+        public Builder role(String role) {
             this.role = role;
             return this;
         }
 
-        public MessageBuilder parts(List<Part> parts) {
+        public Builder parts(List<Part> parts) {
             this.parts = parts;
             return this;
         }
 
-        public MessageBuilder metadata(Map<String, Object> metadata) {
+        public Builder metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
             return this;
         }
 
-        public MessageBuilder kind(String kind) {
+        public Builder kind(String kind) {
             this.kind = kind;
             return this;
         }

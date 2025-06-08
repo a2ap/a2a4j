@@ -93,8 +93,8 @@ public class JSONRPCError {
         this.data = data;
     }
 
-    public static JSONRPCErrorBuilder builder() {
-        return new JSONRPCErrorBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public int getCode() {
@@ -144,7 +144,7 @@ public class JSONRPCError {
     /**
      * Builder for creating instances of JSONRPCError.
      */
-    public static class JSONRPCErrorBuilder {
+    public static class Builder {
 
         private int code;
 
@@ -152,20 +152,20 @@ public class JSONRPCError {
 
         private Object data;
 
-        JSONRPCErrorBuilder() {
+        Builder() {
         }
 
-        public JSONRPCErrorBuilder code(int code) {
+        public Builder code(int code) {
             this.code = code;
             return this;
         }
 
-        public JSONRPCErrorBuilder message(String message) {
+        public Builder message(String message) {
             this.message = message;
             return this;
         }
 
-        public JSONRPCErrorBuilder data(Object data) {
+        public Builder data(Object data) {
             this.data = data;
             return this;
         }

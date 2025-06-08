@@ -37,6 +37,7 @@
     </licenses>
 
     <modules>
+        <module>a2a4j-bom</module>
         <module>a2a4j-core</module>
         <module>a2a4j-samples</module>
         <module>a2a4j-spring-boot-starter</module>

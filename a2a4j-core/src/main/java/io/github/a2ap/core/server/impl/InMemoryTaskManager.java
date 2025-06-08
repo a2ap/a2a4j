@@ -70,7 +70,7 @@ public class InMemoryTaskManager implements TaskManager {
         taskId = taskId == null ? UUID.randomUUID().toString() : taskId;
         String contextId = params.getMessage().getContextId();
         contextId = contextId == null ? UUID.randomUUID().toString() : contextId;
-        RequestContext.RequestContextBuilder contextBuilder = RequestContext.builder()
+        RequestContext.Builder contextBuilder = RequestContext.builder()
                 .taskId(taskId).contextId(contextId).request(params);
         Task currentTask = taskStore.load(taskId);
         if (currentTask == null) {

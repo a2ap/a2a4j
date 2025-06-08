@@ -58,8 +58,8 @@ public class MessageSendConfiguration {
         this.blocking = blocking;
     }
 
-    public static MessageSendConfigurationBuilder builder() {
-        return new MessageSendConfigurationBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public List<String> getAcceptedOutputModes() {
@@ -121,7 +121,7 @@ public class MessageSendConfiguration {
     /**
      * Builder class for MessageSendConfiguration.
      */
-    public static class MessageSendConfigurationBuilder {
+    public static class Builder {
 
         private List<String> acceptedOutputModes;
 
@@ -131,25 +131,25 @@ public class MessageSendConfiguration {
 
         private Boolean blocking;
 
-        MessageSendConfigurationBuilder() {
+        Builder() {
         }
 
-        public MessageSendConfigurationBuilder acceptedOutputModes(List<String> acceptedOutputModes) {
+        public Builder acceptedOutputModes(List<String> acceptedOutputModes) {
             this.acceptedOutputModes = acceptedOutputModes;
             return this;
         }
 
-        public MessageSendConfigurationBuilder historyLength(Integer historyLength) {
+        public Builder historyLength(Integer historyLength) {
             this.historyLength = historyLength;
             return this;
         }
 
-        public MessageSendConfigurationBuilder pushNotificationConfig(PushNotificationConfig pushNotificationConfig) {
+        public Builder pushNotificationConfig(PushNotificationConfig pushNotificationConfig) {
             this.pushNotificationConfig = pushNotificationConfig;
             return this;
         }
 
-        public MessageSendConfigurationBuilder blocking(Boolean blocking) {
+        public Builder blocking(Boolean blocking) {
             this.blocking = blocking;
             return this;
         }
