@@ -97,6 +97,16 @@ public class DefaultA2aClient implements A2aClient {
         this.agentCard = this.retrieveAgentCard();
         this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
     }
+
+    /**
+     * Constructs a new A2aClient with the agent card info
+     * @param agentCard agent card info
+     */
+    public DefaultA2aClient(AgentCard agentCard) {
+        this.agentCard = agentCard;
+        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
+        this.cardResolver = null;
+    }
     
     /**
      * Constructs a new A2AClientImpl with the specified CardResolver.
@@ -120,9 +130,14 @@ public class DefaultA2aClient implements A2aClient {
 
     @Override
     public AgentCard retrieveAgentCard() {
-        AgentCard card = cardResolver.resolveCard();
-        this.agentCard = card;
-        return card;
+        if (this.cardResolver != null) {
+            AgentCard card = cardResolver.resolveCard();
+            this.agentCard = card;
+            return card;        
+        } else {
+            log.warn("Retrieving agent card error due the card resolver is null, use the cache agent card {}", this.agentCard.getName());
+            return this.agentCard;
+        }
     }
 
     /**

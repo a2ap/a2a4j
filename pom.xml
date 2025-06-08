@@ -254,39 +254,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>${flatten-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                        <phase>process-resources</phase>
-                        <configuration>
-                            <updatePomFile>true</updatePomFile>
-                            <flattenMode>ossrh</flattenMode>
-                            <pomElements>
-                                <distributionManagement>remove</distributionManagement>
-                                <dependencyManagement>remove</dependencyManagement>
-                                <repositories>remove</repositories>
-                                <scm>keep</scm>
-                                <url>keep</url>
-                                <organization>resolve</organization>
-                            </pomElements>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>clean</id>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <phase>clean</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>io.github.tonycody.maven.plugins</groupId>
                 <artifactId>sorter-maven-plugin</artifactId>
                 <version>${sorter-maven-plugin.version}</version>
@@ -298,14 +265,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>${maven-deploy-plugin.version}</version>
-                <configuration>
-                    <skip>${maven.deploy.skip}</skip>
-                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -322,27 +281,38 @@
     <profiles>
         <profile>
             <id>release</id>
-
             <distributionManagement>
                 <repository>
-                    <id>sonatype-nexus-staging</id>
-                    <name>Nexus Release Repository</name>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                    <id>ossrh</id>
+                    <url>https://central.sonatype.com/api/v1/publisher/staging/deploy/maven2/</url>
                 </repository>
                 <snapshotRepository>
-                    <id>sonatype-nexus-snapshots</id>
-                    <name>Sonatype Nexus Snapshots</name>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <id>ossrh</id>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
                 </snapshotRepository>
             </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven-source-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${maven-javadoc-plugin.version}</version>
                         <configuration>
                             <doclint>all,-missing</doclint>
+                            <failOnError>false</failOnError>
                         </configuration>
                         <executions>
                             <execution>
@@ -367,7 +337,7 @@
                             </execution>
                         </executions>
                     </plugin>
-
+                    
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>flatten-maven-plugin</artifactId>
