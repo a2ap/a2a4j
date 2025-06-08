@@ -53,8 +53,8 @@ public class MessageSendParams {
         this.metadata = metadata;
     }
 
-    public static MessageSendParamsBuilder builder() {
-        return new MessageSendParamsBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public Message getMessage() {
@@ -106,7 +106,7 @@ public class MessageSendParams {
     /**
      * Builder for creating instances of {@link MessageSendParams}.
      */
-    public static class MessageSendParamsBuilder {
+    public static class Builder {
 
         private Message message;
 
@@ -114,20 +114,20 @@ public class MessageSendParams {
 
         private Map<String, Object> metadata;
 
-        MessageSendParamsBuilder() {
+        Builder() {
         }
 
-        public MessageSendParamsBuilder message(Message message) {
+        public Builder message(Message message) {
             this.message = message;
             return this;
         }
 
-        public MessageSendParamsBuilder configuration(MessageSendConfiguration configuration) {
+        public Builder configuration(MessageSendConfiguration configuration) {
             this.configuration = configuration;
             return this;
         }
 
-        public MessageSendParamsBuilder metadata(Map<String, Object> metadata) {
+        public Builder metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
             return this;
         }

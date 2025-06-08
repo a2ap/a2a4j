@@ -83,8 +83,8 @@ public class JSONRPCRequest {
         this.id = id;
     }
 
-    public static JSONRPCRequestBuilder builder() {
-        return new JSONRPCRequestBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getJsonrpc() {
@@ -140,7 +140,7 @@ public class JSONRPCRequest {
     /**
      * Builder class for JSONRPCRequest.
      */
-    public static class JSONRPCRequestBuilder {
+    public static class Builder {
 
         private String method;
 
@@ -148,20 +148,20 @@ public class JSONRPCRequest {
 
         private String id;
 
-        JSONRPCRequestBuilder() {
+        Builder() {
         }
 
-        public JSONRPCRequestBuilder method(String method) {
+        public Builder method(String method) {
             this.method = method;
             return this;
         }
 
-        public JSONRPCRequestBuilder params(Object params) {
+        public Builder params(Object params) {
             this.params = params;
             return this;
         }
 
-        public JSONRPCRequestBuilder id(String id) {
+        public Builder id(String id) {
             this.id = id;
             return this;
         }

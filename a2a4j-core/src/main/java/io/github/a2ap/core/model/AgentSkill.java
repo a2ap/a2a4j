@@ -87,8 +87,8 @@ public class AgentSkill {
         this.outputModes = outputModes;
     }
 
-    public static AgentSkillBuilder builder() {
-        return new AgentSkillBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getId() {
@@ -175,7 +175,7 @@ public class AgentSkill {
     /**
      * Builder for {@link AgentSkill}
      */
-    public static class AgentSkillBuilder {
+    public static class Builder {
 
         private String id;
 
@@ -191,40 +191,40 @@ public class AgentSkill {
 
         private List<String> outputModes;
 
-        AgentSkillBuilder() {
+        Builder() {
         }
 
-        public AgentSkillBuilder id(String id) {
+        public Builder id(String id) {
             this.id = id;
             return this;
         }
 
-        public AgentSkillBuilder name(String name) {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public AgentSkillBuilder description(String description) {
+        public Builder description(String description) {
             this.description = description;
             return this;
         }
 
-        public AgentSkillBuilder tags(List<String> tags) {
+        public Builder tags(List<String> tags) {
             this.tags = tags;
             return this;
         }
 
-        public AgentSkillBuilder examples(List<String> examples) {
+        public Builder examples(List<String> examples) {
             this.examples = examples;
             return this;
         }
 
-        public AgentSkillBuilder inputModes(List<String> inputModes) {
+        public Builder inputModes(List<String> inputModes) {
             this.inputModes = inputModes;
             return this;
         }
 
-        public AgentSkillBuilder outputModes(List<String> outputModes) {
+        public Builder outputModes(List<String> outputModes) {
             this.outputModes = outputModes;
             return this;
         }

@@ -85,8 +85,8 @@ public class RequestContext {
         this.relatedTasks = relatedTasks;
     }
 
-    public static RequestContextBuilder builder() {
-        return new RequestContextBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getTaskId() {
@@ -155,7 +155,7 @@ public class RequestContext {
     /**
      * Builder for creating instances of RequestContext.
      */
-    public static class RequestContextBuilder {
+    public static class Builder {
 
         private String taskId;
 
@@ -167,30 +167,30 @@ public class RequestContext {
 
         private List<Task> relatedTasks;
 
-        RequestContextBuilder() {
+        Builder() {
         }
 
-        public RequestContextBuilder taskId(String taskId) {
+        public Builder taskId(String taskId) {
             this.taskId = taskId;
             return this;
         }
 
-        public RequestContextBuilder contextId(String contextId) {
+        public Builder contextId(String contextId) {
             this.contextId = contextId;
             return this;
         }
 
-        public RequestContextBuilder request(MessageSendParams request) {
+        public Builder request(MessageSendParams request) {
             this.request = request;
             return this;
         }
 
-        public RequestContextBuilder task(Task task) {
+        public Builder task(Task task) {
             this.task = task;
             return this;
         }
 
-        public RequestContextBuilder relatedTasks(List<Task> relatedTasks) {
+        public Builder relatedTasks(List<Task> relatedTasks) {
             this.relatedTasks = relatedTasks;
             return this;
         }

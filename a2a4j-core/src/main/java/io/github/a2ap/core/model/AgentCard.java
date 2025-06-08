@@ -129,8 +129,8 @@ public class AgentCard {
         this.skills = skills;
     }
 
-    public static AgentCardBuilder builder() {
-        return new AgentCardBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getId() {
@@ -284,7 +284,7 @@ public class AgentCard {
     /**
      * Builder class for creating instances of {@link AgentCard}.
      */
-    public static class AgentCardBuilder {
+    public static class Builder {
 
         private String id;
 
@@ -314,75 +314,75 @@ public class AgentCard {
 
         private List<AgentSkill> skills;
 
-        AgentCardBuilder() {
+        Builder() {
         }
 
-        public AgentCardBuilder id(String id) {
+        public Builder id(String id) {
             this.id = id;
             return this;
         }
 
-        public AgentCardBuilder name(String name) {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public AgentCardBuilder description(String description) {
+        public Builder description(String description) {
             this.description = description;
             return this;
         }
 
-        public AgentCardBuilder url(String url) {
+        public Builder url(String url) {
             this.url = url;
             return this;
         }
 
-        public AgentCardBuilder provider(AgentProvider provider) {
+        public Builder provider(AgentProvider provider) {
             this.provider = provider;
             return this;
         }
 
-        public AgentCardBuilder version(String version) {
+        public Builder version(String version) {
             this.version = version;
             return this;
         }
 
-        public AgentCardBuilder documentationUrl(String documentationUrl) {
+        public Builder documentationUrl(String documentationUrl) {
             this.documentationUrl = documentationUrl;
             return this;
         }
 
-        public AgentCardBuilder capabilities(AgentCapabilities capabilities) {
+        public Builder capabilities(AgentCapabilities capabilities) {
             this.capabilities = capabilities;
             return this;
         }
 
-        public AgentCardBuilder authentication(AgentAuthentication authentication) {
+        public Builder authentication(AgentAuthentication authentication) {
             this.authentication = authentication;
             return this;
         }
 
-        public AgentCardBuilder securitySchemes(Map<String, SecurityScheme> securitySchemes) {
+        public Builder securitySchemes(Map<String, SecurityScheme> securitySchemes) {
             this.securitySchemes = securitySchemes;
             return this;
         }
 
-        public AgentCardBuilder security(List<Map<String, List<String>>> security) {
+        public Builder security(List<Map<String, List<String>>> security) {
             this.security = security;
             return this;
         }
 
-        public AgentCardBuilder defaultInputModes(List<String> defaultInputModes) {
+        public Builder defaultInputModes(List<String> defaultInputModes) {
             this.defaultInputModes = defaultInputModes;
             return this;
         }
 
-        public AgentCardBuilder defaultOutputModes(List<String> defaultOutputModes) {
+        public Builder defaultOutputModes(List<String> defaultOutputModes) {
             this.defaultOutputModes = defaultOutputModes;
             return this;
         }
 
-        public AgentCardBuilder skills(List<AgentSkill> skills) {
+        public Builder skills(List<AgentSkill> skills) {
             this.skills = skills;
             return this;
         }

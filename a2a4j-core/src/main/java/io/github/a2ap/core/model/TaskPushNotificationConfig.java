@@ -74,14 +74,14 @@ public class TaskPushNotificationConfig extends PushNotificationConfig {
                 + ", authToken='" + getAuthToken() + '\'' + '}';
     }
 
-    public static TaskPushNotificationConfigBuilder taskPushBuilder() {
-        return new TaskPushNotificationConfigBuilder();
+    public static Builder taskPushBuilder() {
+        return new Builder();
     }
 
     /**
      * Builder for creating instances of TaskPushNotificationConfig.
      */
-    public static class TaskPushNotificationConfigBuilder {
+    public static class Builder {
 
         private String url;
 
@@ -89,20 +89,20 @@ public class TaskPushNotificationConfig extends PushNotificationConfig {
 
         private String taskId;
 
-        TaskPushNotificationConfigBuilder() {
+        Builder() {
         }
 
-        public TaskPushNotificationConfigBuilder url(String url) {
+        public Builder url(String url) {
             this.url = url;
             return this;
         }
 
-        public TaskPushNotificationConfigBuilder authToken(String authToken) {
+        public Builder authToken(String authToken) {
             this.authToken = authToken;
             return this;
         }
 
-        public TaskPushNotificationConfigBuilder taskId(String taskId) {
+        public Builder taskId(String taskId) {
             this.taskId = taskId;
             return this;
         }

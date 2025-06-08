@@ -115,8 +115,6 @@ public final class JsonUtil {
      * @param jsonStr json string
      * @return true if the string is a json string
      */
-
-
     public static boolean isJsonStr(String jsonStr) {
         if (jsonStr == null || jsonStr.trim().isEmpty()) {
             return false;

@@ -48,8 +48,8 @@ public class AgentAuthentication {
         this.credentials = credentials;
     }
 
-    public static AgentAuthenticationBuilder builder() {
-        return new AgentAuthenticationBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public List<String> getSchemes() {
@@ -91,21 +91,21 @@ public class AgentAuthentication {
     /**
      * Builder class for AgentAuthentication.
      */
-    public static class AgentAuthenticationBuilder {
+    public static class Builder {
 
         private List<String> schemes;
 
         private String credentials;
 
-        AgentAuthenticationBuilder() {
+        Builder() {
         }
 
-        public AgentAuthenticationBuilder schemes(List<String> schemes) {
+        public Builder schemes(List<String> schemes) {
             this.schemes = schemes;
             return this;
         }
 
-        public AgentAuthenticationBuilder credentials(String credentials) {
+        public Builder credentials(String credentials) {
             this.credentials = credentials;
             return this;
         }

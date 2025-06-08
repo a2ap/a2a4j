@@ -46,8 +46,8 @@ public class AgentProvider {
         this.url = url;
     }
 
-    public static AgentProviderBuilder builder() {
-        return new AgentProviderBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getOrganization() {
@@ -89,21 +89,21 @@ public class AgentProvider {
     /**
      * Builder for creating instances of {@link AgentProvider}.
      */
-    public static class AgentProviderBuilder {
+    public static class Builder {
 
         private String organization;
 
         private String url;
 
-        AgentProviderBuilder() {
+        Builder() {
         }
 
-        public AgentProviderBuilder organization(String organization) {
+        public Builder organization(String organization) {
             this.organization = organization;
             return this;
         }
 
-        public AgentProviderBuilder url(String url) {
+        public Builder url(String url) {
             this.url = url;
             return this;
         }
