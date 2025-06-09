@@ -12,6 +12,8 @@
 
 ## 快速开始
 
+> **在运行客户端前，请确保已启动 `server-hello-world` 模块，并监听在 http://localhost:8089。**
+
 ### 前置条件
 
 - Java 17 及以上

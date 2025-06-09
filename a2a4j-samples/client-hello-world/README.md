@@ -12,6 +12,8 @@ This is a sample A2A (Agent2Agent) protocol client implementation demonstrating 
 
 ## Quick Start
 
+> **Before running the client, please make sure the `server-hello-world` module is started and running on http://localhost:8089.**
+
 ### Prerequisites
 
 - Java 17 or higher
