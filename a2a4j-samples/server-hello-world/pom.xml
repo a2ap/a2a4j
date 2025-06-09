@@ -8,8 +8,9 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>server-hello-world</artifactId>
+
+    <name>a2a4j samples server hello world</name>
 
     <scm>
         <connection>git://github.com/a2ap/a2a4j.git</connection>
