@@ -289,8 +289,8 @@ curl -X POST http://localhost:8089/a2a/server \
 
 ### Core Components
 
-- **`A2aServerApplication`**: Spring Boot main application class, configures CORS and application startup
-- **`A2aServerController`**: REST controller implementing A2A protocol endpoints
+- **`A2AServerApplication`**: Spring Boot main application class, configures CORS and application startup
+- **`A2AServerController`**: REST controller implementing A2A protocol endpoints
 - **`DemoAgentExecutor`**: Sample agent executor demonstrating various event types and artifact generation
 
 ### Execution Flow
