@@ -30,20 +30,30 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A2A Client Controller for sending messages to an A2A server.
+ * This controller handles the `/a2a/client/send` endpoint to send messages
+ * in JSON-RPC format to the specified A2A server.
+ * <p>
+ * The server URL can be configured via the `client.a2a-server-url` property.
+ */
 @RestController
 @RequestMapping("/a2a/client")
 public class A2aClientController {
+    
     /**
      * The URL of the A2A server to which this client will send messages.
      * Default is set to "http://localhost:8089" for local development.
      */
     @Value("${client.a2a-server-url:http://localhost:8089}")
     private String serverUrl;
+    
     /**
      * RestTemplate instance for making HTTP requests to the A2A server.
      * This is used to send messages in JSON-RPC format.
      */
     private final RestTemplate restTemplate = new RestTemplate();
+    
     /**
      * Endpoint to send a message to the A2A server.
      * It accepts a JSON payload with the message details.
@@ -60,13 +70,12 @@ public class A2aClientController {
         Map<String, Object> payload = body != null ? body : defaultPayload();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, Object>> request
-                = new HttpEntity<>(payload, headers);
-        ResponseEntity<String> response
-                = restTemplate.postForEntity(url, request, String.class);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
         return ResponseEntity.status(response.getStatusCode())
                 .body(response.getBody());
     }
+    
     /**
      * Constructs a default JSON-RPC payload for sending a message.
      * This is used when no body is provided in the request.
