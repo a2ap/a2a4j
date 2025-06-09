@@ -41,10 +41,6 @@
         <url>https://github.com/a2ap/a2a4j</url>
     </scm>
 
-    <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
-
     <build>
         <plugins>
             <plugin>

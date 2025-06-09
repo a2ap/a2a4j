@@ -65,7 +65,7 @@
 
     <properties>
         <!-- Revision Version -->
-        <revision>0.0.1-RC3-SNAPSHOT</revision>
+        <revision>0.0.1-RC4-SNAPSHOT</revision>
 
         <!-- Maven project basic config -->
         <java.version>17</java.version>
@@ -354,6 +354,11 @@
                         <configuration>
                             <publishingServerId>ossrh</publishingServerId>
                             <autoPublish>true</autoPublish>
+                            <excludeArtifacts>
+                                <excludeArtifact>a2a4j-samples</excludeArtifact>
+                                <excludeArtifact>client-hello-world</excludeArtifact>
+                                <excludeArtifact>server-hello-world</excludeArtifact>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
                 </plugins>
