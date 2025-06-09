@@ -46,7 +46,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @see io.github.a2ap.core.model.AgentCapabilities
  */
 @ConfigurationProperties(prefix = "a2a.server")
-public class A2aServerProperties implements Serializable {
+public class A2AServerProperties implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -608274692651491547L;
