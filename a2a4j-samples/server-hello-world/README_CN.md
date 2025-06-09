@@ -389,8 +389,8 @@ curl -X POST http://localhost:8089/a2a/server \
 
 ### 核心组件
 
-- **`A2aServerApplication`**: Spring Boot 主应用类，配置 CORS 和应用启动
-- **`A2aServerController`**: REST 控制器，实现 A2A 协议端点
+- **`A2AServerApplication`**: Spring Boot 主应用类，配置 CORS 和应用启动
+- **`A2AServerController`**: REST 控制器，实现 A2A 协议端点
 - **`DemoAgentExecutor`**: 示例智能体执行器，展示各种事件类型和工件生成
 
 ### 执行流程

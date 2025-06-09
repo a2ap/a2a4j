@@ -174,7 +174,7 @@ public class Artifact implements TaskUpdate {
 
         private Map<String, Object> metadata;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder artifactId(String artifactId) {
@@ -204,12 +204,6 @@ public class Artifact implements TaskUpdate {
 
         public Artifact build() {
             return new Artifact(artifactId, name, description, parts, metadata);
-        }
-
-        @Override
-        public String toString() {
-            return "Artifact.ArtifactBuilder(artifactId=" + this.artifactId + ", name=" + this.name + ", description="
-                    + this.description + ", parts=" + this.parts + ", metadata=" + this.metadata + ")";
         }
 
     }

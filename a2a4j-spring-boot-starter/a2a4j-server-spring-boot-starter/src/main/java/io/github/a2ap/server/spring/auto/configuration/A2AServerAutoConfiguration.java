@@ -61,13 +61,13 @@ import reactor.core.publisher.Mono;
  * All beans are created with {@link ConditionalOnMissingBean} annotation, allowing users
  * to override any component by providing their own implementation.
  *
- * @see A2aServerProperties
+ * @see A2AServerProperties
  * @see A2AServer
  */
 @Configuration
-@EnableConfigurationProperties(A2aServerProperties.class)
-@AutoConfigureAfter(value = {A2aServerProperties.class})
-public class A2aServerAutoConfiguration {
+@EnableConfigurationProperties(A2AServerProperties.class)
+@AutoConfigureAfter(value = {A2AServerProperties.class})
+public class A2AServerAutoConfiguration {
 
     /**
      * Creates a default in-memory queue manager for managing task event queues. This
@@ -171,7 +171,7 @@ public class A2aServerAutoConfiguration {
      */
     @Bean(name = "a2aServerSelfCard")
     @ConditionalOnMissingBean
-    public AgentCard agentCard(final A2aServerProperties a2aServerProperties) {
+    public AgentCard agentCard(final A2AServerProperties a2aServerProperties) {
         return AgentCard.builder()
                 .name(a2aServerProperties.getName())
                 .url(a2aServerProperties.getUrl())

@@ -16,7 +16,7 @@
 
 package io.github.a2ap.core.client.impl;
 
-import io.github.a2ap.core.client.A2aClient;
+import io.github.a2ap.core.client.A2AClient;
 import io.github.a2ap.core.client.CardResolver;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
@@ -41,8 +41,8 @@ import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 /**
- * Default implementation of the A2aClient interface providing comprehensive A2A protocol client functionality.
- * 
+ * Default implementation of the A2AClient interface providing comprehensive A2A protocol client functionality.
+ *
  * This implementation offers a complete HTTP-based client for interacting with A2A protocol-compliant
  * agents. It handles all aspects of the client-side A2A communication including agent discovery,
  * task management, streaming operations, and push notification configuration.
@@ -77,10 +77,10 @@ import reactor.netty.http.client.HttpClient;
  * Thread safety: This implementation is thread-safe and can be used concurrently
  * across multiple threads.
  */
-public class DefaultA2aClient implements A2aClient {
+public class DefaultA2AClient implements A2AClient {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultA2aClient.class);
-    
+    private static final Logger log = LoggerFactory.getLogger(DefaultA2AClient.class);
+
     private AgentCard agentCard;
     
     private final CardResolver cardResolver;
@@ -92,7 +92,7 @@ public class DefaultA2aClient implements A2aClient {
      * 
      * @param cardResolver The CardResolver to use for resolving agent cards.
      */
-    public DefaultA2aClient(CardResolver cardResolver) {
+    public DefaultA2AClient(CardResolver cardResolver) {
         this.cardResolver = cardResolver;
         this.agentCard = this.retrieveAgentCard();
         this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
@@ -102,7 +102,7 @@ public class DefaultA2aClient implements A2aClient {
      * Constructs a new A2aClient with the agent card info
      * @param agentCard agent card info
      */
-    public DefaultA2aClient(AgentCard agentCard) {
+    public DefaultA2AClient(AgentCard agentCard) {
         this.agentCard = agentCard;
         this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
         this.cardResolver = null;
@@ -114,7 +114,7 @@ public class DefaultA2aClient implements A2aClient {
      * @param cardResolver The CardResolver to use for resolving agent cards.
      * @param agentCard The agent card info.
      */
-    public DefaultA2aClient(AgentCard agentCard, CardResolver cardResolver) {
+    public DefaultA2AClient(AgentCard agentCard, CardResolver cardResolver) {
         this.agentCard = agentCard;
         this.cardResolver = cardResolver;
         this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());

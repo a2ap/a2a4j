@@ -38,7 +38,7 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  * The server can be accessed at {@code http://localhost:8089} by default.
  *
  * @see io.github.a2ap.server.hello.world.agent.DemoAgentExecutor
- * @see io.github.a2ap.server.hello.world.controller.A2aServerController
+ * @see io.github.a2ap.server.hello.world.controller.A2AServerController
  */
 
 @SpringBootApplication

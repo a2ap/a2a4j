@@ -54,7 +54,7 @@ import reactor.core.publisher.Flux;
  * @see io.github.a2ap.core.model.AgentCard
  */
 @RestController
-public class A2aServerController {
+public class A2AServerController {
 
     private final A2AServer a2aServer;
 
@@ -66,7 +66,7 @@ public class A2aServerController {
      * @param a2aServer   the A2A server instance for accessing agent card
      * @param a2aDispatch the dispatcher for handling JSON-RPC requests
      */
-    public A2aServerController(A2AServer a2aServer, Dispatcher a2aDispatch) {
+    public A2AServerController(A2AServer a2aServer, Dispatcher a2aDispatch) {
         this.a2aServer = a2aServer;
         this.a2aDispatch = a2aDispatch;
     }

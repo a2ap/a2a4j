@@ -114,7 +114,7 @@ public class MessageSendParams {
 
         private Map<String, Object> metadata;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder message(Message message) {
@@ -135,13 +135,6 @@ public class MessageSendParams {
         public MessageSendParams build() {
             return new MessageSendParams(message, configuration, metadata);
         }
-
-        @Override
-        public String toString() {
-            return "MessageSendParams.MessageSendParamsBuilder(message=" + this.message + ", configuration="
-                    + this.configuration + ", metadata=" + this.metadata + ")";
-        }
-
     }
 
 }

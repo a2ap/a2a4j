@@ -15,25 +15,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.github.a2ap</groupId>
-        <artifactId>a2a4j</artifactId>
+        <artifactId>a2a4j-samples</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>a2a4j-samples</artifactId>
-    <packaging>pom</packaging>
 
-    <name>a2a4j samples</name>
-    <url>https://github.com/a2ap/a2a4j</url>
-
-    <modules>
-        <module>server-hello-world</module>
-        <module>client-hello-world</module>
-    </modules>
+    <artifactId>client-hello-world</artifactId>
 
     <scm>
         <connection>git://github.com/a2ap/a2a4j.git</connection>
@@ -42,8 +34,26 @@
     </scm>
 
     <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.a2ap</groupId>
+            <artifactId>a2a4j-client-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -53,5 +63,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
