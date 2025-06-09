@@ -4,15 +4,15 @@ This document provides specific API reference for the A2A4J Server Spring Boot S
 
 ## Auto-Configuration
 
-### A2aServerAutoConfiguration
+### A2AServerAutoConfiguration
 
 The main auto-configuration class that sets up all A2A server components.
 
 ```java
 @Configuration
-@EnableConfigurationProperties(A2aServerProperties.class)
-@AutoConfigureAfter(value = {A2aServerProperties.class})
-public class A2aServerAutoConfiguration {
+@EnableConfigurationProperties(A2AServerProperties.class)
+@AutoConfigureAfter(value = {A2AServerProperties.class})
+public class A2AServerAutoConfiguration {
     // Auto-configured beans
 }
 ```
@@ -34,13 +34,13 @@ All beans are created with `@ConditionalOnMissingBean`, allowing easy override.
 
 ## Configuration Properties
 
-### A2aServerProperties
+### A2AServerProperties
 
 Configuration properties class for A2A server settings.
 
 ```java
 @ConfigurationProperties(prefix = "a2a.server")
-public class A2aServerProperties {
+public class A2AServerProperties {
     // Configuration properties
 }
 ```
@@ -139,7 +139,7 @@ public class MyCustomAgentExecutor implements AgentExecutor {
 ```java
 @Bean
 @Primary
-public AgentCard enhancedAgentCard(A2aServerProperties properties) {
+public AgentCard enhancedAgentCard(A2AServerProperties properties) {
     return AgentCard.builder()
         .name(properties.getName())
         .description(properties.getDescription())
@@ -383,7 +383,7 @@ The starter provides IDE support through configuration metadata in `spring-confi
   "groups": [
     {
       "name": "a2a.server",
-      "type": "io.github.a2ap.server.spring.auto.configuration.A2aServerProperties",
+      "type": "io.github.a2ap.server.spring.auto.configuration.A2AServerProperties",
       "description": "Configuration properties for A2A Server."
     }
   ],
@@ -411,7 +411,7 @@ Create your own auto-configuration that builds upon the starter:
 
 ```java
 @Configuration
-@AutoConfigureAfter(A2aServerAutoConfiguration.class)
+@AutoConfigureAfter(A2AServerAutoConfiguration.class)
 @ConditionalOnProperty(name = "myapp.a2a.enhanced", havingValue = "true")
 public class EnhancedA2AAutoConfiguration {
     

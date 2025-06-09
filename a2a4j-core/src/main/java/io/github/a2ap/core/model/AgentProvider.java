@@ -95,7 +95,7 @@ public class AgentProvider {
 
         private String url;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder organization(String organization) {
@@ -110,11 +110,6 @@ public class AgentProvider {
 
         public AgentProvider build() {
             return new AgentProvider(organization, url);
-        }
-
-        @Override
-        public String toString() {
-            return "AgentProvider.AgentProviderBuilder(organization=" + this.organization + ", url=" + this.url + ")";
         }
 
     }

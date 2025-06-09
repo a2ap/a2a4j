@@ -172,7 +172,7 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
 
         private Map<String, Object> metadata;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder id(String id) {
@@ -207,13 +207,6 @@ public class Task implements SendMessageResponse, SendStreamingMessageResponse {
 
         public Task build() {
             return new Task(id, contextId, status, artifacts, history, metadata);
-        }
-
-        @Override
-        public String toString() {
-            return "Task.TaskBuilder(id=" + this.id + ", contextId=" + this.contextId + ", status=" + this.status
-                    + ", artifacts=" + this.artifacts + ", history=" + this.history + ", metadata=" + this.metadata
-                    + ")";
         }
 
     }
