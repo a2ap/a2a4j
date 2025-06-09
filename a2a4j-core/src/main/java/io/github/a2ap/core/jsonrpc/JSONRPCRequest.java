@@ -148,7 +148,7 @@ public class JSONRPCRequest {
 
         private String id;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder method(String method) {
@@ -168,12 +168,6 @@ public class JSONRPCRequest {
 
         public JSONRPCRequest build() {
             return new JSONRPCRequest(method, params, id);
-        }
-
-        @Override
-        public String toString() {
-            return "JSONRPCRequest.JSONRPCRequestBuilder(method=" + this.method + ", params=" + this.params + ", id="
-                    + this.id + ")";
         }
 
     }

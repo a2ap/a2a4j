@@ -97,7 +97,7 @@ public class AgentAuthentication {
 
         private String credentials;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder schemes(List<String> schemes) {
@@ -112,12 +112,6 @@ public class AgentAuthentication {
 
         public AgentAuthentication build() {
             return new AgentAuthentication(schemes, credentials);
-        }
-
-        @Override
-        public String toString() {
-            return "AgentAuthentication.AgentAuthenticationBuilder(schemes=" + this.schemes + ", credentials="
-                    + this.credentials + ")";
         }
 
     }

@@ -152,7 +152,7 @@ public class JSONRPCError {
 
         private Object data;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder code(int code) {
@@ -176,13 +176,6 @@ public class JSONRPCError {
         public JSONRPCError build() {
             return new JSONRPCError(code, message, data);
         }
-
-        @Override
-        public String toString() {
-            return "JSONRPCError.JSONRPCErrorBuilder(code=" + this.code + ", message=" + this.message + ", data="
-                    + this.data + ")";
-        }
-
     }
 
 }

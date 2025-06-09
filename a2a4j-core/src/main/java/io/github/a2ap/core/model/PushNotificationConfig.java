@@ -96,7 +96,7 @@ public class PushNotificationConfig {
 
         private String authToken;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder url(String url) {
@@ -111,12 +111,6 @@ public class PushNotificationConfig {
 
         public PushNotificationConfig build() {
             return new PushNotificationConfig(url, authToken);
-        }
-
-        @Override
-        public String toString() {
-            return "PushNotificationConfig.PushNotificationConfigBuilder(url=" + this.url + ", authToken="
-                    + this.authToken + ")";
         }
 
     }
