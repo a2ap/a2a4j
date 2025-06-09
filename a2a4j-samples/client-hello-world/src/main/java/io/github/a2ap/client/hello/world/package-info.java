@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package io.github.a2ap.client.hello.world;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 /**
- * Main application class for the A2A Client Hello World example.
- * This application demonstrates how to send a message to an A2A server.
+ * Autoconfiguration for A2A Client components.
  */
-@SpringBootApplication
-public class A2AClientApplication {
-    /**
-     * Main entry point for the A2A client application.
-     *
-     * @param args command line arguments
-     */
-    public static void main(final String[] args) {
-        SpringApplication.run(A2AClientApplication.class, args);
-    }
-}
+
+package io.github.a2ap.client.hello.world;
