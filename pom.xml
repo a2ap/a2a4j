@@ -65,7 +65,7 @@
 
     <properties>
         <!-- Revision Version -->
-        <revision>0.0.1-RC3</revision>
+        <revision>0.0.1-RC3-SNAPSHOT</revision>
 
         <!-- Maven project basic config -->
         <java.version>17</java.version>
