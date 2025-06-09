@@ -142,7 +142,7 @@ public class TaskStatus implements TaskUpdate {
 
         private String error;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder state(TaskState state) {
@@ -170,12 +170,6 @@ public class TaskStatus implements TaskUpdate {
          */
         public TaskStatus build() {
             return new TaskStatus(state, message, timestamp, error);
-        }
-
-        @Override
-        public String toString() {
-            return "TaskStatus.TaskStatusBuilder(state=" + this.state + ", message=" + this.message + ", timestamp="
-                    + this.timestamp + ", error=" + this.error + ")";
         }
 
     }

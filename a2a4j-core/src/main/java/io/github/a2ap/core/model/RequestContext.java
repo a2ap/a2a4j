@@ -167,7 +167,7 @@ public class RequestContext {
 
         private List<Task> relatedTasks;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder taskId(String taskId) {
@@ -200,12 +200,6 @@ public class RequestContext {
          */
         public RequestContext build() {
             return new RequestContext(taskId, contextId, request, task, relatedTasks);
-        }
-
-        @Override
-        public String toString() {
-            return "RequestContext.RequestContextBuilder(taskId=" + this.taskId + ", contextId=" + this.contextId
-                    + ", request=" + this.request + ", task=" + this.task + ", relatedTasks=" + this.relatedTasks + ")";
         }
 
     }

@@ -89,7 +89,7 @@ public class TaskPushNotificationConfig extends PushNotificationConfig {
 
         private String taskId;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder url(String url) {
@@ -113,13 +113,6 @@ public class TaskPushNotificationConfig extends PushNotificationConfig {
         public TaskPushNotificationConfig build() {
             return new TaskPushNotificationConfig(url, authToken, taskId);
         }
-
-        @Override
-        public String toString() {
-            return "TaskPushNotificationConfig.TaskPushNotificationConfigBuilder(url=" + this.url + ", authToken="
-                    + this.authToken + ", taskId=" + this.taskId + ")";
-        }
-
     }
 
 }

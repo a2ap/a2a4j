@@ -191,7 +191,7 @@ public class AgentSkill {
 
         private List<String> outputModes;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder id(String id) {
@@ -231,13 +231,6 @@ public class AgentSkill {
 
         public AgentSkill build() {
             return new AgentSkill(id, name, description, tags, examples, inputModes, outputModes);
-        }
-
-        @Override
-        public String toString() {
-            return "AgentSkill.AgentSkillBuilder(id=" + this.id + ", name=" + this.name + ", description="
-                    + this.description + ", tags=" + this.tags + ", examples=" + this.examples + ", inputModes="
-                    + this.inputModes + ", outputModes=" + this.outputModes + ")";
         }
 
     }

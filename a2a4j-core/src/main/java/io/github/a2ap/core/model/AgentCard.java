@@ -314,7 +314,7 @@ public class AgentCard {
 
         private List<AgentSkill> skills;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder id(String id) {
@@ -390,17 +390,6 @@ public class AgentCard {
         public AgentCard build() {
             return new AgentCard(id, name, description, url, provider, version, documentationUrl, capabilities,
                     authentication, securitySchemes, security, defaultInputModes, defaultOutputModes, skills);
-        }
-
-        @Override
-        public String toString() {
-            return "AgentCard.AgentCardBuilder(id=" + this.id + ", name=" + this.name + ", description="
-                    + this.description + ", url=" + this.url + ", provider=" + this.provider + ", version="
-                    + this.version + ", documentationUrl=" + this.documentationUrl + ", capabilities="
-                    + this.capabilities + ", authentication=" + this.authentication + ", securitySchemes="
-                    + this.securitySchemes + ", security=" + this.security + ", defaultInputModes="
-                    + this.defaultInputModes + ", defaultOutputModes=" + this.defaultOutputModes + ", skills="
-                    + this.skills + ")";
         }
 
     }
