@@ -111,7 +111,7 @@ public class AgentCapabilities {
 
         private boolean stateTransitionHistory = false;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder streaming(boolean streaming) {
@@ -131,11 +131,6 @@ public class AgentCapabilities {
 
         public AgentCapabilities build() {
             return new AgentCapabilities(streaming, pushNotifications, stateTransitionHistory);
-        }
-
-        public String toString() {
-            return "AgentCapabilities.AgentCapabilitiesBuilder(streaming=" + this.streaming + ", pushNotifications="
-                    + this.pushNotifications + ", stateTransitionHistory=" + this.stateTransitionHistory + ")";
         }
 
     }

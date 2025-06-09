@@ -131,7 +131,7 @@ public class MessageSendConfiguration {
 
         private Boolean blocking;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder acceptedOutputModes(List<String> acceptedOutputModes) {
@@ -157,14 +157,6 @@ public class MessageSendConfiguration {
         public MessageSendConfiguration build() {
             return new MessageSendConfiguration(acceptedOutputModes, historyLength, pushNotificationConfig, blocking);
         }
-
-        @Override
-        public String toString() {
-            return "MessageSendConfiguration.MessageSendConfigurationBuilder(" + "acceptedOutputModes="
-                    + this.acceptedOutputModes + ", historyLength=" + this.historyLength + ", pushNotificationConfig="
-                    + this.pushNotificationConfig + ", blocking=" + this.blocking + ")";
-        }
-
     }
 
 }

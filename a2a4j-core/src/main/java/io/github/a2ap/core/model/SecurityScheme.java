@@ -161,7 +161,7 @@ public class SecurityScheme {
 
         private String bearerFormat;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder type(String type) {
@@ -196,13 +196,6 @@ public class SecurityScheme {
 
         public SecurityScheme build() {
             return new SecurityScheme(type, scheme, name, in, description, bearerFormat);
-        }
-
-        @Override
-        public String toString() {
-            return "SecurityScheme.SecuritySchemeBuilder(type=" + this.type + ", scheme=" + this.scheme + ", name="
-                    + this.name + ", in=" + this.in + ", description=" + this.description + ", bearerFormat="
-                    + this.bearerFormat + ")";
         }
 
     }

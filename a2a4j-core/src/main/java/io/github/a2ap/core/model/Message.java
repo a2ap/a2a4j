@@ -191,7 +191,7 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
 
         private String kind;
 
-        Builder() {
+        private Builder() {
         }
 
         public Builder messageId(String messageId) {
@@ -232,14 +232,6 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
         public Message build() {
             return new Message(messageId, taskId, contextId, role, parts, metadata, kind);
         }
-
-        @Override
-        public String toString() {
-            return "Message.MessageBuilder(messageId=" + this.messageId + ", taskId=" + this.taskId + ", contextId="
-                    + this.contextId + ", role=" + this.role + ", parts=" + this.parts + ", metadata=" + this.metadata
-                    + ", kind=" + this.kind + ")";
-        }
-
     }
 
 }
