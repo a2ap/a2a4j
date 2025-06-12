@@ -24,7 +24,6 @@ import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
-import io.github.a2ap.core.model.Artifact;
 import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
@@ -233,7 +232,7 @@ public class DefaultA2AClient implements A2AClient {
                     // Accumulate SSE data until complete events are found
                     return accumulator + chunk;
                 })
-                .flatMap(this::parseSSEChunks)
+                .flatMap(this::parseSseChunks)
                 .filter(Objects::nonNull)
                 .doOnError(e -> log.error("Error receiving streaming updates for {}: {}", params, e.getMessage(), e))
                 .doOnComplete(() -> log.info("Message updates stream completed for {}.", params));
@@ -450,7 +449,7 @@ public class DefaultA2AClient implements A2AClient {
                     // Accumulate SSE data until complete events are found
                     return accumulator + chunk;
                 })
-                .flatMap(this::parseSSEChunks)
+                .flatMap(this::parseSseChunks)
                 .filter(Objects::nonNull)
                 .doOnError(e -> log.error("Error resubscribing to task updates for {}: {}", params.getTaskId(), e.getMessage(), e))
                 .doOnComplete(() -> log.info("Task resubscription stream completed for {}.", params.getTaskId()));
@@ -532,7 +531,7 @@ public class DefaultA2AClient implements A2AClient {
      * @param accumulatedData accumulated SSE data
      * @return parsed SendStreamingMessageResponse stream
      */
-    private Flux<SendStreamingMessageResponse> parseSSEChunks(String accumulatedData) {
+    private Flux<SendStreamingMessageResponse> parseSseChunks(String accumulatedData) {
         if (StringUtil.isNullOrEmpty(accumulatedData)) {
             return Flux.empty();
         }
