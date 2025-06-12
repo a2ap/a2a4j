@@ -36,6 +36,12 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>A2AP Community</name>
+        </developer>
+    </developers>
+
     <modules>
         <module>a2a4j-bom</module>
         <module>a2a4j-core</module>
@@ -59,7 +65,7 @@
 
     <properties>
         <!-- Revision Version -->
-        <revision>0.0.1-RC1-SNAPSHOT</revision>
+        <revision>0.0.1-RC4-SNAPSHOT</revision>
 
         <!-- Maven project basic config -->
         <java.version>17</java.version>
@@ -80,7 +86,7 @@
         <!-- plugin versions -->
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
-        <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+        <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
@@ -281,31 +287,8 @@
     <profiles>
         <profile>
             <id>release</id>
-            <distributionManagement>
-                <repository>
-                    <id>ossrh</id>
-                    <url>https://central.sonatype.com/api/v1/publisher/staging/deploy/maven2/</url>
-                </repository>
-                <snapshotRepository>
-                    <id>ossrh</id>
-                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-                </snapshotRepository>
-            </distributionManagement>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>${maven-source-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
@@ -344,7 +327,7 @@
                         <version>${flatten-maven-plugin.version}</version>
                         <configuration>
                             <updatePomFile>true</updatePomFile>
-                            <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                            <flattenMode>ossrh</flattenMode>
                         </configuration>
                         <executions>
                             <execution>
@@ -362,6 +345,21 @@
                                 <phase>clean</phase>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>ossrh</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <excludeArtifacts>
+                                <excludeArtifact>a2a4j-samples</excludeArtifact>
+                                <excludeArtifact>client-hello-world</excludeArtifact>
+                                <excludeArtifact>server-hello-world</excludeArtifact>
+                            </excludeArtifacts>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

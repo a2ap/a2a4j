@@ -24,9 +24,10 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>a2a4j-samples</artifactId>
     <packaging>pom</packaging>
+
+    <name>a2a4j samples</name>
     <url>https://github.com/a2ap/a2a4j</url>
 
     <modules>

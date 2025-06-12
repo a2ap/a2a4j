@@ -16,11 +16,16 @@
 
 package io.github.a2ap.core.client.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.github.a2ap.core.client.A2AClient;
 import io.github.a2ap.core.client.CardResolver;
+import io.github.a2ap.core.exception.A2AError;
+import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.Message;
+import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
@@ -95,7 +100,7 @@ public class DefaultA2AClient implements A2AClient {
     public DefaultA2AClient(CardResolver cardResolver) {
         this.cardResolver = cardResolver;
         this.agentCard = this.retrieveAgentCard();
-        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
+        this.client = HttpClient.create();
     }
 
     /**
@@ -104,7 +109,7 @@ public class DefaultA2AClient implements A2AClient {
      */
     public DefaultA2AClient(AgentCard agentCard) {
         this.agentCard = agentCard;
-        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
+        this.client = HttpClient.create();
         this.cardResolver = null;
     }
     
@@ -117,7 +122,7 @@ public class DefaultA2AClient implements A2AClient {
     public DefaultA2AClient(AgentCard agentCard, CardResolver cardResolver) {
         this.agentCard = agentCard;
         this.cardResolver = cardResolver;
-        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
+        this.client = HttpClient.create();
     }
 
     @Override
@@ -147,7 +152,7 @@ public class DefaultA2AClient implements A2AClient {
      * @return The created Task object received from the agent.
      */
     @Override
-    public Task sendMessage(MessageSendParams taskSendParams) {
+    public SendMessageResponse sendMessage(MessageSendParams taskSendParams) throws A2AError {
         log.info("Sending message to {} with params: {}", this.agentCard.getName(), taskSendParams);
         try {
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
@@ -155,8 +160,12 @@ public class DefaultA2AClient implements A2AClient {
                     .params(taskSendParams)
                     .id(UUID.randomUUID().toString())
                     .build();
-            
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -167,23 +176,31 @@ public class DefaultA2AClient implements A2AClient {
                 JSONRPCResponse response = JsonUtil.fromJson(responseData, JSONRPCResponse.class);
                 if (response != null) {
                     if (response.getError() != null) {
-                        log.error("JSON-RPC error when sending message: code={}, message={}, data={}", 
-                                response.getError().getCode(), 
-                                response.getError().getMessage(), 
-                                response.getError().getData());
-                        return null;
+                        JSONRPCError error = response.getError();
+                        log.error("JSON-RPC error when sending message: code={}, message={}, data={}",
+                                error.getCode(),
+                                error.getMessage(),
+                                error.getData());
+                        throw new A2AError(error.getMessage(), error.getCode(), error.getData());
                     }
                     if (response.getResult() != null) {
-                        Task responseTask = JsonUtil.fromJson(JsonUtil.toJson(response.getResult()), Task.class);
-                        log.info("Message sent successfully. Received task: {}", responseTask);
-                        return responseTask;
+                        String jsonStr = JsonUtil.toJson(response.getResult());
+                        JsonNode jsonNode = JsonUtil.fromJson(jsonStr);
+                        SendMessageResponse messageResponse = null;
+                        if (jsonNode != null && jsonNode.has("kind") && jsonNode.get("kind").asText().equals("message")) {
+                            messageResponse = JsonUtil.fromJson(jsonStr, Message.class);
+                        } else {
+                            messageResponse = JsonUtil.fromJson(jsonStr, Task.class);
+                        }
+                        log.info("Message sent successfully. Received response: {}", messageResponse);
+                        return messageResponse;
                     }
                 }
             }
-            return null;
+            throw new A2AError("response data is null");
         } catch (Exception e) {
             log.error("Error sending message to {}: {}", this.agentCard.getName(), e.getMessage(), e);
-            return null; 
+            throw new A2AError(e.getMessage(), e); 
         }
     }
 
@@ -197,7 +214,12 @@ public class DefaultA2AClient implements A2AClient {
                 .id(UUID.randomUUID().toString())
                 .build();
         
-        return client.post()
+        return client
+                .headers(headers -> {
+                    headers.add("Content-Type", "text/event-stream");
+                })
+                .post()
+                .uri(this.agentCard.getUrl())
                 .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                 .responseContent()
                 .asString()
@@ -223,7 +245,12 @@ public class DefaultA2AClient implements A2AClient {
                     .id(UUID.randomUUID().toString())
                     .build();
             
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -265,7 +292,12 @@ public class DefaultA2AClient implements A2AClient {
                     .id(UUID.randomUUID().toString())
                     .build();
             
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -306,7 +338,12 @@ public class DefaultA2AClient implements A2AClient {
                     .id(UUID.randomUUID().toString())
                     .build();
             
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -345,7 +382,12 @@ public class DefaultA2AClient implements A2AClient {
                     .id(UUID.randomUUID().toString())
                     .build();
             
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -384,7 +426,12 @@ public class DefaultA2AClient implements A2AClient {
                 .id(UUID.randomUUID().toString())
                 .build();
         
-        return client.post()
+        return client
+                .headers(headers -> {
+                    headers.add("Content-Type", "text/event-stream");
+                })
+                .post()
+                .uri(this.agentCard.getUrl())
                 .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                 .responseContent()
                 .asString()

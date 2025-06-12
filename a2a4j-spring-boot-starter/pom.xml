@@ -24,10 +24,11 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>a2a4j-spring-boot-starter</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
+
+    <name>a2a4j spring boot starter</name>
     <url>https://github.com/a2ap/a2a4j</url>
     <modules>
         <module>a2a4j-server-spring-boot-starter</module>
