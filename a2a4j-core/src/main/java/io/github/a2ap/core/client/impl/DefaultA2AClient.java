@@ -230,7 +230,7 @@ public class DefaultA2AClient implements A2AClient {
                 .responseContent()
                 .asString()
                 .scan("", (accumulator, chunk) -> {
-                    // 累积SSE数据直到找到完整的事件
+                    // Accumulate SSE data until complete events are found
                     return accumulator + chunk;
                 })
                 .flatMap(this::parseSSEChunks)
@@ -295,7 +295,7 @@ public class DefaultA2AClient implements A2AClient {
     public Task cancelTask(TaskIdParams params) {
         log.info("Cancelling task {} on {}", params, this.agentCard.getName());
         try {
-            // 构建JSON-RPC请求
+            // Build JSON-RPC request
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
                     .method("tasks/cancel")
                     .params(params)
@@ -447,7 +447,7 @@ public class DefaultA2AClient implements A2AClient {
                 .responseContent()
                 .asString()
                 .scan("", (accumulator, chunk) -> {
-                    // 累积SSE数据直到找到完整的事件
+                    // Accumulate SSE data until complete events are found
                     return accumulator + chunk;
                 })
                 .flatMap(this::parseSSEChunks)
@@ -480,7 +480,7 @@ public class DefaultA2AClient implements A2AClient {
         }
         
         try {
-            // 解析SSE格式数据
+            // Parse SSE format data
             String jsonData = extractJsonFromSSE(eventData);
             if (StringUtil.isNullOrEmpty(jsonData)) {
                 return null;
@@ -527,10 +527,10 @@ public class DefaultA2AClient implements A2AClient {
     }
     
     /**
-     * 解析累积的SSE数据块，提取完整的SSE事件
+     * Parse accumulated SSE data chunks and extract complete SSE events
      * 
-     * @param accumulatedData 累积的SSE数据
-     * @return 解析出的SendStreamingMessageResponse流
+     * @param accumulatedData accumulated SSE data
+     * @return parsed SendStreamingMessageResponse stream
      */
     private Flux<SendStreamingMessageResponse> parseSSEChunks(String accumulatedData) {
         if (StringUtil.isNullOrEmpty(accumulatedData)) {
@@ -539,13 +539,13 @@ public class DefaultA2AClient implements A2AClient {
         
         List<SendStreamingMessageResponse> events = new ArrayList<>();
         
-        // 分割事件（以双换行符分隔）
+        // Split events (separated by double newlines)
         String[] eventBlocks = accumulatedData.split("\n\n");
         
         for (int i = 0; i < eventBlocks.length; i++) {
             String eventBlock = eventBlocks[i].trim();
             
-            // 如果这是最后一个块且没有以\n\n结尾，可能是不完整的事件，跳过
+            // If this is the last block and doesn't end with \n\n, it might be an incomplete event, skip it
             if (i == eventBlocks.length - 1 && !accumulatedData.endsWith("\n\n")) {
                 continue;
             }
@@ -560,28 +560,28 @@ public class DefaultA2AClient implements A2AClient {
     }
 
     /**
-     * 从SSE格式数据中提取JSON内容
+     * Extract JSON content from SSE format data
      * 
-     * @param sseData SSE格式的数据
-     * @return 提取出的JSON字符串
+     * @param sseData SSE format data
+     * @return extracted JSON string
      */
     private String extractJsonFromSSE(String sseData) {
         if (StringUtil.isNullOrEmpty(sseData)) {
             return null;
         }
         
-        // 按行分割SSE数据
+        // Split SSE data by lines
         String[] lines = sseData.split("\n");
         StringBuilder jsonData = new StringBuilder();
         
         for (String line : lines) {
             line = line.trim();
-            // 处理 data: 行
+            // Process data: lines
             if (line.startsWith("data:")) {
-                String dataContent = line.substring(5); // 移除 "data: " 前缀
+                String dataContent = line.substring(5); // Remove "data:" prefix
                 jsonData.append(dataContent);
             }
-            // 忽略 event:, id:, retry: 等其他SSE字段
+            // Ignore other SSE fields like event:, id:, retry:, etc.
         }
         
         String result = jsonData.toString().trim();
