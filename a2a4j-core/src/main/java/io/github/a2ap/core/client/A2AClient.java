@@ -16,7 +16,9 @@
 
 package io.github.a2ap.core.client;
 
+import io.github.a2ap.core.exception.A2AError;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
 import io.github.a2ap.core.model.TaskIdParams;
@@ -52,7 +54,7 @@ public interface A2AClient {
      * @param params The parameters for the tasks/send method.
      * @return created Task object or null.
      */
-    Task sendMessage(MessageSendParams params);
+    SendMessageResponse sendMessage(MessageSendParams params) throws A2AError;
 
     /**
      * Sends a task request and subscribes to streaming updates. Returns a Flux that emits

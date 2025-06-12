@@ -109,6 +109,19 @@ public class A2AError extends RuntimeException {
     }
 
     /**
+     * Constructor with all properties
+     *
+     * @param message The error message
+     * @param code    The error code
+     * @param data    Additional data
+     */
+    public A2AError(String message, int code, Object data) {
+        super(message);
+        this.code = code;
+        this.data = data;
+    }
+
+    /**
      * Constructor with all properties and cause
      *
      * @param message The error message

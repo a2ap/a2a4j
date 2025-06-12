@@ -16,19 +16,29 @@
 
 package io.github.a2ap.client.hello.world.controller;
 
+import io.github.a2ap.core.client.A2AClient;
+import io.github.a2ap.core.client.CardResolver;
+import io.github.a2ap.core.client.impl.DefaultA2AClient;
+import io.github.a2ap.core.client.impl.HttpCardResolver;
+import io.github.a2ap.core.exception.A2AError;
+import io.github.a2ap.core.model.Message;
+import io.github.a2ap.core.model.MessageSendParams;
+import io.github.a2ap.core.model.SendMessageResponse;
+import io.github.a2ap.core.model.SendStreamingMessageResponse;
+import io.github.a2ap.core.model.TextPart;
+import jakarta.annotation.PostConstruct;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
-import java.util.Map;
+import reactor.core.publisher.Flux;
 
 /**
  * A2A Client Controller for sending messages to an A2A server.
@@ -40,63 +50,62 @@ import java.util.Map;
 @RestController
 @RequestMapping("/a2a/client")
 public class A2aClientController {
+
+    private static final Logger log = LoggerFactory.getLogger(A2aClientController.class);
     
     /**
      * The URL of the A2A server to which this client will send messages.
-     * Default is set to "http://localhost:8089" for local development.
      */
     @Value("${client.a2a-server-url:http://localhost:8089}")
     private String serverUrl;
     
-    /**
-     * RestTemplate instance for making HTTP requests to the A2A server.
-     * This is used to send messages in JSON-RPC format.
-     */
-    private final RestTemplate restTemplate = new RestTemplate();
+    public A2AClient a2AClient;
+    
+    @PostConstruct
+    public void init() {
+        // init this a2a card and client
+        CardResolver cardResolver = new HttpCardResolver(this.serverUrl);
+        this.a2AClient = new DefaultA2AClient(cardResolver);
+    }
     
     /**
      * Endpoint to send a message to the A2A server.
      * It accepts a JSON payload with the message details.
-     * If no body is provided, it uses a default message.
      *
-     * @param body The JSON payload containing the message details.
+     * @param message The request message details.
      * @return ResponseEntity with the status and body of the response
      * from the server.
      */
-    @PostMapping("/send")
-    public ResponseEntity<String> sendMessage(
-            @RequestBody(required = false) final Map<String, Object> body) {
-        String url = serverUrl + "/a2a/server";
-        Map<String, Object> payload = body != null ? body : defaultPayload();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-        return ResponseEntity.status(response.getStatusCode())
-                .body(response.getBody());
+    @GetMapping("/send")
+    public ResponseEntity<SendMessageResponse> sendMessage(@RequestParam String message) {
+        Message messageParam = Message.builder().role("user").parts(List.of(TextPart.builder().text(message).build())).build();
+        MessageSendParams params = MessageSendParams.builder()
+                .message(messageParam)
+                .build();
+        try {
+            SendMessageResponse response = this.a2AClient.sendMessage(params);
+            return ResponseEntity.ok(response);
+        } catch (A2AError a2AError) {
+            log.error(a2AError.getMessage(), a2AError);
+            return ResponseEntity.internalServerError().build();
+        }
     }
-    
+
     /**
-     * Constructs a default JSON-RPC payload for sending a message.
-     * This is used when no body is provided in the request.
+     * Endpoint to send a stream message to the A2A server.
+     * It accepts a JSON payload with the message details.
      *
-     * @return A Map representing the default JSON-RPC payload.
+     * @param message The request message details.
+     * @return ResponseEntity with the status and body of the response
+     * from the server.
      */
-    private Map<String, Object> defaultPayload() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("jsonrpc", "2.0");
-        payload.put("method", "message/send");
-        Map<String, Object> params = new HashMap<>();
-        Map<String, Object> message = new HashMap<>();
-        message.put("role", "user");
-        Map<String, Object> part = new HashMap<>();
-        part.put("type", "text");
-        part.put("kind", "text");
-        part.put("text", "Hello from client-hello-world!");
-        message.put("parts", java.util.Collections.singletonList(part));
-        params.put("message", message);
-        payload.put("params", params);
-        payload.put("id", "client-test-1");
-        return payload;
+    @GetMapping(path = "/stream/send", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<SendStreamingMessageResponse>> sendStreamMessage(@RequestParam String message) {
+        Message messageParam = Message.builder().role("user").parts(List.of(TextPart.builder().text(message).build())).build();
+        MessageSendParams params = MessageSendParams.builder()
+                .message(messageParam)
+                .build();
+        return this.a2AClient.sendMessageStream(params)
+                .map(event -> ServerSentEvent.builder(event).build());
     }
 }

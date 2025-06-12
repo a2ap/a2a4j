@@ -264,14 +264,14 @@ public class DefaultA2AServer implements A2AServer {
     public Flux<SendStreamingMessageResponse> subscribeToTaskUpdates(String taskId) {
         log.info("Subscribing to task updates for ID: {}", taskId);
 
-        // 检查任务是否存在
+        // check the task
         Task task = taskManager.getTask(taskId);
         if (task == null) {
             log.warn("Task with ID {} not found for subscription.", taskId);
             return Flux.error(new IllegalArgumentException("Task not found: " + taskId));
         }
 
-        // 如果任务已经完成，返回最终状态
+        // if the task is finish, return
         TaskState state = task.getStatus().getState();
         if (state == TaskState.COMPLETED || state == TaskState.FAILED || state == TaskState.CANCELED
             || state == TaskState.REJECTED) {
@@ -284,7 +284,7 @@ public class DefaultA2AServer implements A2AServer {
             return Flux.just(finalEvent);
         }
 
-        // 对于正在进行的任务，尝试tap到现有的事件队列
+        // for the task is process, try tap the current event queue
         EventQueue eventQueue = queueManager.tap(taskId);
         if (eventQueue != null) {
             log.debug("Task {} is in progress, subscribing to updates via tapped queue.", taskId);

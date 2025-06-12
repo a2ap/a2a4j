@@ -16,21 +16,30 @@
 
 package io.github.a2ap.core.client.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.github.a2ap.core.client.A2AClient;
 import io.github.a2ap.core.client.CardResolver;
+import io.github.a2ap.core.exception.A2AError;
+import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.Message;
+import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskQueryParams;
 import io.github.a2ap.core.model.MessageSendParams;
+import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.util.JsonUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.internal.StringUtil;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -95,7 +104,7 @@ public class DefaultA2AClient implements A2AClient {
     public DefaultA2AClient(CardResolver cardResolver) {
         this.cardResolver = cardResolver;
         this.agentCard = this.retrieveAgentCard();
-        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
+        this.client = HttpClient.create();
     }
 
     /**
@@ -104,7 +113,7 @@ public class DefaultA2AClient implements A2AClient {
      */
     public DefaultA2AClient(AgentCard agentCard) {
         this.agentCard = agentCard;
-        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
+        this.client = HttpClient.create();
         this.cardResolver = null;
     }
     
@@ -117,7 +126,7 @@ public class DefaultA2AClient implements A2AClient {
     public DefaultA2AClient(AgentCard agentCard, CardResolver cardResolver) {
         this.agentCard = agentCard;
         this.cardResolver = cardResolver;
-        this.client = HttpClient.create().baseUrl(this.agentCard.getUrl());
+        this.client = HttpClient.create();
     }
 
     @Override
@@ -147,7 +156,7 @@ public class DefaultA2AClient implements A2AClient {
      * @return The created Task object received from the agent.
      */
     @Override
-    public Task sendMessage(MessageSendParams taskSendParams) {
+    public SendMessageResponse sendMessage(MessageSendParams taskSendParams) throws A2AError {
         log.info("Sending message to {} with params: {}", this.agentCard.getName(), taskSendParams);
         try {
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
@@ -155,8 +164,12 @@ public class DefaultA2AClient implements A2AClient {
                     .params(taskSendParams)
                     .id(UUID.randomUUID().toString())
                     .build();
-            
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -167,23 +180,31 @@ public class DefaultA2AClient implements A2AClient {
                 JSONRPCResponse response = JsonUtil.fromJson(responseData, JSONRPCResponse.class);
                 if (response != null) {
                     if (response.getError() != null) {
-                        log.error("JSON-RPC error when sending message: code={}, message={}, data={}", 
-                                response.getError().getCode(), 
-                                response.getError().getMessage(), 
-                                response.getError().getData());
-                        return null;
+                        JSONRPCError error = response.getError();
+                        log.error("JSON-RPC error when sending message: code={}, message={}, data={}",
+                                error.getCode(),
+                                error.getMessage(),
+                                error.getData());
+                        throw new A2AError(error.getMessage(), error.getCode(), error.getData());
                     }
                     if (response.getResult() != null) {
-                        Task responseTask = JsonUtil.fromJson(JsonUtil.toJson(response.getResult()), Task.class);
-                        log.info("Message sent successfully. Received task: {}", responseTask);
-                        return responseTask;
+                        String jsonStr = JsonUtil.toJson(response.getResult());
+                        JsonNode jsonNode = JsonUtil.fromJson(jsonStr);
+                        SendMessageResponse messageResponse = null;
+                        if (jsonNode != null && jsonNode.has("kind") && jsonNode.get("kind").asText().equals("message")) {
+                            messageResponse = JsonUtil.fromJson(jsonStr, Message.class);
+                        } else {
+                            messageResponse = JsonUtil.fromJson(jsonStr, Task.class);
+                        }
+                        log.info("Message sent successfully. Received response: {}", messageResponse);
+                        return messageResponse;
                     }
                 }
             }
-            return null;
+            throw new A2AError("response data is null");
         } catch (Exception e) {
             log.error("Error sending message to {}: {}", this.agentCard.getName(), e.getMessage(), e);
-            return null; 
+            throw new A2AError(e.getMessage(), e); 
         }
     }
 
@@ -197,11 +218,21 @@ public class DefaultA2AClient implements A2AClient {
                 .id(UUID.randomUUID().toString())
                 .build();
         
-        return client.post()
+        return client
+                .headers(headers -> {
+                    headers.add("Content-Type", "application/json");
+                    headers.add("Accept", "text/event-stream");
+                })
+                .post()
+                .uri(this.agentCard.getUrl())
                 .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                 .responseContent()
                 .asString()
-                .map(this::parseServerSentEvent)
+                .scan("", (accumulator, chunk) -> {
+                    // Accumulate SSE data until complete events are found
+                    return accumulator + chunk;
+                })
+                .flatMap(this::parseSseChunks)
                 .filter(Objects::nonNull)
                 .doOnError(e -> log.error("Error receiving streaming updates for {}: {}", params, e.getMessage(), e))
                 .doOnComplete(() -> log.info("Message updates stream completed for {}.", params));
@@ -223,7 +254,12 @@ public class DefaultA2AClient implements A2AClient {
                     .id(UUID.randomUUID().toString())
                     .build();
             
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -258,14 +294,19 @@ public class DefaultA2AClient implements A2AClient {
     public Task cancelTask(TaskIdParams params) {
         log.info("Cancelling task {} on {}", params, this.agentCard.getName());
         try {
-            // 构建JSON-RPC请求
+            // Build JSON-RPC request
             JSONRPCRequest jsonRpcRequest = JSONRPCRequest.builder()
                     .method("tasks/cancel")
                     .params(params)
                     .id(UUID.randomUUID().toString())
                     .build();
             
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -306,7 +347,12 @@ public class DefaultA2AClient implements A2AClient {
                     .id(UUID.randomUUID().toString())
                     .build();
             
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -345,7 +391,12 @@ public class DefaultA2AClient implements A2AClient {
                     .id(UUID.randomUUID().toString())
                     .build();
             
-            String responseData = client.post()
+            String responseData = client
+                    .headers(headers -> {
+                        headers.add("Content-Type", "application/json");
+                    })
+                    .post()
+                    .uri(this.agentCard.getUrl())
                     .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                     .responseContent()
                     .aggregate()
@@ -384,11 +435,21 @@ public class DefaultA2AClient implements A2AClient {
                 .id(UUID.randomUUID().toString())
                 .build();
         
-        return client.post()
+        return client
+                .headers(headers -> {
+                    headers.add("Content-Type", "application/json");
+                    headers.add("Accept", "text/event-stream");
+                })
+                .post()
+                .uri(this.agentCard.getUrl())
                 .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                 .responseContent()
                 .asString()
-                .map(this::parseServerSentEvent)
+                .scan("", (accumulator, chunk) -> {
+                    // Accumulate SSE data until complete events are found
+                    return accumulator + chunk;
+                })
+                .flatMap(this::parseSseChunks)
                 .filter(Objects::nonNull)
                 .doOnError(e -> log.error("Error resubscribing to task updates for {}: {}", params.getTaskId(), e.getMessage(), e))
                 .doOnComplete(() -> log.info("Task resubscription stream completed for {}.", params.getTaskId()));
@@ -416,8 +477,15 @@ public class DefaultA2AClient implements A2AClient {
         if (StringUtil.isNullOrEmpty(eventData)) {
             return null;
         }
+        
         try {
-            JSONRPCResponse jsonRpcResponse = JsonUtil.fromJson(eventData, JSONRPCResponse.class);
+            // Parse SSE format data
+            String jsonData = extractJsonFromSSE(eventData);
+            if (StringUtil.isNullOrEmpty(jsonData)) {
+                return null;
+            }
+            
+            JSONRPCResponse jsonRpcResponse = JsonUtil.fromJson(jsonData, JSONRPCResponse.class);
             
             if (jsonRpcResponse != null) {
                 if (jsonRpcResponse.getError() != null) {
@@ -428,7 +496,26 @@ public class DefaultA2AClient implements A2AClient {
                     return null;
                 }
                 if (jsonRpcResponse.getResult() != null) {
-                    return JsonUtil.fromJson(JsonUtil.toJson(jsonRpcResponse.getResult()), SendStreamingMessageResponse.class);
+                    String result = JsonUtil.toJson(jsonRpcResponse.getResult());
+                    JsonNode jsonNode = JsonUtil.fromJson(result);
+                    if (jsonNode != null) {
+                        if (jsonNode.has("kind")) {
+                            String kind = jsonNode.get("kind").asText();    
+                            if ("message".equals(kind)) {
+                                return JsonUtil.fromJson(result, Message.class);
+                            } else if ("artifact-update".equals(kind)) {
+                                return JsonUtil.fromJson(result, TaskArtifactUpdateEvent.class);
+                            } else if ("status-update".equals(kind)) {
+                                return JsonUtil.fromJson(result, TaskStatusUpdateEvent.class);
+                            } else {
+                                log.error("Unknown event kind: {}", kind);
+                            }
+                        } else {
+                            return JsonUtil.fromJson(result, Task.class);       
+                        }
+                    } else {
+                        log.error("Can not parse server-sent event: {}", jsonRpcResponse);
+                    }
                 }
             }
             return null;
@@ -436,5 +523,67 @@ public class DefaultA2AClient implements A2AClient {
             log.error("Error parsing server-sent event: {}", e.getMessage());
             return null;
         }
+    }
+    
+    /**
+     * Parse accumulated SSE data chunks and extract complete SSE events
+     * 
+     * @param accumulatedData accumulated SSE data
+     * @return parsed SendStreamingMessageResponse stream
+     */
+    private Flux<SendStreamingMessageResponse> parseSseChunks(String accumulatedData) {
+        if (StringUtil.isNullOrEmpty(accumulatedData)) {
+            return Flux.empty();
+        }
+        
+        List<SendStreamingMessageResponse> events = new ArrayList<>();
+        
+        // Split events (separated by double newlines)
+        String[] eventBlocks = accumulatedData.split("\n\n");
+        
+        for (int i = 0; i < eventBlocks.length; i++) {
+            String eventBlock = eventBlocks[i].trim();
+            
+            // If this is the last block and doesn't end with \n\n, it might be an incomplete event, skip it
+            if (i == eventBlocks.length - 1 && !accumulatedData.endsWith("\n\n")) {
+                continue;
+            }
+            
+            SendStreamingMessageResponse response = parseServerSentEvent(eventBlock);
+            if (response != null) {
+                events.add(response);
+            }
+        }
+        
+        return Flux.fromIterable(events);
+    }
+
+    /**
+     * Extract JSON content from SSE format data
+     * 
+     * @param sseData SSE format data
+     * @return extracted JSON string
+     */
+    private String extractJsonFromSSE(String sseData) {
+        if (StringUtil.isNullOrEmpty(sseData)) {
+            return null;
+        }
+        
+        // Split SSE data by lines
+        String[] lines = sseData.split("\n");
+        StringBuilder jsonData = new StringBuilder();
+        
+        for (String line : lines) {
+            line = line.trim();
+            // Process data: lines
+            if (line.startsWith("data:")) {
+                String dataContent = line.substring(5); // Remove "data:" prefix
+                jsonData.append(dataContent);
+            }
+            // Ignore other SSE fields like event:, id:, retry:, etc.
+        }
+        
+        String result = jsonData.toString().trim();
+        return result.isEmpty() ? null : result;
     }
 }
