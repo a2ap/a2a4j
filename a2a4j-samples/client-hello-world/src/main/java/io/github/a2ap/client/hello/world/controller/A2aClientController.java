@@ -24,17 +24,21 @@ import io.github.a2ap.core.exception.A2AError;
 import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.MessageSendParams;
 import io.github.a2ap.core.model.SendMessageResponse;
+import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.TextPart;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 /**
  * A2A Client Controller for sending messages to an A2A server.
@@ -85,5 +89,23 @@ public class A2aClientController {
             log.error(a2AError.getMessage(), a2AError);
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    /**
+     * Endpoint to send a stream message to the A2A server.
+     * It accepts a JSON payload with the message details.
+     *
+     * @param message The request message details.
+     * @return ResponseEntity with the status and body of the response
+     * from the server.
+     */
+    @GetMapping(path = "/stream/send", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<SendStreamingMessageResponse>> sendStreamMessage(@RequestParam String message) {
+        Message messageParam = Message.builder().role("user").parts(List.of(TextPart.builder().text(message).build())).build();
+        MessageSendParams params = MessageSendParams.builder()
+                .message(messageParam)
+                .build();
+        return this.a2AClient.sendMessageStream(params)
+                .map(event -> ServerSentEvent.builder(event).build());
     }
 }

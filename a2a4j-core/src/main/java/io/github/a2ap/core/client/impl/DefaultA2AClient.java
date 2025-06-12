@@ -24,18 +24,23 @@ import io.github.a2ap.core.jsonrpc.JSONRPCError;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.Artifact;
 import io.github.a2ap.core.model.Message;
 import io.github.a2ap.core.model.SendMessageResponse;
 import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.Task;
+import io.github.a2ap.core.model.TaskArtifactUpdateEvent;
 import io.github.a2ap.core.model.TaskIdParams;
 import io.github.a2ap.core.model.TaskPushNotificationConfig;
 import io.github.a2ap.core.model.TaskQueryParams;
 import io.github.a2ap.core.model.MessageSendParams;
+import io.github.a2ap.core.model.TaskStatusUpdateEvent;
 import io.github.a2ap.core.util.JsonUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.internal.StringUtil;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -216,14 +221,19 @@ public class DefaultA2AClient implements A2AClient {
         
         return client
                 .headers(headers -> {
-                    headers.add("Content-Type", "text/event-stream");
+                    headers.add("Content-Type", "application/json");
+                    headers.add("Accept", "text/event-stream");
                 })
                 .post()
                 .uri(this.agentCard.getUrl())
                 .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                 .responseContent()
                 .asString()
-                .map(this::parseServerSentEvent)
+                .scan("", (accumulator, chunk) -> {
+                    // 累积SSE数据直到找到完整的事件
+                    return accumulator + chunk;
+                })
+                .flatMap(this::parseSSEChunks)
                 .filter(Objects::nonNull)
                 .doOnError(e -> log.error("Error receiving streaming updates for {}: {}", params, e.getMessage(), e))
                 .doOnComplete(() -> log.info("Message updates stream completed for {}.", params));
@@ -428,14 +438,19 @@ public class DefaultA2AClient implements A2AClient {
         
         return client
                 .headers(headers -> {
-                    headers.add("Content-Type", "text/event-stream");
+                    headers.add("Content-Type", "application/json");
+                    headers.add("Accept", "text/event-stream");
                 })
                 .post()
                 .uri(this.agentCard.getUrl())
                 .send(Mono.just(Unpooled.wrappedBuffer(JsonUtil.toJson(jsonRpcRequest).getBytes(StandardCharsets.UTF_8))))
                 .responseContent()
                 .asString()
-                .map(this::parseServerSentEvent)
+                .scan("", (accumulator, chunk) -> {
+                    // 累积SSE数据直到找到完整的事件
+                    return accumulator + chunk;
+                })
+                .flatMap(this::parseSSEChunks)
                 .filter(Objects::nonNull)
                 .doOnError(e -> log.error("Error resubscribing to task updates for {}: {}", params.getTaskId(), e.getMessage(), e))
                 .doOnComplete(() -> log.info("Task resubscription stream completed for {}.", params.getTaskId()));
@@ -463,8 +478,15 @@ public class DefaultA2AClient implements A2AClient {
         if (StringUtil.isNullOrEmpty(eventData)) {
             return null;
         }
+        
         try {
-            JSONRPCResponse jsonRpcResponse = JsonUtil.fromJson(eventData, JSONRPCResponse.class);
+            // 解析SSE格式数据
+            String jsonData = extractJsonFromSSE(eventData);
+            if (StringUtil.isNullOrEmpty(jsonData)) {
+                return null;
+            }
+            
+            JSONRPCResponse jsonRpcResponse = JsonUtil.fromJson(jsonData, JSONRPCResponse.class);
             
             if (jsonRpcResponse != null) {
                 if (jsonRpcResponse.getError() != null) {
@@ -475,7 +497,26 @@ public class DefaultA2AClient implements A2AClient {
                     return null;
                 }
                 if (jsonRpcResponse.getResult() != null) {
-                    return JsonUtil.fromJson(JsonUtil.toJson(jsonRpcResponse.getResult()), SendStreamingMessageResponse.class);
+                    String result = JsonUtil.toJson(jsonRpcResponse.getResult());
+                    JsonNode jsonNode = JsonUtil.fromJson(result);
+                    if (jsonNode != null) {
+                        if (jsonNode.has("kind")) {
+                            String kind = jsonNode.get("kind").asText();    
+                            if ("message".equals(kind)) {
+                                return JsonUtil.fromJson(result, Message.class);
+                            } else if ("artifact-update".equals(kind)) {
+                                return JsonUtil.fromJson(result, TaskArtifactUpdateEvent.class);
+                            } else if ("status-update".equals(kind)) {
+                                return JsonUtil.fromJson(result, TaskStatusUpdateEvent.class);
+                            } else {
+                                log.error("Unknown event kind: {}", kind);
+                            }
+                        } else {
+                            return JsonUtil.fromJson(result, Task.class);       
+                        }
+                    } else {
+                        log.error("Can not parse server-sent event: {}", jsonRpcResponse);
+                    }
                 }
             }
             return null;
@@ -483,5 +524,67 @@ public class DefaultA2AClient implements A2AClient {
             log.error("Error parsing server-sent event: {}", e.getMessage());
             return null;
         }
+    }
+    
+    /**
+     * 解析累积的SSE数据块，提取完整的SSE事件
+     * 
+     * @param accumulatedData 累积的SSE数据
+     * @return 解析出的SendStreamingMessageResponse流
+     */
+    private Flux<SendStreamingMessageResponse> parseSSEChunks(String accumulatedData) {
+        if (StringUtil.isNullOrEmpty(accumulatedData)) {
+            return Flux.empty();
+        }
+        
+        List<SendStreamingMessageResponse> events = new ArrayList<>();
+        
+        // 分割事件（以双换行符分隔）
+        String[] eventBlocks = accumulatedData.split("\n\n");
+        
+        for (int i = 0; i < eventBlocks.length; i++) {
+            String eventBlock = eventBlocks[i].trim();
+            
+            // 如果这是最后一个块且没有以\n\n结尾，可能是不完整的事件，跳过
+            if (i == eventBlocks.length - 1 && !accumulatedData.endsWith("\n\n")) {
+                continue;
+            }
+            
+            SendStreamingMessageResponse response = parseServerSentEvent(eventBlock);
+            if (response != null) {
+                events.add(response);
+            }
+        }
+        
+        return Flux.fromIterable(events);
+    }
+
+    /**
+     * 从SSE格式数据中提取JSON内容
+     * 
+     * @param sseData SSE格式的数据
+     * @return 提取出的JSON字符串
+     */
+    private String extractJsonFromSSE(String sseData) {
+        if (StringUtil.isNullOrEmpty(sseData)) {
+            return null;
+        }
+        
+        // 按行分割SSE数据
+        String[] lines = sseData.split("\n");
+        StringBuilder jsonData = new StringBuilder();
+        
+        for (String line : lines) {
+            line = line.trim();
+            // 处理 data: 行
+            if (line.startsWith("data:")) {
+                String dataContent = line.substring(5); // 移除 "data: " 前缀
+                jsonData.append(dataContent);
+            }
+            // 忽略 event:, id:, retry: 等其他SSE字段
+        }
+        
+        String result = jsonData.toString().trim();
+        return result.isEmpty() ? null : result;
     }
 }
