@@ -8,7 +8,7 @@
 
 [Agent2Agent (A2A)](https://github.com/google-a2a/A2A) providing an open standard for communication and interoperability between independent AI agent systems.
 
-[A2A4J](https://github.com/a2ap/a2a4j) A2A4J is a comprehensive Java implementation of the Agent2Agent (A2A) Protocol,  including server, client, examples, and starters. A2A4J enables agents to discover each other's capabilities, collaborate on tasks, and securely exchange information without needing access to each other's internal state.
+[A2A4J](https://github.com/a2ap/a2a4j) A2A4J is a comprehensive Java implementation of the Agent2Agent (A2A) Protocol, including server, client, examples, and starters. Built on Reactor for reactive programming support, A2A4J enables agents to discover each other's capabilities, collaborate on tasks, and securely exchange information without needing access to each other's internal state.
 
 ## 🚀 Features
 
