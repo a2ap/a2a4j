@@ -65,7 +65,7 @@
 
     <properties>
         <!-- Revision Version -->
-        <revision>0.0.1-RC4-SNAPSHOT</revision>
+        <revision>0.0.1-RC5</revision>
 
         <!-- Maven project basic config -->
         <java.version>17</java.version>
