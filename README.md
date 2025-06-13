@@ -45,29 +45,111 @@ a2a4j/
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
+### 1. Use A2Aj Build Agent
+
+#### Integrate A2A4j SDK
+
+If you’re building on the `SpringBoot` framework, it is recommended to use `a2a4j-server-spring-boot-starter`.
+
+```xml
+<dependency>
+    <groupId>io.github.a2ap</groupId>
+    <artifactId>a2a4j-server-spring-boot-starter</artifactId>
+    <version>${version}</version>
+</dependency>
+```
+
+For other frameworks, it is recommended to use `a2a4j-core`.
+
+```xml
+<dependency>
+    <groupId>io.github.a2ap</groupId>
+    <artifactId>a2a4j-core</artifactId>
+    <version>${version}</version>
+</dependency>
+```
+
+#### Expose an External Endpoint
+
+```java
+@RestController
+public class MyA2AController {
+
+    @Autowired
+    private A2AServer a2aServer;
+    @Autowired
+    private final Dispatcher a2aDispatch;
+
+    @GetMapping(".well-known/agent.json")
+    public ResponseEntity<AgentCard> getAgentCard() {
+        AgentCard card = a2aServer.getSelfAgentCard();
+        return ResponseEntity.ok(card);
+    }
+
+    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
+        return ResponseEntity.ok(a2aDispatch.dispatch(request));
+    }
+
+    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
+        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder()
+                .data(event).event("task-update").build());
+    }
+}
+```
+
+#### Implementing the `AgentExecutor` Interface for Agent Task Execution
+
+```java
+@Component
+public class MyAgentExecutor implements AgentExecutor {
+
+    @Override
+    public Mono<Void> execute(RequestContext context, EventQueue eventQueue) {
+        // your agent logic code
+        TaskStatusUpdateEvent completedEvent = TaskStatusUpdateEvent.builder()
+                .taskId(taskId)
+                .contextId(contextId)
+                .status(TaskStatus.builder()
+                        .state(TaskState.COMPLETED)
+                        .timestamp(String.valueOf(Instant.now().toEpochMilli()))
+                        .message(createAgentMessage("Task completed successfully! Hi you."))
+                        .build())
+                .isFinal(true)
+                .metadata(Map.of(
+                        "executionTime", "3000ms",
+                        "artifactsGenerated", 4,
+                        "success", true))
+                .build();
+
+        eventQueue.enqueueEvent(completedEvent);
+        return Mono.empty();
+    }
+}
+```
+
+#### Done
+
+That’s it — these are the main steps. For detailed implementation, please refer to our [Agent Demo example](./a2a4j-samples/server-hello-world).
+
+### 2. Test Run Agent Example
+
+#### Run the Server Hello World
 
 ```bash
 git clone https://github.com/a2ap/a2a4j.git
+
 cd a2a4j
-```
 
-### 2. Build the Project
-
-```bash
 mvn clean install
-```
 
-### 3. Run the Hello World Example
-
-```bash
 cd a2a4j-samples/server-hello-world
+
 mvn spring-boot:run
 ```
 
 The server will start at `http://localhost:8089`.
-
-### 4. Test the Agent
 
 #### Get Agent Card
 ```bash
@@ -153,119 +235,8 @@ Auto-configuration for A2A clients with Spring Boot, providing:
 ### Examples (`a2a4j-samples`)
 
 Complete working examples demonstrating A2A4J usage:
-- **Hello World Server**: Basic A2A server implementation
-- **Client Examples**: Various client usage patterns
-
-## 🔧 Usage Examples
-
-### Creating an A2A Server
-
-```java
-@RestController
-public class MyA2AController {
-
-    @Autowired
-    private A2AServer a2aServer;
-    @Autowired
-    private final Dispatcher a2aDispatch;
-
-    @GetMapping(".well-known/agent.json")
-    public ResponseEntity<AgentCard> getAgentCard() {
-        AgentCard card = a2aServer.getSelfAgentCard();
-        return ResponseEntity.ok(card);
-    }
-
-    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
-        return ResponseEntity.ok(a2aDispatch.dispatch(request));
-    }
-
-    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
-        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder()
-                .data(event).event("task-update").build());
-    }
-}
-
-@Component
-public class MyAgentExecutor implements AgentExecutor {
-
-    @Override
-    public Mono<Void> execute(RequestContext context, EventQueue eventQueue) {
-        // your agent logic code
-        TaskStatusUpdateEvent completedEvent = TaskStatusUpdateEvent.builder()
-                .taskId(taskId)
-                .contextId(contextId)
-                .status(TaskStatus.builder()
-                        .state(TaskState.COMPLETED)
-                        .timestamp(String.valueOf(Instant.now().toEpochMilli()))
-                        .message(createAgentMessage("Task completed successfully! Hi you."))
-                        .build())
-                .isFinal(true)
-                .metadata(Map.of(
-                        "executionTime", "3000ms",
-                        "artifactsGenerated", 4,
-                        "success", true))
-                .build();
-
-        eventQueue.enqueueEvent(completedEvent);
-        return Mono.empty();
-    }
-}
-```
-
-### Creating an A2A Client
-
-```java
-// Create agent card
-AgentCard agentCard = AgentCard.builder()
-    .name("Target Agent")
-    .url("http://localhost:8089")
-    .version("1.0.0")
-    .capabilities(AgentCapabilities.builder().streaming(true).build())
-    .skills(List.of())
-    .build();
-
-// Create client
-A2AClient client = new A2AClientImpl(agentCard, new HttpCardResolver());
-
-// Send message
-TextPart textPart = new TextPart();
-textPart.setText("Hello from Java client!");
-
-Message message = Message.builder()
-    .role("user")
-    .parts(List.of(textPart))
-    .build();
-
-MessageSendParams params = MessageSendParams.builder()
-    .message(message)
-    .build();
-
-Task result = client.sendTask(params);
-System.out.println("Task created: " + result.getId());
-```
-
-### Streaming Support
-
-```java
-// Send message with streaming
-Flux<SendStreamingMessageResponse> stream = client.sendTaskSubscribe(params);
-
-stream.subscribe(
-    event -> {
-        if (event instanceof TaskStatusUpdateEvent) {
-            TaskStatusUpdateEvent statusEvent = (TaskStatusUpdateEvent) event;
-            System.out.println("Status: " + statusEvent.getStatus().getState());
-        } else if (event instanceof TaskArtifactUpdateEvent) {
-            TaskArtifactUpdateEvent artifactEvent = (TaskArtifactUpdateEvent) event;
-            System.out.println("Artifact: " + artifactEvent.getArtifact().getType());
-        }
-    },
-    error -> System.err.println("Error: " + error.getMessage()),
-    () -> System.out.println("Stream completed")
-);
-```
+- **[Hello World Server](./a2a4j-samples/server-hello-world)**: Basic A2A4j server implementation
+- **[Hello World Client](./a2a4j-samples/client-hello-world)**: Basic A2A4j client implementation
 
 ## 📊 JSON-RPC Methods
 

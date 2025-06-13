@@ -45,29 +45,111 @@ a2a4j/
 
 ## 🚀 快速开始
 
-### 1. 克隆仓库
+### 1. 使用 A2A4j 构建智能体
+
+#### 引入 A2A4j SDK
+
+如果是基于 `SpringBoot` 框架构建，推荐使用 `a2a4j-server-spring-boot-starter`
+
+```xml
+<dependency>
+    <groupId>io.github.a2ap</groupId>
+    <artifactId>a2a4j-server-spring-boot-starter</artifactId>
+    <version>${version}</version>
+</dependency>
+```
+
+其它框架构建，推荐引入 `a2a4j-core`
+
+```xml
+<dependency>
+    <groupId>io.github.a2ap</groupId>
+    <artifactId>a2a4j-core</artifactId>
+    <version>${version}</version>
+</dependency>
+```
+
+#### 实现对外 EndPoint 端点
+
+```java
+@RestController
+public class MyA2AController {
+    
+    @Autowired
+    private A2AServer a2aServer;
+    @Autowired
+    private final Dispatcher a2aDispatch;
+
+    @GetMapping(".well-known/agent.json")
+    public ResponseEntity<AgentCard> getAgentCard() {
+        AgentCard card = a2aServer.getSelfAgentCard();
+        return ResponseEntity.ok(card);
+    }
+
+    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
+        return ResponseEntity.ok(a2aDispatch.dispatch(request));
+    }
+
+    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
+        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder()
+                .data(event).event("task-update").build());
+    }
+}
+```
+
+#### 实现 `Agent` 消息任务执行 `AgentExecutor` 接口 
+
+```java
+@Component
+public class MyAgentExecutor implements AgentExecutor {
+
+    @Override
+    public Mono<Void> execute(RequestContext context, EventQueue eventQueue) {
+        // 你的智能体逻辑
+        TaskStatusUpdateEvent completedEvent = TaskStatusUpdateEvent.builder()
+                .taskId(taskId)
+                .contextId(contextId)
+                .status(TaskStatus.builder()
+                        .state(TaskState.COMPLETED)
+                        .timestamp(String.valueOf(Instant.now().toEpochMilli()))
+                        .message(createAgentMessage("Task completed successfully! Hi you."))
+                        .build())
+                .isFinal(true)
+                .metadata(Map.of(
+                        "executionTime", "3000ms",
+                        "artifactsGenerated", 4,
+                        "success", true))
+                .build();
+
+        eventQueue.enqueueEvent(completedEvent);
+        return Mono.empty();
+    }
+}
+```
+
+#### Done
+
+完毕, 主要的步骤就是这些，具体内容可以参考我们写的 [智能体Demo](./a2a4j-samples/server-hello-world) 代码。
+
+### 2. 测试智能体 Demo
+
+#### 运行 Hello World 示例
 
 ```bash
 git clone https://github.com/a2ap/a2a4j.git
+
 cd a2a4j
-```
 
-### 2. 构建项目
-
-```bash
 mvn clean install
-```
 
-### 3. 运行 Hello World 示例
-
-```bash
 cd a2a4j-samples/server-hello-world
+
 mvn spring-boot:run
 ```
 
 服务器将在 `http://localhost:8089` 启动。
-
-### 4. 测试智能体
 
 #### 获取 Agent Card
 ```bash
@@ -153,119 +235,8 @@ curl -X POST http://localhost:8089/a2a/server \
 ### 示例 (`a2a4j-samples`)
 
 演示 A2A4J 使用方法的完整工作示例：
-- **Hello World 服务器**: 基础 A2A 服务器实现
-- **客户端示例**: 各种客户端使用模式
-
-## 🔧 使用示例
-
-### 创建 A2A 服务器
-
-```java
-@RestController
-public class MyA2AController {
-    
-    @Autowired
-    private A2AServer a2aServer;
-    @Autowired
-    private final Dispatcher a2aDispatch;
-
-    @GetMapping(".well-known/agent.json")
-    public ResponseEntity<AgentCard> getAgentCard() {
-        AgentCard card = a2aServer.getSelfAgentCard();
-        return ResponseEntity.ok(card);
-    }
-
-    @PostMapping(value = "/a2a/server", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONRPCResponse> handleA2ARequestTask(@RequestBody JSONRPCRequest request) {
-        return ResponseEntity.ok(a2aDispatch.dispatch(request));
-    }
-
-    @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
-        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder()
-                .data(event).event("task-update").build());
-    }
-}
-
-@Component
-public class MyAgentExecutor implements AgentExecutor {
-    
-    @Override
-    public Mono<Void> execute(RequestContext context, EventQueue eventQueue) {
-        // 你的智能体逻辑
-        TaskStatusUpdateEvent completedEvent = TaskStatusUpdateEvent.builder()
-                .taskId(taskId)
-                .contextId(contextId)
-                .status(TaskStatus.builder()
-                        .state(TaskState.COMPLETED)
-                        .timestamp(String.valueOf(Instant.now().toEpochMilli()))
-                        .message(createAgentMessage("Task completed successfully! Hi you."))
-                        .build())
-                .isFinal(true)
-                .metadata(Map.of(
-                        "executionTime", "3000ms",
-                        "artifactsGenerated", 4,
-                        "success", true))
-                .build();
-
-        eventQueue.enqueueEvent(completedEvent);
-        return Mono.empty();
-    }
-}
-```
-
-### 创建 A2A 客户端
-
-```java
-// 创建 agent card
-AgentCard agentCard = AgentCard.builder()
-    .name("目标智能体")
-    .url("http://localhost:8089")
-    .version("1.0.0")
-    .capabilities(AgentCapabilities.builder().streaming(true).build())
-    .skills(List.of())
-    .build();
-
-// 创建客户端
-A2AClient client = new A2AClientImpl(agentCard, new HttpCardResolver());
-
-// 发送消息
-TextPart textPart = new TextPart();
-textPart.setText("来自 Java 客户端的问候！");
-
-Message message = Message.builder()
-    .role("user")
-    .parts(List.of(textPart))
-    .build();
-
-MessageSendParams params = MessageSendParams.builder()
-    .message(message)
-    .build();
-
-Task result = client.sendTask(params);
-System.out.println("任务已创建: " + result.getId());
-```
-
-### 流式处理支持
-
-```java
-// 发送流式消息
-Flux<SendStreamingMessageResponse> stream = client.sendTaskSubscribe(params);
-
-stream.subscribe(
-    event -> {
-        if (event instanceof TaskStatusUpdateEvent) {
-            TaskStatusUpdateEvent statusEvent = (TaskStatusUpdateEvent) event;
-            System.out.println("状态: " + statusEvent.getStatus().getState());
-        } else if (event instanceof TaskArtifactUpdateEvent) {
-            TaskArtifactUpdateEvent artifactEvent = (TaskArtifactUpdateEvent) event;
-            System.out.println("产物: " + artifactEvent.getArtifact().getType());
-        }
-    },
-    error -> System.err.println("错误: " + error.getMessage()),
-    () -> System.out.println("流处理完成")
-);
-```
+- **[server-hello-world](./a2a4j-samples/server-hello-world)**: 基于 A2A 服务器实现
+- **[client-hello-world](./a2a4j-samples/client-hello-world)**: 基于 A2A 客户端实现
 
 ## 📊 JSON-RPC 方法
 
