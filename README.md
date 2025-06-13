@@ -1,12 +1,14 @@
 # A2A4J - Agent2Agent Protocol for Java
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.a2ap/a2a4j-parent)](https://search.maven.org/artifact/io.github.a2ap/a2a4j-parent)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.a2ap/a2a4j)](https://search.maven.org/artifact/io.github.a2ap/a2a4j)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Java Version](https://img.shields.io/badge/Java-17%2B-green.svg)](https://openjdk.org/projects/jdk/17/)
 
 📖 **[中文文档](README_CN.md)**
 
-A2A4J is a comprehensive Java implementation of the Agent2Agent (A2A) Protocol, providing an open standard for communication and interoperability between independent AI agent systems. Built with Spring Boot integration and reactive programming support, A2A4J enables agents to discover each other's capabilities, collaborate on tasks, and securely exchange information without needing access to each other's internal state.
+[Agent2Agent (A2A)](https://github.com/google-a2a/A2A) providing an open standard for communication and interoperability between independent AI agent systems.
+
+[A2A4J](https://github.com/a2ap/a2a4j) A2A4J is a comprehensive Java implementation of the Agent2Agent (A2A) Protocol,  including server, client, examples, and starters. A2A4J enables agents to discover each other's capabilities, collaborate on tasks, and securely exchange information without needing access to each other's internal state.
 
 ## 🚀 Features
 

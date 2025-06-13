@@ -1,12 +1,14 @@
 # A2A4J - Agent2Agent Java协议实现
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.a2ap/a2a4j-parent)](https://search.maven.org/artifact/io.github.a2ap/a2a4j-parent)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.a2ap/a2a4j)](https://search.maven.org/artifact/io.github.a2ap/a2a4j)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Java Version](https://img.shields.io/badge/Java-17%2B-green.svg)](https://openjdk.org/projects/jdk/17/)
 
 📖 **[English Documentation](README.md)**
 
-A2A4J 是 Agent2Agent (A2A) 协议的全面 Java 实现，为独立 AI 智能体系统之间的通信和互操作性提供开放标准。基于 Spring Boot 集成和响应式编程支持构建，A2A4J 使智能体能够发现彼此的能力、协作完成任务，并安全地交换信息，而无需访问彼此的内部状态。
+[Agent2Agent (A2A)](https://github.com/google-a2a/A2A) 协议为独立 AI 智能体系统之间的通信和互操作性提供开放标准。
+
+[A2A4J](https://github.com/a2ap/a2a4j) 是 Agent2Agent (A2A) 协议的全面 Java 实现，包括服务器，客户端，样例，Starter。基于 Reactor 响应式编程支持构建，A2A4J 使智能体能够发现彼此的能力、协作完成任务，并安全地交换信息，而无需访问彼此的内部状态。
 
 ## 🚀 功能特性
 
