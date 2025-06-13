@@ -21,7 +21,7 @@
 ### 查找任务
 
 找到您感兴趣的问题！在我们的 GitHub 仓库问题列表中，我们通常会发布一些带有标签 `good first issue` 或 `status: volunteer wanted` 的问题。  
-这些问题欢迎贡献者领取并为止贡献。其中，`good first issues` 通常门槛较低，适合新人。
+这些问题欢迎贡献者领取并为之贡献。其中，`good first issues` 通常门槛较低，适合新人。
 
 当然，如果您有好的想法，也可以直接在 GitHub Discussion 中提议或与社区联系。
 
@@ -73,8 +73,8 @@ git push origin --delete a-dev-branch
 
 ```shell
 git remote add upstream https://github.com/a2ap/a2a4j.git #绑定远程仓库，如果已经执行过，则不需要再次执行
-git checkout master 
-git pull upstream master
+git checkout main 
+git pull upstream main
 ```
 
 <br>
