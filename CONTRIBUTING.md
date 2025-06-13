@@ -43,7 +43,7 @@ Of course, if you have a good idea, you can also propose it directly on GitHub D
     ```shell
     git checkout -b a-feature-branch #Recommended  
     ```
-5. Submit the coed as a commit, the commit message format specification required: [module name or type name]feature or bugfix or doc: custom message.  
+5. Submit the code as a commit, the commit message format specification required: [module name or type name]feature or bugfix or doc: custom message.  
     ```shell
     git add <modified file/path> 
     git commit -m '[docs]feature: necessary instructions' #Recommended 
@@ -78,9 +78,9 @@ git push origin --delete a-dev-branch
 On the master/main branch, you can do the following to sync the upstream repository:
 
 ```shell
-git remote add upstream https://github.com/a2ap/a2a4j.git #Bind the remote warehouse, if it has been executed, it does not need to be executed again
-git checkout master 
-git pull upstream master
+git remote add upstream https://github.com/a2ap/a2a4j.git #Bind the remote repository, if it has been executed, it does not need to be executed again
+git checkout main 
+git pull upstream main
 ```
 
 <br>
