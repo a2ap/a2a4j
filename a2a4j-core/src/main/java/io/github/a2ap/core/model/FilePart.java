@@ -105,7 +105,7 @@ public class FilePart extends Part {
         if (!super.equals(o))
             return false;
         FilePart filePart = (FilePart) o;
-        return Objects.equals(kind, filePart.kind) && Objects.equals(file, filePart.file);
+        return Objects.equals(file, filePart.file);
     }
 
     @Override

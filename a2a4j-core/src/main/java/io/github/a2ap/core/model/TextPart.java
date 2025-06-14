@@ -90,7 +90,7 @@ public class TextPart extends Part {
         if (o == null || getClass() != o.getClass())
             return false;
         TextPart textPart = (TextPart) o;
-        return Objects.equals(kind, textPart.kind) && Objects.equals(text, textPart.text);
+        return Objects.equals(text, textPart.text);
     }
 
     @Override

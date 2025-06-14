@@ -49,6 +49,7 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
     private String contextId;
 
     /**
+     * "user" | "agent"
      * The role of the message sender (e.g., "user", "assistant"). Required field.
      */
     @JsonProperty("role")
@@ -71,7 +72,7 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
      * kind type
      */
     @JsonProperty("kind")
-    private String kind;
+    private String kind = "message";
 
     public Message() {
     }
@@ -189,7 +190,7 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
 
         private Map<String, Object> metadata;
 
-        private String kind;
+        private String kind = "message";
 
         private Builder() {
         }
@@ -225,7 +226,7 @@ public class Message implements SendMessageResponse, SendStreamingMessageRespons
         }
 
         public Builder kind(String kind) {
-            this.kind = kind;
+            this.kind = kind == null ? "message" : kind;
             return this;
         }
 
