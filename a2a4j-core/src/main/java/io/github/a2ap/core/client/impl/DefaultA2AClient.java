@@ -190,14 +190,21 @@ public class DefaultA2AClient implements A2AClient {
                     if (response.getResult() != null) {
                         String jsonStr = JsonUtil.toJson(response.getResult());
                         JsonNode jsonNode = JsonUtil.fromJson(jsonStr);
-                        SendMessageResponse messageResponse = null;
-                        if (jsonNode != null && jsonNode.has("kind") && jsonNode.get("kind").asText().equals("message")) {
-                            messageResponse = JsonUtil.fromJson(jsonStr, Message.class);
-                        } else {
-                            messageResponse = JsonUtil.fromJson(jsonStr, Task.class);
+                        if (jsonNode != null && jsonNode.has("kind")) {
+                            SendMessageResponse messageResponse = null;
+                            String kind = jsonNode.get("kind").asText();
+                            if ("message".equals(kind)) {
+                                messageResponse = JsonUtil.fromJson(jsonStr, Message.class);
+                            } else if ("task".equals(kind)) {
+                                messageResponse = JsonUtil.fromJson(jsonStr, Task.class);
+                            } else {
+                                log.error("Unknown json-rpc kind: {}", kind);
+                            }
+                            if (messageResponse != null) {
+                                log.info("Message sent successfully. Received response: {}", messageResponse);
+                                return messageResponse;
+                            }
                         }
-                        log.info("Message sent successfully. Received response: {}", messageResponse);
-                        return messageResponse;
                     }
                 }
             }
@@ -498,20 +505,18 @@ public class DefaultA2AClient implements A2AClient {
                 if (jsonRpcResponse.getResult() != null) {
                     String result = JsonUtil.toJson(jsonRpcResponse.getResult());
                     JsonNode jsonNode = JsonUtil.fromJson(result);
-                    if (jsonNode != null) {
-                        if (jsonNode.has("kind")) {
-                            String kind = jsonNode.get("kind").asText();    
-                            if ("message".equals(kind)) {
-                                return JsonUtil.fromJson(result, Message.class);
-                            } else if ("artifact-update".equals(kind)) {
-                                return JsonUtil.fromJson(result, TaskArtifactUpdateEvent.class);
-                            } else if ("status-update".equals(kind)) {
-                                return JsonUtil.fromJson(result, TaskStatusUpdateEvent.class);
-                            } else {
-                                log.error("Unknown event kind: {}", kind);
-                            }
+                    if (jsonNode != null && jsonNode.has("kind")) {
+                        String kind = jsonNode.get("kind").asText();
+                        if ("task".equals(kind)) {
+                            return JsonUtil.fromJson(result, Task.class);
+                        } else if ("message".equals(kind)) {
+                            return JsonUtil.fromJson(result, Message.class);
+                        } else if ("artifact-update".equals(kind)) {
+                            return JsonUtil.fromJson(result, TaskArtifactUpdateEvent.class);
+                        } else if ("status-update".equals(kind)) {
+                            return JsonUtil.fromJson(result, TaskStatusUpdateEvent.class);
                         } else {
-                            return JsonUtil.fromJson(result, Task.class);       
+                            log.error("Unknown event kind: {}", kind);
                         }
                     } else {
                         log.error("Can not parse server-sent event: {}", jsonRpcResponse);
