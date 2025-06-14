@@ -105,7 +105,7 @@ public class DataPart extends Part {
         if (!super.equals(o))
             return false;
         DataPart dataPart = (DataPart) o;
-        return Objects.equals(kind, dataPart.kind) && Objects.equals(data, dataPart.data);
+        return Objects.equals(data, dataPart.data);
     }
 
     @Override
