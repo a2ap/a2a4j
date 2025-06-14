@@ -43,7 +43,7 @@ import java.util.Objects;
  * Each part can optionally include metadata for additional context or processing hints.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
 @JsonSubTypes({@JsonSubTypes.Type(value = TextPart.class, name = "text"),
         @JsonSubTypes.Type(value = FilePart.class, name = "file"),
         @JsonSubTypes.Type(value = DataPart.class, name = "data")})

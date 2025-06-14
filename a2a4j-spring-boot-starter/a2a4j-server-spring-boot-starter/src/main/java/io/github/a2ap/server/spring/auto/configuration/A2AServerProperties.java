@@ -18,6 +18,10 @@ package io.github.a2ap.server.spring.auto.configuration;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -57,6 +61,11 @@ public class A2AServerProperties implements Serializable {
     private boolean enabled = true;
 
     /**
+     * The unique agent id
+     */
+    private String id;
+
+    /**
      * The name of the agent.
      */
     private String name;
@@ -77,9 +86,49 @@ public class A2AServerProperties implements Serializable {
     private String url;
 
     /**
+     * Information about the provider of the agent.
+     */
+    private Provider provider;
+
+    /**
+     * An optional URL pointing to the agent's documentation.
+     */
+    private String documentationUrl;
+
+    /**
      * Agent capabilities configuration.
      */
     private Capabilities capabilities = new Capabilities();
+
+    /**
+     * Authentication details required to interact with the agent.
+     */
+    private Authentication authentication = new Authentication();
+
+    /**
+     * Security scheme details used for authenticating with this agent.
+     */
+    private Map<String, SecurityScheme> securitySchemes = new HashMap<>();
+
+    /**
+     * Security requirements for contacting the agent.
+     */
+    private List<Map<String, List<String>>> security = new ArrayList<>();
+
+    /**
+     * Default input modes supported by the agent (e.g., 'text', 'file', 'json').
+     */
+    private List<String> defaultInputModes = List.of("text");
+
+    /**
+     * Default output modes supported by the agent (e.g., 'text', 'file', 'json').
+     */
+    private List<String> defaultOutputModes = List.of("text");
+
+    /**
+     * List of specific skills offered by the agent.
+     */
+    private List<Skill> skills = new ArrayList<>();
 
     /**
      * Returns whether the A2A server is enabled.
@@ -97,6 +146,22 @@ public class A2AServerProperties implements Serializable {
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * Get agent id.
+     * @return agent id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Set agent id.
+     * @param id agent id
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -169,6 +234,70 @@ public class A2AServerProperties implements Serializable {
      */
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Provider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(Provider provider) {
+        this.provider = provider;
+    }
+
+    public String getDocumentationUrl() {
+        return documentationUrl;
+    }
+
+    public void setDocumentationUrl(String documentationUrl) {
+        this.documentationUrl = documentationUrl;
+    }
+
+    public Authentication getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
+    }
+
+    public Map<String, SecurityScheme> getSecuritySchemes() {
+        return securitySchemes;
+    }
+
+    public void setSecuritySchemes(Map<String, SecurityScheme> securitySchemes) {
+        this.securitySchemes = securitySchemes;
+    }
+
+    public List<Map<String, List<String>>> getSecurity() {
+        return security;
+    }
+
+    public void setSecurity(List<Map<String, List<String>>> security) {
+        this.security = security;
+    }
+
+    public List<String> getDefaultInputModes() {
+        return defaultInputModes;
+    }
+
+    public void setDefaultInputModes(List<String> defaultInputModes) {
+        this.defaultInputModes = defaultInputModes;
+    }
+
+    public List<String> getDefaultOutputModes() {
+        return defaultOutputModes;
+    }
+
+    public void setDefaultOutputModes(List<String> defaultOutputModes) {
+        this.defaultOutputModes = defaultOutputModes;
+    }
+
+    public List<Skill> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<Skill> skills) {
+        this.skills = skills;
     }
 
     /**
@@ -270,6 +399,167 @@ public class A2AServerProperties implements Serializable {
             this.stateTransitionHistory = stateTransitionHistory;
         }
 
+    }
+
+    /**
+     * Configuration for agent provider information.
+     */
+    public static class Provider implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * The name of the provider.
+         */
+        private String name;
+
+        /**
+         * The URL of the provider.
+         */
+        private String url;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+    }
+
+    /**
+     * Configuration for agent authentication.
+     */
+    public static class Authentication implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * The type of authentication.
+         */
+        private String type;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+    }
+
+    /**
+     * Configuration for security scheme.
+     */
+    public static class SecurityScheme implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * The type of security scheme.
+         */
+        private String type;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+    }
+
+    /**
+     * Configuration for agent skill.
+     */
+    public static class Skill implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * The name of the skill.
+         */
+        private String name;
+
+        /**
+         * The description of the skill.
+         */
+        private String description;
+
+        /**
+         * Set of tag words describing classes of capabilities for this specific skill.
+         * Example: ["cooking", "customer support", "billing"]
+         */
+        private List<String> tags = new ArrayList<>();
+
+        /**
+         * The set of example scenarios that the skill can perform.
+         * Will be used by the client as a hint to understand how the skill can be used.
+         * Example: ["I need a recipe for bread"]
+         */
+        private List<String> examples;
+
+        /**
+         * The input modes supported by the skill.
+         */
+        private List<String> inputModes = List.of("text");
+
+        /**
+         * The output modes supported by the skill.
+         */
+        private List<String> outputModes = List.of("text");
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public List<String> getTags() {
+            return tags;
+        }
+
+        public void setTags(List<String> tags) {
+            this.tags = tags;
+        }
+
+        public List<String> getExamples() {
+            return examples;
+        }
+
+        public void setExamples(List<String> examples) {
+            this.examples = examples;
+        }
+
+        public List<String> getInputModes() {
+            return inputModes;
+        }
+
+        public void setInputModes(List<String> inputModes) {
+            this.inputModes = inputModes;
+        }
+
+        public List<String> getOutputModes() {
+            return outputModes;
+        }
+
+        public void setOutputModes(List<String> outputModes) {
+            this.outputModes = outputModes;
+        }
     }
 
 }

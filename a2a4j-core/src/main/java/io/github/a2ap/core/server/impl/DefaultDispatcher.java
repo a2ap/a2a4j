@@ -162,10 +162,11 @@ public class DefaultDispatcher implements Dispatcher {
                 }
             }
         } catch (IllegalArgumentException e) {
+            log.error("Invalid argue error processing request: {}", method, e);
             response.setError(new JSONRPCError(JSONRPCError.INVALID_REQUEST, "Invalid params", e.getMessage()));
         } catch (Exception e) {
             response.setError(new JSONRPCError(JSONRPCError.INTERNAL_ERROR, "Internal error", e.getMessage()));
-            log.error("Internal error processing method {}.", method, e);
+            log.error("Internal error processing request {}.", method, e);
         }
         return Flux.just(response);
     }

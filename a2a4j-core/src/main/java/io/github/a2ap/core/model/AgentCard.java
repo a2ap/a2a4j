@@ -32,6 +32,7 @@ public class AgentCard {
     /**
      * The unique identifier of the agent.
      */
+    @NotNull
     private String id;
 
     /**
