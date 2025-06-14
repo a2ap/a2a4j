@@ -17,8 +17,11 @@
 package io.github.a2ap.server.spring.auto.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.a2ap.core.model.AgentAuthentication;
 import io.github.a2ap.core.model.AgentCapabilities;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.AgentProvider;
+import io.github.a2ap.core.model.AgentSkill;
 import io.github.a2ap.core.model.RequestContext;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.AgentExecutor;
@@ -32,12 +35,21 @@ import io.github.a2ap.core.server.TaskManager;
 import io.github.a2ap.core.server.TaskStore;
 import io.github.a2ap.core.server.impl.InMemoryTaskManager;
 import io.github.a2ap.core.server.impl.InMemoryTaskStore;
+import io.github.a2ap.server.spring.auto.configuration.A2AServerProperties.Provider;
+import io.github.a2ap.server.spring.auto.configuration.A2AServerProperties.Authentication;
+import io.github.a2ap.server.spring.auto.configuration.A2AServerProperties.SecurityScheme;
+import io.github.a2ap.server.spring.auto.configuration.A2AServerProperties.Skill;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Autoconfiguration for A2A Server components.
@@ -172,17 +184,84 @@ public class A2AServerAutoConfiguration {
     @Bean(name = "a2aServerSelfCard")
     @ConditionalOnMissingBean
     public AgentCard agentCard(final A2AServerProperties a2aServerProperties) {
-        return AgentCard.builder()
+        AgentCard.Builder builder = AgentCard.builder()
+                .id(a2aServerProperties.getId())
                 .name(a2aServerProperties.getName())
                 .url(a2aServerProperties.getUrl())
                 .version(a2aServerProperties.getVersion())
-                .description(a2aServerProperties.getDescription())
-                .capabilities(AgentCapabilities.builder()
-                        .streaming(a2aServerProperties.getCapabilities().isStreaming())
-                        .pushNotifications(a2aServerProperties.getCapabilities().isPushNotifications())
-                        .stateTransitionHistory(a2aServerProperties.getCapabilities().isStateTransitionHistory())
-                        .build())
-                .build();
+                .description(a2aServerProperties.getDescription());
+
+        // Add provider information if exists
+        if (a2aServerProperties.getProvider() != null) {
+            builder.provider(AgentProvider.builder()
+                    .organization(a2aServerProperties.getProvider().getName())
+                    .url(a2aServerProperties.getProvider().getUrl())
+                    .build());
+        }
+
+        // Add documentation URL if exists
+        if (a2aServerProperties.getDocumentationUrl() != null) {
+            builder.documentationUrl(a2aServerProperties.getDocumentationUrl());
+        }
+
+        // Add capabilities if exists
+        if (a2aServerProperties.getCapabilities() != null) {
+            builder.capabilities(AgentCapabilities.builder()
+                    .streaming(a2aServerProperties.getCapabilities().isStreaming())
+                    .pushNotifications(a2aServerProperties.getCapabilities().isPushNotifications())
+                    .stateTransitionHistory(a2aServerProperties.getCapabilities().isStateTransitionHistory())
+                    .build());
+        }
+
+        // Add authentication information if exists
+        if (a2aServerProperties.getAuthentication() != null && a2aServerProperties.getAuthentication().getType() != null) {
+            builder.authentication(AgentAuthentication.builder()
+                    .schemes(List.of(a2aServerProperties.getAuthentication().getType()))
+                    .build());
+        }
+
+        // Add security schemes if exists
+        if (a2aServerProperties.getSecuritySchemes() != null && !a2aServerProperties.getSecuritySchemes().isEmpty()) {
+            builder.securitySchemes(a2aServerProperties.getSecuritySchemes().entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> io.github.a2ap.core.model.SecurityScheme.builder()
+                                    .type(e.getValue().getType())
+                                    .build())));
+        }
+
+        // Add security requirements if exists
+        if (a2aServerProperties.getSecurity() != null && !a2aServerProperties.getSecurity().isEmpty()) {
+            builder.security(a2aServerProperties.getSecurity());
+        }
+
+        // Add default input modes if exists
+        if (a2aServerProperties.getDefaultInputModes() != null && !a2aServerProperties.getDefaultInputModes().isEmpty()) {
+            builder.defaultInputModes(a2aServerProperties.getDefaultInputModes());
+        }
+
+        // Add default output modes if exists
+        if (a2aServerProperties.getDefaultOutputModes() != null && !a2aServerProperties.getDefaultOutputModes().isEmpty()) {
+            builder.defaultOutputModes(a2aServerProperties.getDefaultOutputModes());
+        }
+
+        // Add skills list if exists
+        if (a2aServerProperties.getSkills() != null && !a2aServerProperties.getSkills().isEmpty()) {
+            builder.skills(a2aServerProperties.getSkills().stream()
+                    .filter(skill -> skill != null && skill.getName() != null)
+                    .map(skill -> AgentSkill.builder()
+                            .id(skill.getName())
+                            .name(skill.getName())
+                            .description(skill.getDescription())
+                            .tags(skill.getTags())
+                            .examples(skill.getExamples())
+                            .inputModes(skill.getInputModes())
+                            .outputModes(skill.getOutputModes())
+                            .build())
+                    .collect(Collectors.toList()));
+        }
+
+        return builder.build();
     }
 
     /**
