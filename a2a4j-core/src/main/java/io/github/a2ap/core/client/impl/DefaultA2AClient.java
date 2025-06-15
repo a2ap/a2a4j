@@ -543,21 +543,10 @@ public class DefaultA2AClient implements A2AClient {
         
         List<SendStreamingMessageResponse> events = new ArrayList<>();
         
-        // Split events (separated by double newlines)
-        String[] eventBlocks = accumulatedData.split("\n\n");
-        
-        for (int i = 0; i < eventBlocks.length; i++) {
-            String eventBlock = eventBlocks[i].trim();
-            
-            // If this is the last block and doesn't end with \n\n, it might be an incomplete event, skip it
-            if (i == eventBlocks.length - 1 && !accumulatedData.endsWith("\n\n")) {
-                continue;
-            }
-            
-            SendStreamingMessageResponse response = parseServerSentEvent(eventBlock);
-            if (response != null) {
-                events.add(response);
-            }
+        // handle the sse single message
+        SendStreamingMessageResponse response = parseServerSentEvent(accumulatedData);
+        if (response != null) {
+            events.add(response);
         }
         
         return Flux.fromIterable(events);
