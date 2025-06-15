@@ -55,7 +55,7 @@ If you’re building on the `SpringBoot` framework, it is recommended to use `a2
 <dependency>
     <groupId>io.github.a2ap</groupId>
     <artifactId>a2a4j-server-spring-boot-starter</artifactId>
-    <version>${version}</version>
+    <version>0.0.1</version>
 </dependency>
 ```
 
@@ -65,7 +65,7 @@ For other frameworks, it is recommended to use `a2a4j-core`.
 <dependency>
     <groupId>io.github.a2ap</groupId>
     <artifactId>a2a4j-core</artifactId>
-    <version>${version}</version>
+    <version>0.0.1</version>
 </dependency>
 ```
 
