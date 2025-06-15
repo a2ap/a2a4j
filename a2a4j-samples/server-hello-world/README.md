@@ -173,40 +173,6 @@ event: task-update
 data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","status":{"state":"COMPLETED","message":"Task completed successfully!"}},"id":"stream-1"}
 ```
 
-### 4. Task Status Query
-
-Query the current status of a specific task:
-
-```bash
-curl -X POST http://localhost:8089/a2a/server \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "method": "tasks/get",
-    "params": {
-      "taskId": "task-abc123"
-    },
-    "id": "get-task-1"
-  }'
-```
-
-### 5. Task Cancellation
-
-Cancel a running task:
-
-```bash
-curl -X POST http://localhost:8089/a2a/server \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "method": "tasks/cancel",
-    "params": {
-      "taskId": "task-abc123"
-    },
-    "id": "cancel-1"
-  }'
-```
-
 ## Advanced Testing Scenarios
 
 ### Test Streaming Response Handling
@@ -311,11 +277,36 @@ server:
 
 a2a:
   server:
-    name: "My A2A Agent"  # Agent name
-    description: "Custom description"  # Agent description
+    id: "server-hello-world"
+    name: "A2A Java Server"
+    description: "A sample A2A agent implemented in Java"
+    version: "1.0.0"
+    url: "http://localhost:${server.port}/a2a/server"
+    provider:
+      name: "A2AP Team"
+      url: "https://github.com/a2ap"
+    documentationUrl: "https://github.com/a2ap/a2a4j"
     capabilities:
-      streaming: true  # Whether to support streaming responses
-      pushNotifications: false  # Whether to support push notifications
+      streaming: true
+      pushNotifications: false
+      stateTransitionHistory: true
+    defaultInputModes:
+      - "text"
+    defaultOutputModes:
+      - "text"
+    skills:
+      - name: "hello-world"
+        description: "A simple hello world skill"
+        tags:
+          - "greeting"
+          - "basic"
+        examples:
+          - "Say hello to me"
+          - "Greet me"
+        inputModes:
+          - "text"
+        outputModes:
+          - "text"
 ```
 
 ## Troubleshooting
@@ -402,20 +393,11 @@ EXPOSE 8089
 ENTRYPOINT ["java", "-jar", "/app.jar"]
 ```
 
-### Environment Configuration
-
-```bash
-# Production environment variables
-export SERVER_PORT=8089
-export A2A_SERVER_NAME="Production A2A Agent"
-export LOGGING_LEVEL_ROOT=INFO
-```
-
 ## References
 
 - [A2A4J Core Documentation](../../a2a4j-core/README.md)
 - [Spring Boot Starter Documentation](../../a2a4j-spring-boot-starter/a2a4j-server-spring-boot-starter/README.md)
-- [A2A Protocol Specification](https://github.com/a2ap/protocol)
+- [A2A Protocol Specification](https://google-a2a.github.io/A2A/specification/)
 - [JSON-RPC 2.0 Specification](https://www.jsonrpc.org/specification)
 
 ## License
