@@ -55,7 +55,7 @@ a2a4j/
 <dependency>
     <groupId>io.github.a2ap</groupId>
     <artifactId>a2a4j-server-spring-boot-starter</artifactId>
-    <version>${version}</version>
+    <version>0.0.1</version>
 </dependency>
 ```
 
@@ -65,7 +65,7 @@ a2a4j/
 <dependency>
     <groupId>io.github.a2ap</groupId>
     <artifactId>a2a4j-core</artifactId>
-    <version>${version}</version>
+    <version>0.0.1</version>
 </dependency>
 ```
 

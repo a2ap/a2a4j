@@ -46,7 +46,7 @@ a2a:
           - "basic"
         examples:
           - "Say hello to me"
-          - "Greet me in Chinese"
+          - "Greet me"
         inputModes:
           - "text"
         outputModes:

@@ -273,40 +273,6 @@ event:task-update
 data:{"jsonrpc":"2.0","result":{"taskId":"43dc70c4-149a-44de-b96f-a28687895da3","contextId":"67318bf5-cbee-491f-8ac7-62164b57bf9e","kind":"status-update","status":{"state":"completed","message":{"role":"agent","parts":[{"type":"text","kind":"text","text":"Task completed successfully! I have generated a detailed response and example code for you."}]},"timestamp":"1749283741347"},"final":true,"metadata":{"artifactsGenerated":4,"executionTime":"3000ms","success":true}},"id":"stream-1"}
 ```
 
-### 4. 任务状态查询
-
-查询指定任务的当前状态：
-
-```bash
-curl -X POST http://localhost:8089/a2a/server \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "method": "tasks/get",
-    "params": {
-      "taskId": "task-abc123"
-    },
-    "id": "get-task-1"
-  }'
-```
-
-### 5. 任务取消
-
-取消正在运行的任务：
-
-```bash
-curl -X POST http://localhost:8089/a2a/server \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "method": "tasks/cancel",
-    "params": {
-      "taskId": "task-abc123"
-    },
-    "id": "cancel-1"
-  }'
-```
-
 ## 高级测试场景
 
 ### 测试流式响应处理
@@ -407,15 +373,40 @@ curl -X POST http://localhost:8089/a2a/server \
 
 ```yaml
 server:
-  port: 8089  # 修改服务器端口
+  port: 8089
 
 a2a:
   server:
-    name: "我的 A2A 智能体"  # 智能体名称
-    description: "自定义描述"  # 智能体描述
+    id: "server-hello-world"
+    name: "A2A Java Server"
+    description: "A sample A2A agent implemented in Java"
+    version: "1.0.0"
+    url: "http://localhost:${server.port}/a2a/server"
+    provider:
+      name: "A2AP Team"
+      url: "https://github.com/a2ap"
+    documentationUrl: "https://github.com/a2ap/a2a4j"
     capabilities:
-      streaming: true  # 是否支持流式响应
-      pushNotifications: false  # 是否支持推送通知
+      streaming: true
+      pushNotifications: false
+      stateTransitionHistory: true
+    defaultInputModes:
+      - "text"
+    defaultOutputModes:
+      - "text"
+    skills:
+      - name: "hello-world"
+        description: "A simple hello world skill"
+        tags:
+          - "greeting"
+          - "basic"
+        examples:
+          - "Say hello to me"
+          - "Greet me"
+        inputModes:
+          - "text"
+        outputModes:
+          - "text"
 ```
 
 ## 故障排除
@@ -502,20 +493,11 @@ EXPOSE 8089
 ENTRYPOINT ["java", "-jar", "/app.jar"]
 ```
 
-### 环境配置
-
-```bash
-# 生产环境变量
-export SERVER_PORT=8089
-export A2A_SERVER_NAME="Production A2A Agent"
-export LOGGING_LEVEL_ROOT=INFO
-```
-
 ## 参考资料
 
 - [A2A4J 核心文档](../../a2a4j-core/README.md)
 - [Spring Boot Starter 文档](../../a2a4j-spring-boot-starter/a2a4j-server-spring-boot-starter/README.md)
-- [A2A 协议规范](https://github.com/a2ap/protocol)
+- [A2A 协议规范](https://google-a2a.github.io/A2A/specification/)
 - [JSON-RPC 2.0 规范](https://www.jsonrpc.org/specification)
 
 ## 许可证
