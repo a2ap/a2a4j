@@ -27,7 +27,7 @@ a2a:
     version: "1.0.0"
     url: "http://localhost:${server.port}/a2a/server"
     provider:
-      name: "A2A Team"
+      name: "A2AP Team"
       url: "https://github.com/a2ap"
     documentationUrl: "https://github.com/a2ap/a2a4j"
     capabilities:

@@ -28,6 +28,7 @@ import io.github.a2ap.core.model.SendStreamingMessageResponse;
 import io.github.a2ap.core.model.TextPart;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,7 +79,7 @@ public class A2aClientController {
      */
     @GetMapping("/send")
     public ResponseEntity<SendMessageResponse> sendMessage(@RequestParam String message) {
-        Message messageParam = Message.builder().role("user").parts(List.of(TextPart.builder().text(message).build())).build();
+        Message messageParam = Message.builder().messageId(UUID.randomUUID().toString()).role("user").parts(List.of(TextPart.builder().text(message).build())).build();
         MessageSendParams params = MessageSendParams.builder()
                 .message(messageParam)
                 .build();
@@ -101,7 +102,7 @@ public class A2aClientController {
      */
     @GetMapping(path = "/stream/send", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<SendStreamingMessageResponse>> sendStreamMessage(@RequestParam String message) {
-        Message messageParam = Message.builder().role("user").parts(List.of(TextPart.builder().text(message).build())).build();
+        Message messageParam = Message.builder().messageId(UUID.randomUUID().toString()).role("user").parts(List.of(TextPart.builder().text(message).build())).build();
         MessageSendParams params = MessageSendParams.builder()
                 .message(messageParam)
                 .build();
