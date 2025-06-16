@@ -71,18 +71,48 @@ curl -X GET http://localhost:8089/.well-known/agent.json
 **Expected Response Example:**
 ```json
 {
+  "id": "server-hello-world",
   "name": "A2A Java Server",
   "description": "A sample A2A agent implemented in Java",
+  "url": "http://localhost:8089/a2a/server",
+  "provider": {
+    "organization": "A2A",
+    "url": "https://github.com/google-a2a/a2a-samples"
+  },
   "version": "1.0.0",
-  "url": "http://localhost:8089",
+  "documentationUrl": "https://google-a2a.github.io/A2A/",
   "capabilities": {
     "streaming": true,
     "pushNotifications": false,
     "stateTransitionHistory": true
   },
-  "skills": [],
-  "defaultInputModes": ["text"],
-  "defaultOutputModes": ["text"]
+  "defaultInputModes": [
+    "text"
+  ],
+  "defaultOutputModes": [
+    "text"
+  ],
+  "skills": [
+    {
+      "id": "hello-world",
+      "name": "hello-world",
+      "description": "A simple hello world skill",
+      "tags": [
+        "greeting",
+        "basic"
+      ],
+      "examples": [
+        "Say hello to me",
+        "Greet me"
+      ],
+      "inputModes": [
+        "text"
+      ],
+      "outputModes": [
+        "text"
+      ]
+    }
+  ]
 }
 ```
 
@@ -101,31 +131,15 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "Please help me analyze basic machine learning concepts"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "test-1"
   }'
-```
-
-**Expected Response Example:**
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "taskId": "task-abc123",
-    "contextId": "ctx-456789",
-    "status": {
-      "state": "CREATED",
-      "timestamp": "1703123456789"
-    }
-  },
-  "id": "test-1"
-}
 ```
 
 ### 3. Streaming Message Sending
@@ -144,33 +158,15 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "Generate a simple Java class example"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "stream-1"
   }'
-```
-
-**Expected Streaming Response:**
-```
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","status":{"state":"WORKING","message":"Starting to process user request..."}},"id":"stream-1"}
-
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","status":{"state":"WORKING","message":"Analyzing user input..."}},"id":"stream-1"}
-
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","artifact":{"artifactId":"text-response","name":"AI Assistant Response","parts":[{"type":"text","text":"Here's my analysis of your question:\n\n"}]}},"id":"stream-1"}
-
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","artifact":{"artifactId":"code-example","name":"Example Code","parts":[{"type":"text","text":"// Example code\npublic class ExampleService {\n..."}]}},"id":"stream-1"}
-
-event: task-update
-data: {"jsonrpc":"2.0","result":{"taskId":"task-xyz","status":{"state":"COMPLETED","message":"Task completed successfully!"}},"id":"stream-1"}
 ```
 
 ## Advanced Testing Scenarios
@@ -187,10 +183,10 @@ echo '{
   "params": {
     "message": {
       "role": "user",
-      "parts": [{"type": "text", "kind": "text", "text": "Create a data structure example"}]
+      "parts": [{"kind": "text", "text": "Create a data structure example"}]
     }
   },
-  "id": "advanced-1"
+  "id": "1"
 }' | http POST localhost:8089/a2a/server \
   Content-Type:application/json \
   Accept:text/event-stream
@@ -212,7 +208,7 @@ for i in {1..5}; do
       \"params\": {
         \"message\": {
           \"role\": \"user\",
-          \"parts\": [{\"type\": \"text\", \"kind\": \"text\", \"text\": \"Concurrent request $i\"}]
+          \"parts\": [{\"kind\": \"text\", \"text\": \"Concurrent request $i\"}]
         }
       },
       \"id\": \"concurrent-$i\"

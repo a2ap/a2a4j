@@ -48,11 +48,11 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "Hello, A2A!"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "1"
@@ -73,11 +73,11 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "Hello, streaming A2A!"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "1"
@@ -105,17 +105,8 @@ curl -X POST http://localhost:8089/a2a/server \
 ## Client Usage Example
 
 ```java
-// Create agent card
-AgentCard agentCard = AgentCard.builder()
-    .name("Target Agent")
-    .url("http://localhost:8089")
-    .version("1.0.0")
-    .capabilities(AgentCapabilities.builder().streaming(true).build())
-    .skills(List.of())
-    .build();
-
 // Create client
-A2AClient client = new A2AClientImpl(agentCard, new HttpCardResolver());
+A2AClient client = new A2AClientImpl(agentCard, new HttpCardResolver("http://localhost:8089"));
 
 // Send message
 TextPart textPart = new TextPart();
@@ -212,27 +203,6 @@ a2a4j-core/
 
 ## Configuration
 
-### Application Properties
-
-```properties
-# Server configuration
-server.port=8089
-
-# Agent card configuration
-a2a.agent.name=My A2A Agent
-a2a.agent.version=1.0.0
-a2a.agent.description=A sample A2A agent
-a2a.agent.documentation-url=https://example.com/docs
-
-# Capabilities
-a2a.agent.capabilities.streaming=true
-a2a.agent.capabilities.push-notifications=true
-
-# Default input/output modes
-a2a.agent.default-input-modes=text,file
-a2a.agent.default-output-modes=text,file,json
-```
-
 ### Custom Agent Executor
 
 ```java
@@ -310,99 +280,6 @@ class A2AIntegrationTest {
 }
 ```
 
-## Security
-
-### Authentication
-
-The A2A protocol supports various authentication schemes:
-
-```java
-AgentAuthentication auth = AgentAuthentication.builder()
-    .type("bearer")
-    .bearerToken("your-token-here")
-    .build();
-
-AgentCard agentCard = AgentCard.builder()
-    .name("Secure Agent")
-    .url("https://secure-agent.example.com")
-    .authentication(auth)
-    .build();
-```
-
-### Security Schemes
-
-```java
-Map<String, SecurityScheme> securitySchemes = Map.of(
-    "bearer", SecurityScheme.builder()
-        .type("http")
-        .scheme("bearer")
-        .bearerFormat("JWT")
-        .build()
-);
-
-AgentCard agentCard = AgentCard.builder()
-    .securitySchemes(securitySchemes)
-    .security(List.of(Map.of("bearer", List.of())))
-    .build();
-```
-
-## Error Handling
-
-The library provides comprehensive error handling:
-
-```java
-try {
-    Task task = client.sendTask(params);
-} catch (A2AError e) {
-    switch (e.getCode()) {
-        case A2AError.INVALID_PARAMS:
-            // Handle invalid parameters
-            break;
-        case A2AError.TASK_NOT_FOUND:
-            // Handle task not found
-            break;
-        default:
-            // Handle other errors
-            break;
-    }
-}
-```
-
-## Performance Considerations
-
-### Connection Pooling
-
-```java
-// Configure HTTP client for better performance
-@Bean
-public WebClient webClient() {
-    ConnectionProvider provider = ConnectionProvider.builder("a2a-pool")
-        .maxConnections(100)
-        .maxIdleTime(Duration.ofSeconds(30))
-        .build();
-        
-    HttpClient httpClient = HttpClient.create(provider)
-        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
-        
-    return WebClient.builder()
-        .clientConnector(new ReactorClientHttpConnector(httpClient))
-        .build();
-}
-```
-
-### Streaming Optimization
-
-```java
-// Configure streaming buffer sizes
-@ConfigurationProperties("a2a.streaming")
-public class StreamingConfig {
-    private int bufferSize = 8192;
-    private Duration flushInterval = Duration.ofMillis(100);
-    
-    // getters and setters
-}
-```
-
 ## Contributing
 
 We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
@@ -413,19 +290,6 @@ We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) 
 2. Install Java 17+
 3. Run `mvn clean install`
 4. Import into your IDE
-
-### Code Style
-
-We use [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html). Please format your code accordingly.
-
-## Roadmap
-
-- [ ] WebSocket support for real-time communication
-- [ ] GraphQL integration
-- [ ] Kubernetes operator for agent deployment
-- [ ] Performance monitoring and metrics
-- [ ] Enhanced security features
-- [ ] Multi-tenant support
 
 ## License
 
@@ -443,4 +307,3 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - [Documentation](https://github.com/a2ap/a2a4j/wiki)
 - [Issue Tracker](https://github.com/a2ap/a2a4j/issues)
 - [Discussions](https://github.com/a2ap/a2a4j/discussions)
-- [Stack Overflow](https://stackoverflow.com/questions/tagged/a2a4j) 
