@@ -39,6 +39,7 @@ a2a4j/
 │   └── a2a4j-client-spring-boot-starter/   # 客户端启动器
 ├── a2a4j-samples/                 # 示例实现
 │   └── server-hello-world/        # Hello World 服务器示例
+│   └── client-hello-world/        # Hello World 客户端示例
 ├── specification/                 # A2A 协议规范
 ├── tools/                        # 开发工具和配置
 ```
@@ -168,11 +169,11 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "你好，A2A！"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "1"
@@ -192,11 +193,11 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "你好，流式 A2A！"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "1"

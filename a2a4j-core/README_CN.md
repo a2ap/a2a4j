@@ -52,11 +52,11 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "Hello, A2A!"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "1"
@@ -84,16 +84,7 @@ curl -X POST http://localhost:8089/a2a/server \
 ## 客户端使用示例
 
 ```java
-// 创建客户端
-AgentCard agentCard = AgentCard.builder()
-    .name("Target Agent")
-    .url("http://localhost:8089")
-    .version("1.0.0")
-    .capabilities(AgentCapabilities.builder().streaming(true).build())
-    .skills(List.of())
-    .build();
-
-A2AClient client = new A2AClientImpl(agentCard, new HttpCardResolver());
+A2AClient client = new A2AClientImpl(agentCard, new HttpCardResolver("http://localhost:8089"));
 
 // 发送消息
 TextPart textPart = new TextPart();

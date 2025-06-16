@@ -39,6 +39,7 @@ a2a4j/
 │   └── a2a4j-client-spring-boot-starter/   # Client-side starter
 ├── a2a4j-samples/                 # Example implementations
 │   └── server-hello-world/        # Hello World server example
+│   └── client-hello-world/        # Hello World client example
 ├── specification/                 # A2A protocol specification
 ├── tools/                        # Development tools and configuration
 ```
@@ -168,11 +169,11 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "Hello, A2A!"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "1"
@@ -192,11 +193,11 @@ curl -X POST http://localhost:8089/a2a/server \
         "role": "user",
         "parts": [
           {
-            "type": "text",
             "kind": "text",
             "text": "Hello, streaming A2A!"
           }
-        ]
+        ],
+        "messageId": "9229e770-767c-417b-a0b0-f0741243c589"
       }
     },
     "id": "1"
