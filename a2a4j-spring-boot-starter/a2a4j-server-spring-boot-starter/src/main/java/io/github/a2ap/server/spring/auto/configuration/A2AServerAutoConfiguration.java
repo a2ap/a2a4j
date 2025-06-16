@@ -256,6 +256,9 @@ public class A2AServerAutoConfiguration {
                     .collect(Collectors.toList()));
         }
 
+        // Add authenticated extended card support
+        builder.supportsAuthenticatedExtendedCard(a2aServerProperties.isSupportsAuthenticatedExtendedCard());
+
         return builder.build();
     }
 

@@ -34,6 +34,7 @@ a2a:
       streaming: true
       pushNotifications: false
       stateTransitionHistory: true
+    supportsAuthenticatedExtendedCard: true
     defaultInputModes:
       - "text"
     defaultOutputModes:

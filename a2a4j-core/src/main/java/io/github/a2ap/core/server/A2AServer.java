@@ -87,6 +87,16 @@ public interface A2AServer {
     AgentCard getSelfAgentCard();
 
     /**
+     * Retrieves the authenticated extended AgentCard for this server.
+     * This method should return a potentially more detailed version of the Agent Card
+     * after the client has authenticated. Only available if the agent supports
+     * authenticated extended cards.
+     *
+     * @return The server's authenticated extended AgentCard, or null if not supported
+     */
+    AgentCard getAuthenticatedExtendedCard();
+
+    /**
      * Subscribes to updates for a specific task.
      *
      * @param taskId The ID of the task to subscribe to
