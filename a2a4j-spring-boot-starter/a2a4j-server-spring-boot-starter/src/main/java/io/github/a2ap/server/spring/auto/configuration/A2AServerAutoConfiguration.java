@@ -184,7 +184,8 @@ public class A2AServerAutoConfiguration {
                 .name(a2aServerProperties.getName())
                 .url(a2aServerProperties.getUrl())
                 .version(a2aServerProperties.getVersion())
-                .description(a2aServerProperties.getDescription());
+                .description(a2aServerProperties.getDescription())
+                .supportsAuthenticatedExtendedCard(a2aServerProperties.isSupportsAuthenticatedExtendedCard());
 
         // Add provider information if exists
         if (a2aServerProperties.getProvider() != null) {

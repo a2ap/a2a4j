@@ -107,13 +107,19 @@ public class AgentCard {
     @NotNull
     private List<AgentSkill> skills;
 
+    /**
+     * true if the agent supports providing an extended agent card when the user is authenticated.
+     * Defaults to false if not specified.
+     */
+    private boolean supportsAuthenticatedExtendedCard = false;
+
     public AgentCard() {
     }
 
     public AgentCard(String id, String name, String description, String url, AgentProvider provider, String version,
                      String documentationUrl, AgentCapabilities capabilities, AgentAuthentication authentication,
                      Map<String, SecurityScheme> securitySchemes, List<Map<String, List<String>>> security,
-                     List<String> defaultInputModes, List<String> defaultOutputModes, List<AgentSkill> skills) {
+                     List<String> defaultInputModes, List<String> defaultOutputModes, List<AgentSkill> skills, boolean supportsAuthenticatedExtendedCard) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -128,6 +134,7 @@ public class AgentCard {
         this.defaultInputModes = defaultInputModes;
         this.defaultOutputModes = defaultOutputModes;
         this.skills = skills;
+        this.supportsAuthenticatedExtendedCard = supportsAuthenticatedExtendedCard;
     }
 
     public static Builder builder() {
@@ -246,6 +253,14 @@ public class AgentCard {
         this.skills = skills;
     }
 
+    public boolean isSupportsAuthenticatedExtendedCard() {
+        return supportsAuthenticatedExtendedCard;
+    }
+
+    public void setSupportsAuthenticatedExtendedCard(boolean supportsAuthenticatedExtendedCard) {
+        this.supportsAuthenticatedExtendedCard = supportsAuthenticatedExtendedCard;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -263,13 +278,14 @@ public class AgentCard {
                 && Objects.equals(security, agentCard.security)
                 && Objects.equals(defaultInputModes, agentCard.defaultInputModes)
                 && Objects.equals(defaultOutputModes, agentCard.defaultOutputModes)
-                && Objects.equals(skills, agentCard.skills);
+                && Objects.equals(skills, agentCard.skills)
+                && supportsAuthenticatedExtendedCard == agentCard.supportsAuthenticatedExtendedCard;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, url, provider, version, documentationUrl, capabilities,
-                authentication, securitySchemes, security, defaultInputModes, defaultOutputModes, skills);
+                authentication, securitySchemes, security, defaultInputModes, defaultOutputModes, skills, supportsAuthenticatedExtendedCard);
     }
 
     @Override
@@ -279,7 +295,7 @@ public class AgentCard {
                 + ", documentationUrl='" + documentationUrl + '\'' + ", capabilities=" + capabilities
                 + ", authentication=" + authentication + ", securitySchemes=" + securitySchemes + ", security="
                 + security + ", defaultInputModes=" + defaultInputModes + ", defaultOutputModes=" + defaultOutputModes
-                + ", skills=" + skills + '}';
+                + ", skills=" + skills + ", supportsAuthenticatedExtendedCard=" + supportsAuthenticatedExtendedCard + '}';
     }
 
     /**
@@ -314,6 +330,8 @@ public class AgentCard {
         private List<String> defaultOutputModes = List.of("text");
 
         private List<AgentSkill> skills;
+
+        private boolean supportsAuthenticatedExtendedCard;
 
         private Builder() {
         }
@@ -388,9 +406,15 @@ public class AgentCard {
             return this;
         }
 
+        public Builder supportsAuthenticatedExtendedCard(boolean supportsAuthenticatedExtendedCard) {
+            this.supportsAuthenticatedExtendedCard = supportsAuthenticatedExtendedCard;
+            return this;
+        }
+
         public AgentCard build() {
             return new AgentCard(id, name, description, url, provider, version, documentationUrl, capabilities,
-                    authentication, securitySchemes, security, defaultInputModes, defaultOutputModes, skills);
+                    authentication, securitySchemes, security, defaultInputModes, defaultOutputModes, skills,
+                    supportsAuthenticatedExtendedCard);
         }
 
     }

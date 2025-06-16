@@ -131,6 +131,12 @@ public class A2AServerProperties implements Serializable {
     private List<Skill> skills = new ArrayList<>();
 
     /**
+     * true if the agent supports providing an extended agent card when the user is authenticated.
+     * Defaults to false if not specified.
+     */
+    private boolean supportsAuthenticatedExtendedCard = false;
+
+    /**
      * Returns whether the A2A server is enabled.
      *
      * @return true if enabled, false otherwise
@@ -298,6 +304,14 @@ public class A2AServerProperties implements Serializable {
 
     public void setSkills(List<Skill> skills) {
         this.skills = skills;
+    }
+
+    public boolean isSupportsAuthenticatedExtendedCard() {
+        return supportsAuthenticatedExtendedCard;
+    }
+
+    public void setSupportsAuthenticatedExtendedCard(boolean supportsAuthenticatedExtendedCard) {
+        this.supportsAuthenticatedExtendedCard = supportsAuthenticatedExtendedCard;
     }
 
     /**
