@@ -291,6 +291,7 @@ public class AgentCard {
                 supportsAuthenticatedExtendedCard);
     }
 
+    @SuppressWarnings("checkstyle:OperatorWrap")
     @Override
     public String toString() {
         return "AgentCard{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\'' +
