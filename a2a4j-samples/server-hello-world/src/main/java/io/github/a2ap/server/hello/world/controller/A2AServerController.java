@@ -19,16 +19,22 @@ package io.github.a2ap.server.hello.world.controller;
 import io.github.a2ap.core.jsonrpc.JSONRPCRequest;
 import io.github.a2ap.core.jsonrpc.JSONRPCResponse;
 import io.github.a2ap.core.model.AgentCard;
+import io.github.a2ap.core.model.AgentSkill;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.Dispatcher;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+
+import java.util.Collections;
 
 /**
  * Spring Boot REST Controller that implements the A2A protocol endpoints.
@@ -102,6 +108,63 @@ public class A2AServerController {
     @GetMapping(".well-known/agent.json")
     public ResponseEntity<AgentCard> getAgentCard() {
         AgentCard card = a2aServer.getSelfAgentCard();
+        return ResponseEntity.ok(card);
+    }
+
+    /**
+     * Returns the authenticated extended agent card.
+     *
+     * <p>
+     * This endpoint provides a potentially more detailed version of the Agent Card
+     * after the client has authenticated. This endpoint is available only if
+     * {@code AgentCard.supportsAuthenticatedExtendedCard} is {@code true}.
+     *
+     * <p>
+     * The client MUST authenticate the request using one of the schemes declared
+     * in the public {@code AgentCard.securitySchemes} and {@code AgentCard.security} fields.
+     *
+     * <p>
+     * <strong>Example request:</strong>
+     * <pre>GET /agent/authenticatedExtendedCard
+     * Authorization: Bearer &lt;access_token&gt;</pre>
+     *
+     * <p>
+     * <strong>Example response:</strong> Same format as the public agent card,
+     * but may contain additional details or skills not present in the public card.
+     *
+     * @return ResponseEntity containing the authenticated extended agent card
+     */
+    @GetMapping("/a2a/agent/authenticatedExtendedCard")
+    public ResponseEntity<AgentCard> getAuthenticatedExtendedCard(@RequestHeader(name = "X-API-Key", required = false) String apiKey) {
+        if (apiKey == null || apiKey.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, "ApiKey realm=\"A2A Server\"").build();
+        }
+
+        // Check for forbidden access - simulate a scenario where certain API keys are valid but lack permission
+        if ("forbidden-api-key".equals(apiKey)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        if (!"your-secure-api-key".equals(apiKey)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, "ApiKey realm=\"A2A Server\"").build();
+        }
+
+        AgentCard card = a2aServer.getAuthenticatedExtendedCard();
+        // Add extended content example: add a skill only if it doesn't already exist
+        if (card != null && card.getSkills() != null) {
+            boolean hasExtendedSkill = card.getSkills().stream().anyMatch(skill -> "extended-skill-id".equals(skill.getId()));
+
+            if (!hasExtendedSkill) {
+                card.getSkills().add(new AgentSkill("extended-skill-id", "Extended Skill", "This skill is only visible to authenticated users.",
+                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+            }
+        }
+        if (card == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        if (!card.isSupportsAuthenticatedExtendedCard()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(card);
     }
 
@@ -208,8 +271,7 @@ public class A2AServerController {
      */
     @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
-        return a2aDispatch.dispatchStream(request)
-                .map(event -> ServerSentEvent.<JSONRPCResponse>builder().data(event).event("task-update").build());
+        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder().data(event).event("task-update").build());
     }
 
 }
