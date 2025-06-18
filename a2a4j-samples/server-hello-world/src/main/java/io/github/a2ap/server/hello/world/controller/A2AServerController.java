@@ -22,7 +22,6 @@ import io.github.a2ap.core.model.AgentCard;
 import io.github.a2ap.core.model.AgentSkill;
 import io.github.a2ap.core.server.A2AServer;
 import io.github.a2ap.core.server.Dispatcher;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,8 +32,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.Collections;
 import reactor.core.publisher.Flux;
+
+import java.util.Collections;
 
 /**
  * Spring Boot REST Controller that implements the A2A protocol endpoints.
@@ -139,32 +139,24 @@ public class A2AServerController {
         if (apiKey == null || apiKey.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, "ApiKey realm=\"A2A Server\"").build();
         }
-        
+
         // Check for forbidden access - simulate a scenario where certain API keys are valid but lack permission
         if ("forbidden-api-key".equals(apiKey)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        
+
         if (!"your-secure-api-key".equals(apiKey)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, "ApiKey realm=\"A2A Server\"").build();
         }
-        
+
         AgentCard card = a2aServer.getAuthenticatedExtendedCard();
         // Add extended content example: add a skill only if it doesn't already exist
         if (card != null && card.getSkills() != null) {
-            boolean hasExtendedSkill = card.getSkills().stream()
-                .anyMatch(skill -> "extended-skill-id".equals(skill.getId()));
-            
+            boolean hasExtendedSkill = card.getSkills().stream().anyMatch(skill -> "extended-skill-id".equals(skill.getId()));
+
             if (!hasExtendedSkill) {
-                card.getSkills().add(new AgentSkill(
-                    "extended-skill-id",
-                    "Extended Skill",
-                    "This skill is only visible to authenticated users.",
-                    Collections.emptyList(),
-                    Collections.emptyList(),
-                    Collections.emptyList(),
-                    Collections.emptyList()
-                ));
+                card.getSkills().add(new AgentSkill("extended-skill-id", "Extended Skill", "This skill is only visible to authenticated users.",
+                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
             }
         }
         if (card == null) {
@@ -279,8 +271,7 @@ public class A2AServerController {
      */
     @PostMapping(value = "/a2a/server", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<JSONRPCResponse>> handleA2ARequestTaskSubscribe(@RequestBody JSONRPCRequest request) {
-        return a2aDispatch.dispatchStream(request)
-                .map(event -> ServerSentEvent.<JSONRPCResponse>builder().data(event).event("task-update").build());
+        return a2aDispatch.dispatchStream(request).map(event -> ServerSentEvent.<JSONRPCResponse>builder().data(event).event("task-update").build());
     }
 
 }

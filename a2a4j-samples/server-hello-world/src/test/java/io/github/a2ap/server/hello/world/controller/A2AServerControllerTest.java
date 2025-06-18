@@ -29,7 +29,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -53,12 +55,14 @@ class A2AServerControllerTest {
 
     @Test
     void authenticatedExtendedCard_shouldReturn401_whenApiKeyEmpty() throws Exception {
-        mockMvc.perform(get("/a2a/agent/authenticatedExtendedCard").header("X-API-Key", "")).andExpect(status().isUnauthorized()).andExpect(header().string("WWW-Authenticate", "ApiKey realm=\"A2A Server\""));
+        mockMvc.perform(get("/a2a/agent/authenticatedExtendedCard").header("X-API-Key", ""))
+                .andExpect(status().isUnauthorized()).andExpect(header().string("WWW-Authenticate", "ApiKey realm=\"A2A Server\""));
     }
 
     @Test
     void authenticatedExtendedCard_shouldReturn401_whenApiKeyInvalid() throws Exception {
-        mockMvc.perform(get("/a2a/agent/authenticatedExtendedCard").header("X-API-Key", INVALID_API_KEY)).andExpect(status().isUnauthorized()).andExpect(header().string("WWW-Authenticate", "ApiKey realm=\"A2A Server\""));
+        mockMvc.perform(get("/a2a/agent/authenticatedExtendedCard").header("X-API-Key", INVALID_API_KEY)).andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate", "ApiKey realm=\"A2A Server\""));
     }
 
     @Test
@@ -68,7 +72,8 @@ class A2AServerControllerTest {
 
     @Test
     void authenticatedExtendedCard_shouldReturn200_andValidAgentCard_whenApiKeyValid() throws Exception {
-        MvcResult result = mockMvc.perform(get("/a2a/agent/authenticatedExtendedCard").header("X-API-Key", API_KEY).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MvcResult result = mockMvc.perform(get("/a2a/agent/authenticatedExtendedCard").header("X-API-Key", API_KEY).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON)).andReturn();
 
         String response = result.getResponse().getContentAsString();
         assertThat(response).isNotEmpty();
