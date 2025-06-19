@@ -43,7 +43,7 @@ import java.util.Objects;
  * Each part can optionally include metadata for additional context or processing hints.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind", include = JsonTypeInfo.As.EXISTING_PROPERTY)
 @JsonSubTypes({@JsonSubTypes.Type(value = TextPart.class, name = "text"),
         @JsonSubTypes.Type(value = FilePart.class, name = "file"),
         @JsonSubTypes.Type(value = DataPart.class, name = "data")})
@@ -62,6 +62,10 @@ public abstract class Part {
     private Map<String, Object> metadata;
 
     protected Part() {
+    }
+
+    protected Part(String kind) {
+        this.kind = kind;
     }
 
     protected Part(String kind, Map<String, Object> metadata) {
