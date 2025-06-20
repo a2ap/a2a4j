@@ -29,12 +29,6 @@ import java.util.Objects;
 public class DataPart extends Part {
 
     /**
-     * The kind type of the part, always "data" for DataPart. Required field.
-     */
-    @JsonProperty("kind")
-    private final String kind = "data";
-
-    /**
      * The structured data content. Required field.
      */
     @JsonProperty("data")
@@ -44,7 +38,7 @@ public class DataPart extends Part {
      * Default constructor.
      */
     public DataPart() {
-        super();
+        super("data");
     }
 
     /**
@@ -53,7 +47,7 @@ public class DataPart extends Part {
      * @param data the structured data content
      */
     public DataPart(Object data) {
-        super();
+        super("data");
         this.data = data;
     }
 
@@ -66,16 +60,6 @@ public class DataPart extends Part {
     public DataPart(Object data, Map<String, Object> metadata) {
         super("data", metadata);
         this.data = data;
-    }
-
-    /**
-     * Gets the kind.
-     *
-     * @return the kind, always "data"
-     */
-    @Override
-    public String getKind() {
-        return kind;
     }
 
     /**
@@ -110,12 +94,12 @@ public class DataPart extends Part {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), kind, data);
+        return Objects.hash(super.hashCode(), getKind(), data);
     }
 
     @Override
     public String toString() {
-        return "DataPart{" + "kind='" + kind + '\'' + ", data=" + data + ", metadata=" + getMetadata() + '}';
+        return "DataPart{" + "kind='" + getKind() + '\'' + ", data=" + data + ", metadata=" + getMetadata() + '}';
     }
 
     /**

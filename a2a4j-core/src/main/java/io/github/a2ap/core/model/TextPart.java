@@ -28,12 +28,6 @@ import java.util.Objects;
 public class TextPart extends Part {
 
     /**
-     * The kind type of the part, always "text" for TextPart. Required field.
-     */
-    @JsonProperty("kind")
-    private final String kind = "text";
-
-    /**
      * The text content. Required field.
      */
     @JsonProperty("text")
@@ -43,7 +37,7 @@ public class TextPart extends Part {
      * Default constructor
      */
     public TextPart() {
-        super();
+        super("text");
     }
 
     /**
@@ -52,17 +46,8 @@ public class TextPart extends Part {
      * @param text The text content
      */
     public TextPart(String text) {
-        super();
+        super("text");
         this.text = text;
-    }
-
-    /**
-     * Gets the kind
-     *
-     * @return The kind, always "text"
-     */
-    public String getKind() {
-        return kind;
     }
 
     /**
@@ -95,12 +80,12 @@ public class TextPart extends Part {
 
     @Override
     public int hashCode() {
-        return Objects.hash(kind, text);
+        return Objects.hash(getKind(), text);
     }
 
     @Override
     public String toString() {
-        return "TextPart{" + "kind='" + kind + '\'' + ", text='" + text + '\'' + '}';
+        return "TextPart{" + "kind='" + getKind() + '\'' + ", text='" + text + '\'' + '}';
     }
 
     /**

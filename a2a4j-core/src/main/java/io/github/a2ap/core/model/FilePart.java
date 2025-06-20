@@ -29,12 +29,6 @@ import java.util.Map;
 public class FilePart extends Part {
 
     /**
-     * The kind type of the part, always "file" for FilePart. Required field.
-     */
-    @JsonProperty("kind")
-    private final String kind = "file";
-
-    /**
      * The file content. Required field.
      */
     @JsonProperty("file")
@@ -44,7 +38,7 @@ public class FilePart extends Part {
      * Default constructor
      */
     public FilePart() {
-        super();
+        super("file");
     }
 
     /**
@@ -53,7 +47,7 @@ public class FilePart extends Part {
      * @param file The file content
      */
     public FilePart(FileContent file) {
-        super();
+        super("file");
         this.file = file;
     }
 
@@ -66,16 +60,6 @@ public class FilePart extends Part {
     public FilePart(FileContent file, Map<String, Object> metadata) {
         super("file", metadata);
         this.file = file;
-    }
-
-    /**
-     * Gets the kind
-     *
-     * @return The kind, always "file"
-     */
-    @Override
-    public String getKind() {
-        return kind;
     }
 
     /**
@@ -110,12 +94,12 @@ public class FilePart extends Part {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), kind, file);
+        return Objects.hash(super.hashCode(), getKind(), file);
     }
 
     @Override
     public String toString() {
-        return "FilePart{" + "kind='" + kind + '\'' + ", file=" + file + ", metadata=" + getMetadata() + '}';
+        return "FilePart{" + "kind='" + getKind() + '\'' + ", file=" + file + ", metadata=" + getMetadata() + '}';
     }
 
     /**
