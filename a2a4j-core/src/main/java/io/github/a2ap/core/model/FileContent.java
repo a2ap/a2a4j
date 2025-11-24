@@ -18,6 +18,8 @@ package io.github.a2ap.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.Objects;
 
@@ -25,6 +27,14 @@ import java.util.Objects;
  * Represents the content of a file.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.DEDUCTION,
+        defaultImpl = FileContent.class
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(FileWithBytes.class),
+        @JsonSubTypes.Type(FileWithUri.class)
+})
 public abstract class FileContent {
 
     /**
